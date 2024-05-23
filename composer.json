@@ -1,0 +1,45 @@
+{
+  "name": "j7-dev/wp-utils",
+  "version": "0.0.1",
+  "description": "Various WordPress classes and traits for WordPress",
+  "homepage": "https://github.com/j7-dev",
+  "type": "library",
+  "keywords": [
+    "wordpress",
+    "utils",
+    "traits",
+    "classes"
+  ],
+  "license": "GPL-3.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "J7\\WpUtils\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "JerryLiu",
+      "email": "j7.dev.gg@gmail.com",
+      "homepage": "https://github.com/j7-dev",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "require": {
+    "j7-dev/tgm-plugin-activation-forked": "1.2.2",
+    "yahnis-elsts/plugin-update-checker": "5.3"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "@stable",
+    "wp-coding-standards/wpcs": "@stable",
+    "dealerdirect/phpcodesniffer-composer-installer": "@stable"
+  },
+  "scripts": {
+    "lint": "phpcs"
+  }
+}
