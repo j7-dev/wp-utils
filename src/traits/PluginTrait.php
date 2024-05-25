@@ -143,7 +143,7 @@ trait PluginTrait {
 		self::$snake         = strtolower( str_replace( ' ', '_', $args['app_name'] ) );
 		self::$github_repo   = $args['github_repo'];
 		self::$callback      = $args['callback'];
-		self::$callback_args = $args['callback_args'];
+		self::$callback_args = $args['callback_args'] ?? array();
 	}
 
 	/**
