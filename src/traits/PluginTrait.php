@@ -107,6 +107,13 @@ trait PluginTrait {
 	private static $callback_args = array();
 
 	/**
+	 * Plugin Entry File
+	 *
+	 * @var string
+	 */
+	private static $plugin_entry_path;
+
+	/**
 	 * Init
 	 * Set the app_name, github_repo, callback, callback_args
 	 *
@@ -119,8 +126,8 @@ trait PluginTrait {
 
 		$this->set_const( $args );
 
-		\register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		\register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		\register_activation_hook( self::$plugin_entry_path, array( $this, 'activate' ) );
+		\register_deactivation_hook( self::$plugin_entry_path, array( $this, 'deactivate' ) );
 		\add_action( 'plugins_loaded', array( $this, 'check_required_plugins' ) );
 
 		$this->register_required_plugins();
@@ -144,6 +151,9 @@ trait PluginTrait {
 		self::$github_repo   = $args['github_repo'];
 		self::$callback      = $args['callback'];
 		self::$callback_args = $args['callback_args'] ?? array();
+
+		$reflector               = new \ReflectionClass( get_called_class() );
+		self::$plugin_entry_path = $reflector?->getFileName();
 	}
 
 	/**
@@ -268,7 +278,7 @@ trait PluginTrait {
 		try {
 			$update_checker = PucFactory::buildUpdateChecker(
 				self::$github_repo,
-				__FILE__,
+				self::$plugin_entry_path,
 				self::$kebab
 			);
 			/**
@@ -296,12 +306,12 @@ trait PluginTrait {
 		$is_j7rp_complete = $instance->is_j7rp_complete();
 
 		if ( $is_j7rp_complete ) {
-			self::$dir = \untrailingslashit( \wp_normalize_path( \plugin_dir_path( __FILE__ ) ) );
-			self::$url = \untrailingslashit( \plugin_dir_url( __FILE__ ) );
+			self::$dir = \untrailingslashit( \wp_normalize_path( \plugin_dir_path( self::$plugin_entry_path ) ) );
+			self::$url = \untrailingslashit( \plugin_dir_url( self::$plugin_entry_path ) );
 			if ( ! \function_exists( 'get_plugin_data' ) ) {
 				require_once \ABSPATH . 'wp-admin/includes/plugin.php';
 				}
-			$plugin_data   = \get_plugin_data( __FILE__ );
+			$plugin_data   = \get_plugin_data( self::$plugin_entry_path );
 			self::$version = $plugin_data['Version'];
 
 			if(is_callable(self::$callback)){
