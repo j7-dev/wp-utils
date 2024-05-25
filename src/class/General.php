@@ -7,6 +7,9 @@
 
 namespace J7\WpUtils;
 
+if ( class_exists( 'General' ) ) {
+	return;
+}
 /**
  * General class
  */

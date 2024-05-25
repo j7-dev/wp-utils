@@ -7,6 +7,10 @@
 
 namespace J7\WpUtils;
 
+if ( class_exists( 'WC' ) ) {
+	return;
+}
+
 /**
  * WC class
  */

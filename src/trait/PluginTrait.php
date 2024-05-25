@@ -7,6 +7,10 @@
 
 namespace J7\WpUtils;
 
+if ( trait_exists( 'PluginTrait' ) ) {
+	return;
+}
+
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 use J7_Required_Plugins;
 

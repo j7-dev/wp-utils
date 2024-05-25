@@ -7,6 +7,10 @@
 
 namespace J7\WpUtils;
 
+if ( class_exists( 'WP' ) ) {
+	return;
+}
+
 /**
  * WP class
  */

@@ -7,6 +7,10 @@
 
 namespace J7\WpUtils;
 
+if ( trait_exists( 'SingletonTrait' ) ) {
+	return;
+}
+
 trait SingletonTrait {
 
 	/**
