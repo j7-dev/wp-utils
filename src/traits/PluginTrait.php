@@ -12,7 +12,6 @@ if ( trait_exists( 'PluginTrait' ) ) {
 }
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-use J7_Required_Plugins;
 
 trait PluginTrait {
 
@@ -94,10 +93,24 @@ trait PluginTrait {
 	);
 
 	/**
-	 * Init
-	 * Set the app_name, github_repo
+	 * Callback after check required plugins
 	 *
-	 * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '' ) );
+	 * @var array
+	 */
+	private static $callback;
+
+	/**
+	 * Callback Args
+	 *
+	 * @var array
+	 */
+	private static $callback_args = array();
+
+	/**
+	 * Init
+	 * Set the app_name, github_repo, callback, callback_args
+	 *
+	 * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '', 'callback' => array($this, 'func') ) );
 	 * @param array $args The arguments.
 	 *
 	 * @return void
@@ -108,6 +121,7 @@ trait PluginTrait {
 
 		\register_activation_hook( __FILE__, array( $this, 'activate' ) );
 		\register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		\add_action( 'plugins_loaded', array( $this, 'check_required_plugins' ) );
 
 		$this->register_required_plugins();
 		$this->set_puc_pat();
@@ -124,10 +138,12 @@ trait PluginTrait {
 	 * @return void
 	 */
 	final public function set_const( array $args ): void {
-		self::$app_name    = $args['app_name'];
-		self::$kebab       = strtolower( str_replace( ' ', '-', $args['app_name'] ) );
-		self::$snake       = strtolower( str_replace( ' ', '_', $args['app_name'] ) );
-		self::$github_repo = $args['github_repo'];
+		self::$app_name      = $args['app_name'];
+		self::$kebab         = strtolower( str_replace( ' ', '-', $args['app_name'] ) );
+		self::$snake         = strtolower( str_replace( ' ', '_', $args['app_name'] ) );
+		self::$github_repo   = $args['github_repo'];
+		self::$callback      = $args['callback'];
+		self::$callback_args = $args['callback_args'];
 	}
 
 	/**
@@ -268,6 +284,31 @@ trait PluginTrait {
 			// throw $th;
 		}
 	}
+
+
+	/**
+		 * Check required plugins
+		 *
+		 * @return void
+		 */
+		public function check_required_plugins():void {
+		$instance         = \J7_Required_Plugins::get_instance( self::$kebab );
+		$is_j7rp_complete = $instance->is_j7rp_complete();
+
+		if ( $is_j7rp_complete ) {
+			self::$dir = \untrailingslashit( \wp_normalize_path( \plugin_dir_path( __FILE__ ) ) );
+			self::$url = \untrailingslashit( \plugin_dir_url( __FILE__ ) );
+			if ( ! \function_exists( 'get_plugin_data' ) ) {
+				require_once \ABSPATH . 'wp-admin/includes/plugin.php';
+				}
+			$plugin_data   = \get_plugin_data( __FILE__ );
+			self::$version = $plugin_data['Version'];
+
+			if(is_callable(self::$callback)){
+						call_user_func_array(self::$callback, self::$callback_args);
+				}
+			}
+		}
 
 		/**
 		 * Activate
