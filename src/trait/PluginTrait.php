@@ -93,13 +93,21 @@ trait PluginTrait {
 		// ),
 	);
 
+	/**
+	 * Init
+	 * Set the app_name, github_repo
+	 *
+	 * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '' ) );
+	 * @param array $args The arguments.
+	 *
+	 * @return void
+	 */
 	final public function init( array $args ): void {
 
 		$this->set_const( $args );
 
 		\register_activation_hook( __FILE__, array( $this, 'activate' ) );
 		\register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
-		\add_action( 'plugins_loaded', array( $this, 'check_required_plugins' ) );
 
 		$this->register_required_plugins();
 		$this->set_puc_pat();
