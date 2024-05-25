@@ -5,7 +5,7 @@
  * @package J7\WpUtils
  */
 
-namespace J7\WpUtils;
+namespace J7\WpUtils\Traits;
 
 if ( trait_exists( 'PluginTrait' ) ) {
 	return;

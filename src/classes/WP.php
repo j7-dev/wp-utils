@@ -5,7 +5,7 @@
  * @package J7\WpUtils
  */
 
-namespace J7\WpUtils;
+namespace J7\WpUtils\Classes;
 
 if ( class_exists( 'WP' ) ) {
 	return;

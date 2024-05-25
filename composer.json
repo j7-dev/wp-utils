@@ -1,6 +1,6 @@
 {
   "name": "j7-dev/wp-utils",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Various WordPress classes and traits for WordPress",
   "homepage": "https://github.com/j7-dev",
   "type": "library",
@@ -13,7 +13,8 @@
   "license": "GPL-3.0-or-later",
   "autoload": {
     "psr-4": {
-      "\\J7\\WpUtils\\": "src/"
+      "J7\\WpUtils\\Classes\\": "src/classes/",
+      "J7\\WpUtils\\Traits\\": "src/traits/"
     }
   },
   "authors": [
