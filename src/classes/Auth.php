@@ -27,7 +27,7 @@ abstract class Auth {
 	 *       'posts',
 	 *       array(
 	 *           'methods'             => 'GET',
-	 *           'callback'            => array( $this, 'get_template_sites_by_user_id_callback' ),
+	 *           'callback'            => array( $this, 'get_posts_callback' ),
 	 *           'permission_callback' => array( $this, 'check_basic_auth' ),
 	 *       )
 	 * );
@@ -48,5 +48,39 @@ abstract class Auth {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check IP Permission
+	 * 限制 API 只能由指定的 IP 範圍內訪問
+	 *
+	 * @example:
+	 * \register_rest_route(
+	 *       'v1/api',
+	 *       'posts',
+	 *       array(
+	 *           'methods'             => 'GET',
+	 *           'callback'            => array( $this, 'get_posts_callback' ),
+	 *           'permission_callback' => array( $this, 'check_ip_permission' ),
+	 *       )
+	 * );
+	 *
+	 * @return bool
+	 */
+	public function check_ip_permission() {
+		// 允許的 IP 範圍起始和結束 IP
+		$start_ip = '61.220.100.0';
+		$end_ip   = '61.220.100.10';
+
+		// 將起始和結束 IP 轉換為長整型
+		$start_ip_long = sprintf( '%u', ip2long( $start_ip ) );
+		$end_ip_long   = sprintf( '%u', ip2long( $end_ip ) );
+
+    // phpcs:disable
+    $request_ip_long = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
+    // phpcs:enable
+
+		// 檢查發起請求的 IP 是否在允許的範圍內
+		return ( $request_ip_long >= $start_ip_long && $request_ip_long <= $end_ip_long );
 	}
 }
