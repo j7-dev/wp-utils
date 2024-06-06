@@ -83,24 +83,12 @@ abstract class WP {
 	 *
 	 * @param array $params - 要檢查的參數 assoc array
 	 * @param array $required_params - string[] 必要參數
-	 * @param bool  $throw_in_rest - 是否在 REST API 中拋出錯誤
-	 * @return \WP_REST_Response|bool
+	 * @return true|\WP_Error
 	 */
-	public static function include_required_params( array $params, array $required_params, bool $throw_in_rest = false ) {
-
+	public static function include_required_params( array $params, array $required_params) {
 		$missing_params = array_diff( $required_params, array_keys( $params ) );
 		if ( ! empty( $missing_params ) ) {
-			if ( $throw_in_rest ) {
-				return new \WP_REST_Response(
-					array(
-						'status'  => 500,
-						'message' => 'missing required params',
-						'data'    => \wp_json_encode( $missing_params ),
-					),
-					500
-				);
-			}
-			return false;
+			throw new \WP_Error( 'missing_required_params', \wp_json_encode( $missing_params ), 400 );
 		}
 		return true;
 	}
