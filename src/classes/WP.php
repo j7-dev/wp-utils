@@ -126,7 +126,7 @@ abstract class WP {
 
 
 	/**
-	 * 轉換器，將陣列轉換成 data 與 meta data
+	 * 分隔器，將陣列轉換成 data 與 meta data
 	 * 因為 WP / WC 的資料通常區分成 data 與 meta data
 	 *
 	 * @param array       $args - 原始資料
@@ -135,7 +135,7 @@ abstract class WP {
 	 * - data: array
 	 * - meta_data: array
 	 */
-	public static function converter( array $args, ?string $obj = 'post' ): array {
+	public static function separator( array $args, ?string $obj = 'post' ): array {
 		$data_fields = self::get_data_fields( $obj );
 
 		// 將資料拆成 data 與 meta_data
