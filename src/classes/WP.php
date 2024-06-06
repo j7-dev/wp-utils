@@ -85,7 +85,7 @@ abstract class WP {
 	 * @param array $required_params - string[] 必要參數
 	 * @return true|\WP_Error
 	 */
-	public static function include_required_params( array $params, array $required_params) {
+	public static function include_required_params( array $params, array $required_params ) {
 		$missing_params = array_diff( $required_params, array_keys( $params ) );
 		if ( ! empty( $missing_params ) ) {
 			throw new \WP_Error( 'missing_required_params', \wp_json_encode( $missing_params ), 400 );
@@ -122,5 +122,78 @@ abstract class WP {
 		$html .= '</div>';
 
 		return $html;
+	}
+
+
+	/**
+	 * 轉換器，將陣列轉換成 data 與 meta data
+	 * 因為 WP / WC 的資料通常區分成 data 與 meta data
+	 *
+	 * @param array       $args - 原始資料
+	 * @param string|null $obj - 'post' | 'term' | 'user' | 'product'
+	 * @return array
+	 * - data: array
+	 * - meta_data: array
+	 */
+	public static function converter( array $args, ?string $obj = 'post' ): array {
+		$data_fields = self::get_data_fields( $obj );
+
+		// 將資料拆成 data 與 meta_data
+		$data      = array();
+		$meta_data = array();
+
+		foreach ( $args as $key => $value ) {
+			if ( \in_array( $key, $data_fields, true ) ) {
+				$data[ $key ] = $value;
+			} else {
+				$meta_data[ $key ] = $value;
+			}
+		}
+
+		return array(
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		);
+	}
+
+	/**
+	 * 取得 data fields
+	 *
+	 * @param string|null $obj - 'post' | 'term' | 'user' | 'product'
+	 * @return string[]
+	 */
+	public static function get_data_fields( ?string $obj = 'post' ) {
+		switch ( $obj ) {
+			case 'post':
+				return array(
+					'ID',
+					'post_author',
+					'post_date',
+					'post_date_gmt',
+					'post_content',
+					'post_content_filtered',
+					'post_title',
+					'post_excerpt',
+					'post_status',
+					'post_type',
+					'comment_status',
+					'ping_status',
+					'post_password',
+					'post_name',
+					'to_ping',
+					'pinged',
+					'post_parent',
+					'menu_order',
+					'post_mime_type',
+					'guid',
+					'import_id',
+					'post_category',
+					'tags_input',
+					'tax_input',
+					'page_template',
+				);
+			default:
+				return array();
+		}
 	}
 }
