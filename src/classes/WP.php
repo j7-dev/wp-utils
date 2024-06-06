@@ -196,4 +196,20 @@ abstract class WP {
 				return array();
 		}
 	}
+
+	/**
+	 * 取得 image info
+	 *
+	 * @param string $attachment_id - 附件 ID
+	 * @return array
+	 * - id: string
+	 * - url: string
+	 */
+	public static function get_image_info( string $attachment_id ) {
+		$image_url = \wp_get_attachment_url( $attachment_id );
+		return array(
+			'id'  => $attachment_id,
+			'url' => $image_url,
+		);
+	}
 }
