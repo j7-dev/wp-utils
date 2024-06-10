@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3ab6bb0ec11a01c1428bfcf288be667",
+    "content-hash": "975bb8b9ef8f70c9084c9494afc9f257",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/j7-dev/tgm-plugin-activation-forked.git",
-                "reference": "42433f3d49088a8435f46806ae001bbc0bf96156"
+                "reference": "c1a5f4c4286c624d3161dfe230eb22a256cd093a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/j7-dev/tgm-plugin-activation-forked/zipball/42433f3d49088a8435f46806ae001bbc0bf96156",
-                "reference": "42433f3d49088a8435f46806ae001bbc0bf96156",
+                "url": "https://api.github.com/repos/j7-dev/tgm-plugin-activation-forked/zipball/c1a5f4c4286c624d3161dfe230eb22a256cd093a",
+                "reference": "c1a5f4c4286c624d3161dfe230eb22a256cd093a",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "issues": "https://github.com/j7-dev/tgm-plugin-activation-forked/issues",
                 "source": "https://github.com/j7-dev/tgm-plugin-activation-forked"
             },
-            "time": "2024-05-21T17:57:04+00:00"
+            "time": "2024-06-10T10:48:54+00:00"
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
