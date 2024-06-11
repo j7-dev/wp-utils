@@ -1,6 +1,6 @@
 {
   "name": "j7-dev/wp-utils",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Various WordPress classes and traits for WordPress",
   "homepage": "https://github.com/j7-dev",
   "type": "library",
