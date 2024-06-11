@@ -10,9 +10,9 @@ namespace J7\WpUtils\Api;
 use J7\WpUtils\WC;
 
 /**
- * Class Api
+ * Class product
  */
-final class Api {
+final class Product {
 
 	use \J7\WpUtils\SingletonTrait;
 
@@ -20,7 +20,7 @@ final class Api {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_products' ) );
+		\add_action( 'rest_api_init', array( $this, 'register_api_product' ) );
 	}
 
 	/**
@@ -28,7 +28,7 @@ final class Api {
 	 *
 	 * @return void
 	 */
-	public function register_api_products(): void {
+	public function register_api_product(): void {
 
 		$apis = array(
 			array(
@@ -46,12 +46,14 @@ final class Api {
 		);
 
 		foreach ( $apis as $api ) {
+			// 用正則表達式替換 -, / 替換為 _
+			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
 			\register_rest_route(
 				'v1/wp-utils',
 				$api['endpoint'],
 				array(
 					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
+					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
 					'permission_callback' => function () {
 						return \current_user_can( 'manage_options' );
 					},
@@ -301,4 +303,4 @@ final class Api {
 	}
 }
 
-Api::instance();
+product::instance();

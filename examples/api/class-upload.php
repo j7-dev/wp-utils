@@ -1,0 +1,158 @@
+<?php
+/**
+ * Upload Api 上傳檔案
+ */
+
+declare(strict_types=1);
+
+namespace J7\WpUtils\Api;
+
+/**
+ * Class product
+ */
+final class Upload {
+
+	use \J7\WpUtils\SingletonTrait;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		\add_action( 'rest_api_init', array( $this, 'register_api_upload' ) );
+	}
+
+	/**
+	 * Register products API
+	 *
+	 * @return void
+	 */
+	public function register_api_upload(): void {
+
+		$apis = array(
+			array(
+				'endpoint' => 'upload',
+				'method'   => 'post',
+			),
+		);
+
+		foreach ( $apis as $api ) {
+			// 用正則表達式替換 -, / 替換為 _
+			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
+			\register_rest_route(
+				'v1/wp-utils',
+				$api['endpoint'],
+				array(
+					'methods'             => $api['method'],
+					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
+					'permission_callback' => function () {
+						return \current_user_can( 'manage_options' );
+					},
+				)
+			);
+		}
+	}
+
+	/**
+	 * Post upload callback
+	 * 上傳檔案
+	 * post 走 form-data
+	 *  - files: binary[]
+	 * -  upload_only: '0' or '1 // 是否只上傳，不新增到媒體庫
+	 *
+	 * @param  \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function post_upload_callback( $request ) {
+		// get data from form-data
+		$file_params = $request->get_file_params();
+		$body_params = $request->get_body_params();
+		$upload_only = $body_params['upload_only'] ?? '0';
+
+		if ( ! ! $file_params['files']['tmp_name'] ) {
+
+			if ( ! function_exists( 'media_handle_upload' ) ) {
+				require_once 'wp-admin/includes/image.php';
+				require_once 'wp-admin/includes/file.php';
+				require_once 'wp-admin/includes/media.php';
+			}
+
+			$upload_results   = array();
+			$upload_overrides = array( 'test_form' => false );
+			$_FILES           = array();
+			// 遍歷每個上傳的檔案
+			foreach ( $file_params['files']['tmp_name'] as $key => $tmp_name ) {
+				if ( ! empty( $tmp_name ) ) {
+					$file = array(
+						'name'     => $file_params['files']['name'][ $key ],
+						'type'     => $file_params['files']['type'][ $key ],
+						'tmp_name' => $tmp_name,
+						'error'    => $file_params['files']['error'][ $key ],
+						'size'     => $file_params['files']['size'][ $key ],
+					);
+
+					$_FILES[ $key ] = $file;
+
+					if ( $upload_only ) {
+						// 直接上傳到 wp-content/uploads 不會新增到媒體庫
+						$upload_result = \wp_handle_upload( $file, $upload_overrides );
+						unset( $upload_result['file'] );
+						$upload_result['id']   = null;
+						$upload_result['type'] = $file['type'];
+						$upload_result['name'] = $file['name'];
+						$upload_result['size'] = $file['size'];
+						if ( isset( $upload_result['error'] ) ) {
+							return new \WP_REST_Response(
+								array(
+									'code'    => 'upload_error',
+									'message' => $upload_result['error'],
+									'data'    => $upload_result,
+								),
+								400
+							);
+						}
+					} else {
+						// 將檔案上傳到媒體庫
+						$attachment_id = \media_handle_upload(
+							file_id: $key,
+							post_id: 0
+						);
+
+						if ( \is_wp_error( $attachment_id ) ) {
+							// 處理錯誤
+							return new \WP_REST_Response(
+								array(
+									'code'    => 'upload_error',
+									'message' => $attachment_id->get_error_message(),
+									'data'    => $upload_result,
+								),
+								400
+							);
+						}
+
+						$upload_result = array(
+							'id'   => (string) $attachment_id,
+							'url'  => \wp_get_attachment_url( $attachment_id ),
+							'type' => $file['type'],
+							'name' => $file['name'],
+							'size' => $file['size'],
+						);
+					}
+
+					$upload_results[] = $upload_result;
+				}
+			}
+
+			// 返回上傳成功的訊息
+			return \rest_ensure_response(
+				array(
+					'code'    => 'upload_success',
+					'message' => '檔案上傳成功',
+					'data'    => $upload_results,
+				)
+			);
+
+		}
+	}
+}
+
+Upload::instance();
