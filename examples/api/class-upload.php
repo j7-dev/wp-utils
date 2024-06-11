@@ -1,6 +1,8 @@
 <?php
 /**
  * Upload Api 上傳檔案
+ * TODO 檔案類型檢查
+ * ex allow  jpg, png, pdf
  */
 
 declare(strict_types=1);
