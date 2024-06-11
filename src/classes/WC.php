@@ -66,4 +66,22 @@ abstract class WC {
 
 		return $formatted_top_selling_products;
 	}
+
+
+	/**
+	 * Get formatted meta data
+	 * 原本是 WC_Meta_Data[]，轉換成 key => value 的 array
+	 *
+	 * @param \WC_Product $product Product.
+	 * @return array
+	 */
+	public static function get_formatted_meta_data( \WC_Product $product ): array {
+		$meta_data           = $product->get_meta_data();
+		$formatted_meta_data = array();
+		foreach ( $meta_data as $meta ) {
+			$formatted_meta_data[ $meta->key ] = $meta->value;
+		}
+
+		return $formatted_meta_data;
+	}
 }
