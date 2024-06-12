@@ -33,31 +33,39 @@ final class Product {
 
 		$apis = array(
 			array(
-				'endpoint' => 'products',
-				'method'   => 'get',
+				'endpoint'            => 'products',
+				'method'              => 'get',
+				'permission_callback' => function () {
+					return \current_user_can( 'manage_options' );
+				},
 			),
 			array(
-				'endpoint' => 'terms',
-				'method'   => 'get',
+				'endpoint'            => 'terms',
+				'method'              => 'get',
+				'permission_callback' => function () {
+					return \current_user_can( 'manage_options' );
+				},
 			),
 			array(
-				'endpoint' => 'options',
-				'method'   => 'get',
+				'endpoint'            => 'options',
+				'method'              => 'get',
+				'permission_callback' => function () {
+					return \current_user_can( 'manage_options' );
+				},
 			),
 		);
 
 		foreach ( $apis as $api ) {
 			// 用正則表達式替換 -, / 替換為 _
-			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
+			$endpoint_fn = str_replace( '(?P<id>\d+)', 'with_id', $api['endpoint'] );
+			$endpoint_fn = preg_replace( '/[-\/]/', '_', $endpoint_fn );
 			\register_rest_route(
-				'v1/wp-utils',
+				'wp-utils/v1',
 				$api['endpoint'],
 				array(
 					'methods'             => $api['method'],
 					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
-					'permission_callback' => function () {
-						return \current_user_can( 'manage_options' );
-					},
+					'permission_callback' => $api['permission_callback'],
 				)
 			);
 		}
