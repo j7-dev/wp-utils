@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin trait
  *
@@ -14,6 +15,7 @@ if ( trait_exists( 'PluginTrait' ) ) {
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 trait PluginTrait {
+
 
 	/**
 	 * App Name
@@ -161,7 +163,8 @@ trait PluginTrait {
 	 *
 	 * @return void
 	 */
-	public function register_required_plugins(): void { // phpcs:ignore
+	final public function register_required_plugins(): void
+	{ // phpcs:ignore
 		// phpcs:disable
 		$config = array(
 			'id'           => self::$kebab, // Unique ID for hashing notices for multiple instances of TGMPA.
@@ -171,15 +174,15 @@ trait PluginTrait {
 			'capability'   => 'manage_options', // Capability needed to view plugin install page, should be a capability associated with the parent menu used.
 			'has_notices'  => true, // Show admin notices or not.
 			'dismissable'  => false, // If false, a user cannot dismiss the nag message.
-			'dismiss_msg'  => \__( '這個訊息將在依賴套件被安裝並啟用後消失。' . self::$app_name . ' 沒有這些依賴套件的情況下將無法運作！', 'wp_react_plugin' ), // If 'dismissable' is false, this message will be output at top of nag.
+			'dismiss_msg'  => \__('這個訊息將在依賴套件被安裝並啟用後消失。' . self::$app_name . ' 沒有這些依賴套件的情況下將無法運作！', 'wp_react_plugin'), // If 'dismissable' is false, this message will be output at top of nag.
 			'is_automatic' => true, // Automatically activate plugins after installation or not.
 			'message'      => '', // Message to output right before the plugins table.
 			'strings'      => array(
-				'page_title'                      => \__( '安裝依賴套件', 'wp_react_plugin' ),
-				'menu_title'                      => \__( '安裝依賴套件', 'wp_react_plugin' ),
-				'installing'                      => \__( '安裝套件: %s', 'wp_react_plugin' ), // translators: %s: plugin name.
-				'updating'                        => \__( '更新套件: %s', 'wp_react_plugin' ), // translators: %s: plugin name.
-				'oops'                            => \__( 'OOPS! plugin API 出錯了', 'wp_react_plugin' ),
+				'page_title'                      => \__('安裝依賴套件', 'wp_react_plugin'),
+				'menu_title'                      => \__('安裝依賴套件', 'wp_react_plugin'),
+				'installing'                      => \__('安裝套件: %s', 'wp_react_plugin'), // translators: %s: plugin name.
+				'updating'                        => \__('更新套件: %s', 'wp_react_plugin'), // translators: %s: plugin name.
+				'oops'                            => \__('OOPS! plugin API 出錯了', 'wp_react_plugin'),
 				'notice_can_install_required'     => \_n_noop(
 					// translators: 1: plugin name(s).
 					self::$app_name . ' 依賴套件: %1$s.',
@@ -231,24 +234,24 @@ trait PluginTrait {
 					'啟用套件',
 					'wp_react_plugin'
 				),
-				'return'                          => \__( '回到安裝依賴套件', 'wp_react_plugin' ),
-				'plugin_activated'                => \__( '套件啟用成功', 'wp_react_plugin' ),
-				'activated_successfully'          => \__( '以下套件已成功啟用:', 'wp_react_plugin' ),
+				'return'                          => \__('回到安裝依賴套件', 'wp_react_plugin'),
+				'plugin_activated'                => \__('套件啟用成功', 'wp_react_plugin'),
+				'activated_successfully'          => \__('以下套件已成功啟用:', 'wp_react_plugin'),
 				// translators: 1: plugin name.
-				'plugin_already_active'           => \__( '沒有執行任何動作 %1$s 已啟用', 'wp_react_plugin' ),
+				'plugin_already_active'           => \__('沒有執行任何動作 %1$s 已啟用', 'wp_react_plugin'),
 				// translators: 1: plugin name.
-				'plugin_needs_higher_version'     => \__( self::$app_name . ' 未啟用。' . self::$app_name . ' 需要新版本的 %s 。請更新套件。', 'wp_react_plugin' ),
+				'plugin_needs_higher_version'     => \__(self::$app_name . ' 未啟用。' . self::$app_name . ' 需要新版本的 %s 。請更新套件。', 'wp_react_plugin'),
 				// translators: 1: dashboard link.
-				'complete'                        => \__( '所有套件已成功安裝跟啟用 %1$s', 'wp_react_plugin' ),
-				'dismiss'                         => \__( '關閉通知', 'wp_react_plugin' ),
-				'notice_cannot_install_activate'  => \__( '有一個或以上的依賴/推薦套件需要安裝/更新/啟用', 'wp_react_plugin' ),
-				'contact_admin'                   => \__( '請聯繫網站管理員', 'wp_react_plugin' ),
+				'complete'                        => \__('所有套件已成功安裝跟啟用 %1$s', 'wp_react_plugin'),
+				'dismiss'                         => \__('關閉通知', 'wp_react_plugin'),
+				'notice_cannot_install_activate'  => \__('有一個或以上的依賴/推薦套件需要安裝/更新/啟用', 'wp_react_plugin'),
+				'contact_admin'                   => \__('請聯繫網站管理員', 'wp_react_plugin'),
 
 				'nag_type'                        => 'error', // Determines admin notice type - can only be one of the typical WP notice classes, such as 'updated', 'update-nag', 'notice-warning', 'notice-info' or 'error'. Some of which may not work as expected in older WP versions.
 			),
 		);
 
-		\j7rp($this->required_plugins, $config );
+		\j7rp($this->required_plugins, $config);
 	}
 
 	/**
@@ -256,13 +259,14 @@ trait PluginTrait {
 	 *
 	 * @return array
 	 */
-	public static function set_puc_pat(): void{
+	public static function set_puc_pat(): void
+	{
 		$env_file = self::$dir . '/.puc_pat';
 
 		// Check if .env file exists
-		if ( file_exists( $env_file ) ) {
+		if (file_exists($env_file)) {
 			// Read contents of .env file
-			$env_contents = file_get_contents( $env_file );
+			$env_contents = file_get_contents($env_file);
 			self::$puc_pat = trim($env_contents);
 		}
 	}
@@ -274,7 +278,8 @@ trait PluginTrait {
 	 *
 	 * @return void
 	 */
-	public function plugin_update_checker(): void {
+	public function plugin_update_checker(): void
+	{
 		try {
 			$update_checker = PucFactory::buildUpdateChecker(
 				self::$github_repo,
@@ -286,53 +291,52 @@ trait PluginTrait {
 			 *
 			 * @var \Puc_v4p4_Vcs_PluginUpdateChecker $update_checker
 			 */
-			$update_checker->setBranch( 'master' );
+			$update_checker->setBranch('master');
 			// if your repo is private, you need to set authentication
 			// $update_checker->setAuthentication( self::$puc_pat );
 			$update_checker->getVcsApi()->enableReleaseAssets();
-		} catch ( \Throwable $th ) { // phpcs:ignore
+		} catch (\Throwable $th) { // phpcs:ignore
 			// throw $th;
 		}
 	}
 
 
 	/**
-		 * Check required plugins
-		 *
-		 * @return void
-		 */
-		public function check_required_plugins():void {
-		$instance         = \J7_Required_Plugins::get_instance( self::$kebab );
+	 * Check required plugins
+	 *
+	 * @return void
+	 */
+	public function check_required_plugins(): void
+	{
+		$instance         = \J7_Required_Plugins::get_instance(self::$kebab);
 		$is_j7rp_complete = $instance->is_j7rp_complete();
 
-		if ( $is_j7rp_complete ) {
-			self::$dir = \untrailingslashit( \wp_normalize_path( \plugin_dir_path( self::$plugin_entry_path ) ) );
-			self::$url = \untrailingslashit( \plugin_dir_url( self::$plugin_entry_path ) );
-			if ( ! \function_exists( 'get_plugin_data' ) ) {
+		if ($is_j7rp_complete) {
+			self::$dir = \untrailingslashit(\wp_normalize_path(\plugin_dir_path(self::$plugin_entry_path)));
+			self::$url = \untrailingslashit(\plugin_dir_url(self::$plugin_entry_path));
+			if (!\function_exists('get_plugin_data')) {
 				require_once \ABSPATH . 'wp-admin/includes/plugin.php';
-				}
-			$plugin_data   = \get_plugin_data( self::$plugin_entry_path );
+			}
+			$plugin_data   = \get_plugin_data(self::$plugin_entry_path);
 			self::$version = $plugin_data['Version'];
 
-			if(is_callable(self::$callback)){
-						call_user_func_array(self::$callback, self::$callback_args);
-				}
+			if (is_callable(self::$callback)) {
+				call_user_func_array(self::$callback, self::$callback_args);
 			}
 		}
-
-		/**
-		 * Activate
-		 *
-		 * @return void
-		 */
-		public function activate() { // phpcs:ignore
 	}
 
-		/**
-		 * Deactivate
-		 *
-		 * @return void
-		 */
-		public function deactivate() { // phpcs:ignore
-	}
+	/**
+	 * Activate
+	 *
+	 * @return void
+	 */
+	abstract public function activate():void;
+
+	/**
+	 * Deactivate
+	 *
+	 * @return void
+	 */
+	abstract public function deactivate():void;
 }
