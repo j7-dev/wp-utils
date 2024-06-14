@@ -17,6 +17,7 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 trait PluginTrait {
 
 
+
 	/**
 	 * App Name
 	 *
@@ -99,21 +100,21 @@ trait PluginTrait {
 	 *
 	 * @var array
 	 */
-	private static $callback;
+	protected static $callback;
 
 	/**
 	 * Callback Args
 	 *
 	 * @var array
 	 */
-	private static $callback_args = array();
+	protected static $callback_args = array();
 
 	/**
 	 * Plugin Entry File
 	 *
 	 * @var string
 	 */
-	private static $plugin_entry_path;
+	protected static $plugin_entry_path;
 
 	/**
 	 * Init
@@ -331,12 +332,16 @@ trait PluginTrait {
 	 *
 	 * @return void
 	 */
-	abstract public function activate():void;
+	final public function activate(): void
+	{
+	}
 
 	/**
 	 * Deactivate
 	 *
 	 * @return void
 	 */
-	abstract public function deactivate():void;
+	final public function deactivate(): void
+	{
+	}
 }
