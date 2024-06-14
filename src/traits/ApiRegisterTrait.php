@@ -18,26 +18,21 @@ if ( trait_exists( 'ApiRegisterTrait' ) ) {
 trait ApiRegisterTrait {
 
 	/**
-	 * APIs
+	 * Register APIs
+	 * 預設的 permission_callback 是 '__return_true'，即不做任何權限檢查
 	 *
-	 * @var array
+	 * @param array     $apis api has following keys:
 	 * - endpoint: string
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
-	 */
-	protected $apis = array();
-
-	/**
-	 * Register APIs
-	 * 預設的 permission_callback 是 current_user_can( 'manage_options' )
 	 *
-	 * @param string   $namespace Namespace.
-	 * @param callable $default_permission_callback Default permission callback.
+	 * @param ?string   $namespace Namespace.
+	 * @param ?callable $default_permission_callback Default permission callback.
 	 * @return void
 	 */
-	final public function register_apis( string $namespace = 'wp-utils/v1', callable $default_permission_callback ): void {
+	final protected function register_apis( array $apis, string $namespace = 'wp-utils/v1', ?callable $default_permission_callback ): void {
 
-		foreach ( $this->apis as $api ) {
+		foreach ( $apis as $api ) {
 			// 用正則表達式替換 -, / 替換為 _
 			$endpoint_fn = str_replace( '(?P<id>\d+)', 'with_id', $api['endpoint'] );
 			$endpoint_fn = preg_replace( '/[-\/]/', '_', $endpoint_fn );
