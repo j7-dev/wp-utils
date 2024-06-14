@@ -2,6 +2,7 @@
 /**
  * Upload Api 上傳檔案
  * TODO 檔案類型檢查
+ * TODO 可以寫成 TRAIT
  * ex allow  jpg, png, pdf
  */
 
@@ -13,8 +14,23 @@ namespace J7\WpUtils\Api;
  * Class product
  */
 final class Upload {
+	use \J7\WpUtils\Traits\SingletonTrait;
+	use \J7\WpUtils\Traits\ApiRegisterTrait;
 
-	use \J7\WpUtils\SingletonTrait;
+	/**
+	 * APIs
+	 *
+	 * @var array
+	 * - endpoint: string
+	 * - method: 'get' | 'post' | 'patch' | 'delete'
+	 * - permission_callback : callable
+	 */
+	protected $apis = array(
+		array(
+			'endpoint' => 'upload',
+			'method'   => 'post',
+		),
+	);
 
 	/**
 	 * Constructor.
@@ -29,31 +45,11 @@ final class Upload {
 	 * @return void
 	 */
 	public function register_api_upload(): void {
-
-		$apis = array(
-			array(
-				'endpoint'            => 'upload',
-				'method'              => 'post',
-				'permission_callback' => function () {
-					return \current_user_can( 'manage_options' );
-				},
-			),
+		$this->register_apis(
+			apis: $this->apis,
+			namespace: Plugin::$kebab,
+			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
-
-		foreach ( $apis as $api ) {
-			// 用正則表達式替換 -, / 替換為 _
-			$endpoint_fn = str_replace( '(?P<id>\d+)', 'with_id', $api['endpoint'] );
-			$endpoint_fn = preg_replace( '/[-\/]/', '_', $endpoint_fn );
-			\register_rest_route(
-				'wp-utils/v1',
-				$api['endpoint'],
-				array(
-					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
-					'permission_callback' => $api['permission_callback'],
-				)
-			);
-		}
 	}
 
 	/**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WP class
  *
@@ -15,6 +16,7 @@ if ( class_exists( 'WP' ) ) {
  * WP class
  */
 abstract class WP {
+
 
 
 	/**
@@ -131,12 +133,26 @@ abstract class WP {
 	 *
 	 * @param array       $args - 原始資料
 	 * @param string|null $obj - 'post' | 'term' | 'user' | 'product'
+	 * @param array|null  $files - file 物件
 	 * @return array
 	 * - data: array
 	 * - meta_data: array
 	 */
-	public static function separator( array $args, ?string $obj = 'post' ): array {
+	public static function separator( array $args, ?string $obj = 'post', ?array $files ): array {
 		$data_fields = self::get_data_fields( $obj );
+
+		if ( ! ! $files ) {
+			$upload_results    = self::files_to_media( $files );
+			$image_id          = $upload_results[0]['id'] ?? null;
+			$gallery_image_ids = array_map( fn( $result ) => $result['id'], array_slice( $upload_results, 1 ) );
+
+			if ( ! ! $image_id ) {
+				$args['image_id'] = $image_id;
+			}
+			if ( ! ! $gallery_image_ids ) {
+				$args['gallery_image_ids'] = $gallery_image_ids;
+			}
+		}
 
 		// 將資料拆成 data 與 meta_data
 		$data      = array();
@@ -268,5 +284,152 @@ abstract class WP {
 			'id'  => $attachment_id,
 			'url' => $image_url,
 		);
+	}
+
+
+
+	/**
+	 * 將檔案上傳到媒體庫
+	 *
+	 * @param array $files - $_FILES
+	 * @param bool  $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
+	 * @return \array
+	 */
+	public static function files_to_media( $files, $upload_only = false ) {
+
+		if ( ! $files ) {
+			return [];
+		}
+
+		if ( ! function_exists( 'media_handle_upload' ) ) {
+			require_once 'wp-admin/includes/image.php';
+			require_once 'wp-admin/includes/file.php';
+			require_once 'wp-admin/includes/media.php';
+		}
+
+		$is_multiple_files = is_array( $files['tmp_name'] );
+
+		if ( $is_multiple_files ) {
+			$upload_results = self::handle_multiple_files_to_media( $files, $upload_only );
+		} else {
+			$upload_results = self::handle_single_files_to_media( $files, $upload_only );
+		}
+
+		return $upload_results;
+	}
+
+	/**
+	 * 將單個檔案上傳到媒體庫
+	 *
+	 * @param array $file - $_FILES
+	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
+	 * @return array - 上傳結果
+	 * @throws \WP_Error  - 上傳錯誤.
+	 */
+	public static function handle_single_files_to_media( $file, $upload_only = false ) {
+		$upload_results   = array();
+		$upload_overrides = array( 'test_form' => false );
+
+		$_FILES         = array();
+		$_FILES['file'] = $file;
+
+		if ( $upload_only ) {
+			// 直接上傳到 wp-content/uploads 不會新增到媒體庫
+			$upload_result = \wp_handle_upload( $file, $upload_overrides );
+			unset( $upload_result['file'] );
+			$upload_result['id']   = null;
+			$upload_result['type'] = $file['type'];
+			$upload_result['name'] = $file['name'];
+			$upload_result['size'] = $file['size'];
+			if ( isset( $upload_result['error'] ) ) {
+				throw new \WP_Error( 'upload_error', $upload_result['error'], 400 );
+			}
+		} else {
+			// 將檔案上傳到媒體庫
+			$attachment_id = \media_handle_upload(
+				file_id: 'file',
+				post_id: 0
+			);
+
+			if ( \is_wp_error( $attachment_id ) ) {
+				throw new \WP_Error( 'upload_error', $attachment_id->get_error_message(), 400 );
+			}
+
+			$upload_result = array(
+				'id'   => (string) $attachment_id,
+				'url'  => \wp_get_attachment_url( $attachment_id ),
+				'type' => $file['type'],
+				'name' => $file['name'],
+				'size' => $file['size'],
+			);
+		}
+
+		$upload_results[] = $upload_result;
+
+		return $upload_results;
+	}
+
+	/**
+	 * 將多個檔案上傳到媒體庫
+	 *
+	 * @param array $files - $_FILES
+	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
+	 * @return array
+	 * @throws \WP_Error - 上傳錯誤.
+	 */
+	public static function handle_multiple_files_to_media( $files, $upload_only = false ) {
+		$upload_results   = array();
+		$upload_overrides = array( 'test_form' => false );
+		$_FILES           = array();
+
+		// 遍歷每個上傳的檔案
+		foreach ( $files['tmp_name'] as $key => $tmp_name ) {
+			if ( ! empty( $tmp_name ) ) {
+				$file = array(
+					'name'     => $files['name'][ $key ],
+					'type'     => $files['type'][ $key ],
+					'tmp_name' => $tmp_name,
+					'error'    => $files['error'][ $key ],
+					'size'     => $files['size'][ $key ],
+				);
+
+				$_FILES[ $key ] = $file;
+
+				if ( $upload_only ) {
+					// 直接上傳到 wp-content/uploads 不會新增到媒體庫
+					$upload_result = \wp_handle_upload( $file, $upload_overrides );
+					unset( $upload_result['file'] );
+					$upload_result['id']   = null;
+					$upload_result['type'] = $file['type'];
+					$upload_result['name'] = $file['name'];
+					$upload_result['size'] = $file['size'];
+					if ( isset( $upload_result['error'] ) ) {
+						throw new \WP_Error( 'upload_error', $upload_result['error'], 400 );
+					}
+				} else {
+					// 將檔案上傳到媒體庫
+					$attachment_id = \media_handle_upload(
+						file_id: $key,
+						post_id: 0
+					);
+
+					if ( \is_wp_error( $attachment_id ) ) {
+						throw new \WP_Error( 'upload_error', $attachment_id->get_error_message(), 400 );
+					}
+
+					$upload_result = array(
+						'id'   => (string) $attachment_id,
+						'url'  => \wp_get_attachment_url( $attachment_id ),
+						'type' => $file['type'],
+						'name' => $file['name'],
+						'size' => $file['size'],
+					);
+				}
+
+				$upload_results[] = $upload_result;
+			}
+		}
+
+		return $upload_results;
 	}
 }
