@@ -30,7 +30,7 @@ trait ApiRegisterTrait {
 	 * @param ?callable $default_permission_callback Default permission callback.
 	 * @return void
 	 */
-	final protected function register_apis( array $apis, string $namespace = 'wp-utils/v1', ?callable $default_permission_callback ): void {
+	final protected function register_apis( array $apis, ?string $namespace = 'wp-utils/v1', ?callable $default_permission_callback = null ): void {
 
 		foreach ( $apis as $api ) {
 			// 用正則表達式替換 -, / 替換為 _
