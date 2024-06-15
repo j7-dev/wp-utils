@@ -138,7 +138,7 @@ abstract class WP {
 	 * - data: array
 	 * - meta_data: array
 	 */
-	public static function separator( array $args, ?string $obj = 'post', ?array $files ): array {
+	public static function separator( array $args, ?string $obj = 'post', ?array $files = [] ): array {
 		$data_fields = self::get_data_fields( $obj );
 
 		if ( ! ! $files ) {
@@ -296,10 +296,6 @@ abstract class WP {
 	 * @return \array
 	 */
 	public static function files_to_media( $files, $upload_only = false ) {
-
-		if ( ! $files ) {
-			return [];
-		}
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
 			require_once 'wp-admin/includes/image.php';
