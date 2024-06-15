@@ -15,7 +15,7 @@ if ( class_exists( 'LogFactory' ) ) {
 /**
  * Class LogFactory
  */
-abstract class LogFactory {
+final class LogFactory {
 
 	/**
 	 * Log table name
