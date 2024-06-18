@@ -64,10 +64,11 @@ abstract class WP {
 	 * Sanitize Array
 	 * Sanitize 一個深層的關聯陣列
 	 *
-	 * @param array $value Value to sanitize
+	 * @param mixed $value Value to sanitize
+	 * @param bool  $allow_br 是否允許換行 \n \r，預設為 true，如果為 false，則會用 sanitize_text_field
 	 * @return array|string
 	 */
-	public static function sanitize_text_field_deep( $value ) {
+	public static function sanitize_text_field_deep( $value, $allow_br = true ) {
 		if ( is_array( $value ) ) {
 			// if array, sanitize each element
 			foreach ( $value as $key => $item ) {
@@ -76,7 +77,11 @@ abstract class WP {
 			return $value;
 		} else {
 			// if not array, sanitize the value
-			return \sanitize_text_field( $value );
+			if ( $allow_br ) {
+				return \sanitize_textarea_field( $value );
+			} else {
+				return \sanitize_text_field( $value );
+			}
 		}
 	}
 
@@ -138,7 +143,7 @@ abstract class WP {
 	 * - data: array
 	 * - meta_data: array
 	 */
-	public static function separator( array $args, ?string $obj = 'post', ?array $files = [] ): array {
+	public static function separator( array $args, ?string $obj = 'post', ?array $files = array() ): array {
 		$data_fields = self::get_data_fields( $obj );
 
 		if ( ! ! $files ) {
