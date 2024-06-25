@@ -43,6 +43,7 @@ trait LogTableCreationTrait {
 									point_changed tinytext NOT NULL,
 									new_balance tinytext NOT NULL,
 									modified_by bigint(20) NOT NULL,
+									expire_date datetime DEFAULT NULL,
 									date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 									PRIMARY KEY  (id)
 							) $charset_collate;";

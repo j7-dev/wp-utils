@@ -85,4 +85,76 @@ abstract class General {
 
 		return $html;
 	}
+
+	/**
+	 * Generate a random string, using a cryptographically secure
+	 * pseudorandom number generator (random_int)
+	 *
+	 * This function uses type hints now (PHP 7+ only), but it was originally
+	 * written for PHP 5 as well.
+	 *
+	 * Credit: https://stackoverflow.com/questions/4356289/php-random-string-generator/31107425#31107425
+	 *
+	 * For PHP 7, random_int is a PHP core function
+	 * For PHP 5.x, depends on https://github.com/paragonie/random_compat
+	 *
+	 * @param int    $length      How many characters do we want?.
+	 * @param string $keyspace base character set. [0-9a-zA-Z]
+	 * @param string $extend A string of all possible characters to select from.
+	 *
+	 * @return string
+	 * @throws \RangeException RangeException.
+	 */
+	public static function random_str( int $length = 64, ?string $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ?string $extend = '' ): string {
+		if ( $length < 1 ) {
+			throw new \RangeException( 'Length must be a positive integer' );
+		}
+		$keyspace .= $extend; // '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+
+		$pieces = array();
+		$max    = mb_strlen( $keyspace, '8bit' ) - 1;
+		for ( $i = 0; $i < $length; ++$i ) {
+			$pieces [] = $keyspace[ random_int( 0, $max ) ];
+		}
+		return implode( '', $pieces );
+	}
+
+	/**
+	 * 驗證字串是否為純英文字串 或者是 被 urlencode 過的字串
+	 *
+	 * @param string $str - 字串
+	 *
+	 * @return bool
+	 */
+	public static function is_english( string $str ): bool {
+		if ( self::contains_non_ascii( $str ) || self::is_urlencoded( $str ) ) {
+			return false; // 包含非ASCII字符或已被 urlencode
+		}
+
+		return true; // 純英文字串
+	}
+
+	/**
+	 * 檢查字串是否包含中文字元等非 ASCII 字元
+	 *
+	 * @param string $str - 字串
+	 *
+	 * @return bool
+	 */
+	public static function contains_non_ascii( string $str ): bool {
+		return preg_match( '/[^\x00-\x7F]/', $str ) !== 0;
+	}
+
+	/**
+	 * 檢查字串是否已被 urlencode
+	 *
+	 * @param string $str - 字串
+	 *
+	 * @return bool
+	 */
+	public static function is_urlencoded( string $str ): bool {
+		$decoded = urldecode( $str );
+
+		return $decoded !== $str;
+	}
 }

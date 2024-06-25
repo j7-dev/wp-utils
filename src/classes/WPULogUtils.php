@@ -1,6 +1,7 @@
 <?php
 /**
- * LogFactory class
+ * WPULogUtils  class
+ * LOG 系統初始化
  * 能輕鬆創建 & 操作 log table
  *
  * @package J7\WpUtils
@@ -8,21 +9,21 @@
 
 namespace J7\WpUtils\Classes;
 
-if ( class_exists( 'LogFactory' ) ) {
+if ( class_exists( 'WPULogUtils ' ) ) {
 	return;
 }
 
 /**
- * Class LogFactory
+ * Class WPULogUtils
  */
-final class LogFactory {
+final class WPULogUtils {
 
 	/**
 	 * Log table name
 	 *
 	 * @var string
 	 */
-	public $table_name;
+	public string $table_name;
 
 	/**
 	 * Constructor
@@ -39,7 +40,6 @@ final class LogFactory {
 	 * @return array
 	 */
 	public function get_log_types() {
-
 		$log_types = array(
 			'purchase', // 購買
 			'modify', // 修改
@@ -58,13 +58,13 @@ final class LogFactory {
 	 * @param array $args {
 	 *     Optional. An array of arguments to control the retrieval of logs.
 	 *
-	 *     @type int    $number       The number of logs to retrieve per page. Default 10.
-	 *     @type int    $offset       The number of logs to offset (skip) in the query. Useful for pagination. Default 0.
-	 *     @type string $orderby      The column by which to order the logs. Default 'date'.
-	 *     @type string $order        The order direction ('ASC' or 'DESC'). Default 'DESC'.
-	 *     @type string $user_id      The ID of the user to filter logs by. Default empty.
-	 *     @type string $modified_by  The ID of the user who modified to filter logs by. Default empty.
-	 *     @type string $type         The type of log to filter by. Default empty.
+	 * @type int $number The number of logs to retrieve per page. Default 10.
+	 * @type int $offset The number of logs to offset (skip) in the query. Useful for pagination. Default 0.
+	 * @type string $orderby The column by which to order the logs. Default 'date'.
+	 * @type string $order The order direction ('ASC' or 'DESC'). Default 'DESC'.
+	 * @type string $user_id The ID of the user to filter logs by. Default empty.
+	 * @type string $modified_by The ID of the user who modified to filter logs by. Default empty.
+	 * @type string $type The type of log to filter by. Default empty.
 	 * }
 	 * @return array Returns an associative array with two keys:
 	 *               'list' — an array of log objects or arrays based on the query results,
@@ -90,7 +90,7 @@ final class LogFactory {
 		$orderby     = \esc_sql( $args['orderby'] );
 		$order       = strtoupper( $args['order'] ) === 'ASC' ? 'ASC' : 'DESC';
 		$user_id     = \esc_sql( $args['user_id'] );
-		$modified_by = \esc_sql( $args['modified_by'] );
+		$modified_by = \esc_sql( $args['modified_by'] ?? '' );
 		$type        = \esc_sql( $args['type'] );
 
 		$table_name = $wpdb->prefix . $this->table_name;
@@ -113,7 +113,7 @@ final class LogFactory {
 
 		$total_query = str_replace( ' *', ' COUNT(*)', $query );
 
-		if ( $numberposts != -1 ) {
+		if ( $numberposts != - 1 ) {
 			// Add ordering and limited pagination if not fetching all
 			$query .= $wpdb->prepare( ' LIMIT %d, %d', $offset, $numberposts );
 		}
@@ -132,7 +132,7 @@ final class LogFactory {
 		// 查询总记录数以计算分页信息
 		$total = $wpdb->get_var( $total_query );
 
-		if ( $numberposts != -1 ) {
+		if ( $numberposts != - 1 ) {
 			$total_pages = ceil( $total / $numberposts );
 			$page_size   = $numberposts;
 			$current     = (int) floor( $offset / $numberposts ) + 1;
@@ -161,16 +161,16 @@ final class LogFactory {
 	/**
 	 * Insert a log entry into the database.
 	 *
-	 * @param int    $user_id     The ID of the user to log the entry for.
-	 * @param array  $args        An array of arguments to log.
-	 * @param float  $points      The points to log.
+	 * @param int $user_id The ID of the user to log the entry for.
+	 * @param array $args An array of arguments to log.
+	 * @param float $points The points to log.
 	 * @param string $points_slug The points slug to log.
 	 *
 	 * @return void
 	 * @throws \WP_Error Exception.
 	 * @throws \Exception Exception.
 	 */
-	public function insert_user_log( $user_id = 0, $args = array(), $points = 0, $points_slug = '' ) {
+	public function insert_user_log( $user_id = 0, $args = array(), $points = 0, $points_slug = '' ): void {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . $this->table_name;
@@ -179,7 +179,12 @@ final class LogFactory {
 			throw new \WP_Error( 'invalid_points_slug', '沒有指定 points slug' );
 		}
 
-		$modified_by = \absint( $args['modified_by'] );
+		$modified_by = \absint( $args['modified_by'] ?? '' );
+
+		$expire_date = \sanitize_text_field( $args['expire_date'] ) ?? '';
+
+		$expire_date = ! ! $expire_date ? \gmdate( 'Y-m-d H:i:s', strtotime( $args['expire_date'] ) ) : null;
+
 
 		try {
 			$new_balance = (float) ( $args['new_balance'] ?? \get_user_meta( $user_id, $points_slug, true ) );
@@ -193,6 +198,7 @@ final class LogFactory {
 					'point_slug'    => $points_slug,
 					'point_changed' => number_format( $args['point_changed'] ?? '', 2 ),
 					'new_balance'   => number_format( $new_balance, 2 ),
+					'expire_date'   => $expire_date,
 					'date'          => \current_time( 'mysql' ),
 				)
 			);
