@@ -11,18 +11,19 @@ namespace J7\WpUtils\Classes;
 
 use Exception;
 
-if ( class_exists( 'WPUPointUtils ' ) ) {
+if (class_exists('WPUPointUtils ')) {
     return;
 }
 
 /**
  * Class Point
  */
-final class WPUPointUtils {
+final class WPUPointUtils
+{
     use \J7\WpUtils\Traits\SingletonTrait;
 
-    public const POST_TYPE = 'wpu_point';
-    public const DEFAULT_POINT_SLUG = 'wpu_default_point';
+    public const string POST_TYPE = 'wpu_point';
+    public ?WPUPoint $default_point = null;
 
     /**
      * Log instance
@@ -31,16 +32,17 @@ final class WPUPointUtils {
      */
     public WPULogUtils $log_instance;
 
-    public function init( WPULogUtils $log_instance ): void {
-        \add_action( 'init', [ $this, 'register_post_type' ], 10 );
-        \add_action( 'init', [ $this, 'create_default_point' ], 20 );
+    public function init(WPULogUtils $log_instance): void
+    {
+        \add_action('init', [$this, 'register_post_type'], 10);
+        \add_action('init', [$this, 'create_default_point'], 20);
         $this->log_instance = $log_instance;
 
-        \add_filter( 'pre_wp_unique_post_slug', [ $this, 'filter_point_slug' ], 99, 6 );
+        \add_filter('pre_wp_unique_post_slug', [$this, 'filter_point_slug'], 99, 6);
 
         $all_points = $this->get_all_points();
-        foreach ( $all_points as $point ) {
-            \add_action( 'user_' . $point->slug . '_points_updated', [ $this, 'insert_log' ], 10, 4 );
+        foreach ($all_points as $point) {
+            \add_action('user_' . $point->slug . '_points_updated', [$this, 'insert_log'], 10, 4);
         }
     }
 
@@ -51,19 +53,20 @@ final class WPUPointUtils {
      *
      * @return array WPUPoint[]
      */
-    public function get_all_points( ?string $post_status = 'publish' ): array {
+    public function get_all_points(?string $post_status = 'publish'): array
+    {
         $all_point_posts = \get_posts(
             [
-                'post_type'      => self::POST_TYPE,
-                'posts_per_page' => - 1,
-                'post_status'    => $post_status,
-                'order'          => 'ASC',
+                'post_type' => self::POST_TYPE,
+                'posts_per_page' => -1,
+                'post_status' => $post_status,
+                'order' => 'ASC',
             ]
         );
 
         return array_map(
-            function ( $post ) {
-                return new WPUPoint( $post );
+            function ($post) {
+                return new WPUPoint($post);
             },
             $all_point_posts
         );
@@ -80,8 +83,9 @@ final class WPUPointUtils {
      * @return void
      * @throws Exception
      */
-    public function insert_log( int $user_id, array $args, float $points, string $point_slug ): void {
-        $this->log_instance->insert_user_log( $user_id, $args, $points, $point_slug );
+    public function insert_log(int $user_id, array $args, float $points, string $point_slug): void
+    {
+        $this->log_instance->insert_user_log($user_id, $args, $points, $point_slug);
     }
 
     /**
@@ -89,83 +93,86 @@ final class WPUPointUtils {
      *
      * @return void
      */
-    public function register_post_type(): void {
-        $is_post_type_exists = \post_type_exists( self::POST_TYPE );
-        if ( $is_post_type_exists ) {
+    public function register_post_type(): void
+    {
+        $is_post_type_exists = \post_type_exists(self::POST_TYPE);
+        if ($is_post_type_exists) {
             return;
         }
         $labels = [
-            'name'                  => _x( 'Points', 'Post type general name', 'wp-utils' ),
-            'singular_name'         => _x( 'Point', 'Post type singular name', 'wp-utils' ),
-            'menu_name'             => _x( 'Points', 'Admin Menu text', 'wp-utils' ),
-            'name_admin_bar'        => _x( 'Point', 'Add New on Toolbar', 'wp-utils' ),
-            'add_new'               => __( 'Add New', 'wp-utils' ),
-            'add_new_item'          => __( 'Add New Point', 'wp-utils' ),
-            'new_item'              => __( 'New Point', 'wp-utils' ),
-            'edit_item'             => __( 'Edit Point', 'wp-utils' ),
-            'view_item'             => __( 'View Point', 'wp-utils' ),
-            'all_items'             => __( 'All Points', 'wp-utils' ),
-            'search_items'          => __( 'Search Points', 'wp-utils' ),
-            'parent_item_colon'     => __( 'Parent Points:', 'wp-utils' ),
-            'not_found'             => __( 'No books found.', 'wp-utils' ),
-            'not_found_in_trash'    => __( 'No books found in Trash.', 'wp-utils' ),
-            'featured_image'        => _x( 'Point Cover Image',
+            'name' => _x('Points', 'Post type general name', 'wp-utils'),
+            'singular_name' => _x('Point', 'Post type singular name', 'wp-utils'),
+            'menu_name' => _x('Points', 'Admin Menu text', 'wp-utils'),
+            'name_admin_bar' => _x('Point', 'Add New on Toolbar', 'wp-utils'),
+            'add_new' => __('Add New', 'wp-utils'),
+            'add_new_item' => __('Add New Point', 'wp-utils'),
+            'new_item' => __('New Point', 'wp-utils'),
+            'edit_item' => __('Edit Point', 'wp-utils'),
+            'view_item' => __('View Point', 'wp-utils'),
+            'all_items' => __('All Points', 'wp-utils'),
+            'search_items' => __('Search Points', 'wp-utils'),
+            'parent_item_colon' => __('Parent Points:', 'wp-utils'),
+            'not_found' => __('No books found.', 'wp-utils'),
+            'not_found_in_trash' => __('No books found in Trash.', 'wp-utils'),
+            'featured_image' => _x('Point Cover Image',
                 'Overrides the “Featured Image” phrase for this post type. Added in 4.3',
-                'wp-utils' ),
-            'set_featured_image'    => _x( 'Set cover image',
+                'wp-utils'),
+            'set_featured_image' => _x('Set cover image',
                 'Overrides the “Set featured image” phrase for this post type. Added in 4.3',
-                'wp-utils' ),
-            'remove_featured_image' => _x( 'Remove cover image',
+                'wp-utils'),
+            'remove_featured_image' => _x('Remove cover image',
                 'Overrides the “Remove featured image” phrase for this post type. Added in 4.3',
-                'wp-utils' ),
-            'use_featured_image'    => _x( 'Use as cover image',
+                'wp-utils'),
+            'use_featured_image' => _x('Use as cover image',
                 'Overrides the “Use as featured image” phrase for this post type. Added in 4.3',
-                'wp-utils' ),
-            'archives'              => _x( 'Point archives',
+                'wp-utils'),
+            'archives' => _x('Point archives',
                 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4',
-                'wp-utils' ),
-            'insert_into_item'      => _x( 'Insert into book',
+                'wp-utils'),
+            'insert_into_item' => _x('Insert into book',
                 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4',
-                'wp-utils' ),
-            'uploaded_to_this_item' => _x( 'Uploaded to this book',
+                'wp-utils'),
+            'uploaded_to_this_item' => _x('Uploaded to this book',
                 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4',
-                'wp-utils' ),
-            'filter_items_list'     => _x( 'Filter books list',
+                'wp-utils'),
+            'filter_items_list' => _x('Filter books list',
                 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4',
-                'wp-utils' ),
-            'items_list_navigation' => _x( 'Points list navigation',
+                'wp-utils'),
+            'items_list_navigation' => _x('Points list navigation',
                 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4',
-                'wp-utils' ),
-            'items_list'            => _x( 'Points list',
+                'wp-utils'),
+            'items_list' => _x('Points list',
                 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4',
-                'wp-utils' ),
+                'wp-utils'),
         ];
 
         $args = [
-            'labels'             => $labels,
-            'public'             => false,
+            'labels' => $labels,
+            'public' => false,
             'publicly_queryable' => false,
-            'show_ui'            => true,
-            'show_in_menu'       => true,
-            'query_var'          => true,
-            'capability_type'    => 'post',
-            'has_archive'        => true,
-            'hierarchical'       => false,
-            'menu_position'      => 70,
-            'menu_icon'          => 'dashicons-awards',
-            'supports'           => [ 'title', 'thumbnail', 'custom-fields' ],
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'query_var' => true,
+            'capability_type' => 'post',
+            'has_archive' => true,
+            'hierarchical' => false,
+            'menu_position' => 70,
+            'menu_icon' => 'dashicons-awards',
+            'supports' => ['title', 'thumbnail', 'custom-fields'],
         ];
 
-        \register_post_type( self::POST_TYPE, $args );
+        \register_post_type(self::POST_TYPE, $args);
     }
 
     /**
      * Get default point
+     * @deprecated
      *
      * @return WPUPoint|null
      */
-    public function get_default_point(): ?WPUPoint {
-        return self::get_point_by_slug( self::DEFAULT_POINT_SLUG );
+    public function get_default_point(): ?WPUPoint
+    {
+        return $this->default_point;
     }
 
     /**
@@ -175,20 +182,21 @@ final class WPUPointUtils {
      *
      * @return WPUPoint|null
      */
-    public function get_point_by_slug( string $slug ): ?WPUPoint {
+    public function get_point_by_slug(string $slug): ?WPUPoint
+    {
         $all_points = $this->get_all_points();
-        $point      = \array_filter(
+        $point = \array_filter(
             $all_points,
-            function ( $point ) use ( $slug ) {
+            function ($point) use ($slug) {
                 return $point->slug === $slug;
             }
         );
 
-        if ( ! $point ) {
+        if (!$point) {
             return null;
         }
 
-        return \reset( $point );
+        return \reset($point);
     }
 
     /**
@@ -206,13 +214,14 @@ final class WPUPointUtils {
      */
     public function filter_point_slug(
         ?string $override_slug,
-        string $slug,
-        int $post_id,
-        string $post_status,
-        string $post_type,
-        int $post_parent
-    ): ?string {
-        if ( self::POST_TYPE !== $post_type ) {
+        string  $slug,
+        int     $post_id,
+        string  $post_status,
+        string  $post_type,
+        int     $post_parent
+    ): ?string
+    {
+        if (self::POST_TYPE !== $post_type) {
             return $override_slug;
         }
 
@@ -225,27 +234,29 @@ final class WPUPointUtils {
      *
      * @return void
      */
-    public function create_default_point(): void {
+    public function create_default_point(): void
+    {
         $post_type = self::POST_TYPE;
-        $query     = new \WP_Query( array(
-            'name'           => self::DEFAULT_POINT_SLUG,
-            'post_type'      => $post_type,
-            'post_status'    => 'any',
-            'posts_per_page' => 1,
-        ) );
+        $posts = get_posts(array(
+            'post_type' => $post_type,
+            'post_status' => 'any',
+            'numberposts' => 1,
+            'order' => 'ASC'
+        ));
 
-        if ( $query->have_posts() ) {
-            return;
+        if (!!$posts && is_array($posts)) {
+            $this->default_point = $posts[0];
         } else {
             // create default member_lv
             $post_id = \wp_insert_post(
                 [
-                    'post_title'  => '購物金',
-                    'post_type'   => $post_type,
+                    'post_title' => '購物金',
+                    'post_type' => $post_type,
                     'post_status' => 'publish',
-                    'post_name'   => self::DEFAULT_POINT_SLUG,
                 ]
             );
+            $post = get_post($post_id);
+            $this->default_point = $post;
             // TODO 設定預設圖片
         }
     }
