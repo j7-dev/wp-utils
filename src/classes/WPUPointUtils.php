@@ -22,8 +22,8 @@ final class WPUPointUtils
 {
     use \J7\WpUtils\Traits\SingletonTrait;
 
-    public const string POST_TYPE = 'wpu_point';
-    public ?WPUPoint $default_point = null;
+    public const POST_TYPE = 'wpu_point';
+    public $default_point = null;
 
     /**
      * Log instance
