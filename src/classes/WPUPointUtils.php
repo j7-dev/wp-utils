@@ -245,7 +245,9 @@ final class WPUPointUtils
         ));
 
         if (!!$posts && is_array($posts)) {
-            $this->default_point = $posts[0];
+            $post = $posts[0];
+            $point = new WPUPoint($post);
+            $this->default_point = $point;
         } else {
             // create default member_lv
             $post_id = \wp_insert_post(
