@@ -90,40 +90,52 @@ abstract class WC
 		return $formatted_meta_data;
 	}
 
-	/**
-	 * 用產品反查訂單
-	 *
-	 * @param int      $product_id   產品 ID
-	 * @param int|null $user_id 用戶 ID
-	 * @param int|null $limit   限制數量
-	 *
-	 * @return array string[] order_ids
-	 */
-	public static function get_order_ids_by_product_id(int $product_id, ?int $user_id, ?int $limit = 10): array
-	{
-		$user_id = $user_id ?? \get_current_user_id();
+    /**
+     * 用產品反查訂單
+     *
+     * @param int        $product_id 產品 ID
+     * @param array|null $args 參數
+     * - user_id int 使用者 ID
+     * - limit int 查詢筆數
+     * - order_statuses string[] 訂單狀態, 預設 [ 'wc-completed', 'wc-processing' ]
+     *
+     * @return array string[] order_ids
+     */
+    public static function get_order_ids_by_product_id( int $product_id, ?array $args ): array {
+        global $wpdb;
+        $user_id               = $args['user_id'] ?? \get_current_user_id();
+        $limit                 = $args['limit'] ?? 10;
+        $order_statuses        = $args['order_statuses'] ?? [ 'wc-completed', 'wc-processing' ];
+        $order_statuses_string = implode( ',', array_map( function ( $status ) {
+            return '"' . $status . '"';
+        }, $order_statuses ) );
 
-		global $wpdb;
-
-		return $wpdb->get_col(
-			$wpdb->prepare(
-				"
+        try {
+            $prepare = $wpdb->prepare(
+                "
         SELECT order_items.order_id
         FROM {$wpdb->prefix}woocommerce_order_items as order_items
         LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta ON order_items.order_item_id = order_item_meta.order_item_id
         LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
         WHERE posts.post_type = 'shop_order'
-          AND posts.post_author = %d
-          AND posts.post_status IN ( 'wc-completed', 'wc-processing' )
+          AND posts.post_author = %1\$s
+          AND posts.post_status IN ( %2\$s )
           AND order_items.order_item_type = 'line_item'
           AND order_item_meta.meta_key = '_product_id'
-          AND order_item_meta.meta_value = %s
+          AND order_item_meta.meta_value = %3\$s
         ORDER BY order_items.order_id DESC
-        LIMIT %d",
-				$user_id,
-				$product_id,
-				$limit
-			)
-		);
-	}
+        LIMIT %4\$s",
+                $user_id,
+                $order_statuses_string,
+                $product_id,
+                $limit
+            );
+
+            return $wpdb->get_col( str_replace( '\"', '"', $prepare ) );
+        } catch ( \Exception $e ) {
+            \J7\WpUtils\Classes\Log::info( $e->getMessage() );
+
+            return [];
+        }
+    }
 }
