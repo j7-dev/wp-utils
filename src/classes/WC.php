@@ -92,6 +92,7 @@ abstract class WC
 
     /**
      * 用產品反查訂單
+     * TODO 支援 HPOS
      *
      * @param int        $product_id 產品 ID
      * @param array|null $args 參數

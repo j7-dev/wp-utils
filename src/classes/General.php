@@ -224,6 +224,8 @@ abstract class General {
      * @param array $fn_array
      * - callback callable function
      * - args array 參數
+     * @param int|null $precision 精確度，預設 5
+     * @param bool|null $print_log 是否印出 log，預設 true
      *
      * @return array
      * - return mixed
