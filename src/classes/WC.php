@@ -211,10 +211,12 @@ abstract class WC
                  */
                 $product_id = $item->get_product_id();
 
-                // Your condition related to your 2 specific products Ids
-                if ( in_array( $product_id, $target_product_ids ) ) {
-                    $has_bought = true;
-                }
+               if(is_array($target_product_ids)){
+                   $has_bought = in_array( $product_id, $target_product_ids );
+               }else{
+                   $has_bought =  $product_id === $target_product_ids;
+               }
+
             }
         }
 
