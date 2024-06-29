@@ -96,9 +96,9 @@ abstract class WC
      *
      * @param int        $product_id 產品 ID
      * @param array|null $args 參數
-     * - user_id int 使用者 ID
-     * - limit int 查詢筆數
-     * - order_statuses string[] 訂單狀態, 預設 [ 'wc-completed', 'wc-processing' ]
+     * - user_id int 使用者 ID，預設 current_user_id
+     * - limit int 查詢筆數，預設 10
+     * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed', 'wc-processing' ]
      *
      * @return array string[] order_ids
      */
@@ -106,10 +106,28 @@ abstract class WC
         global $wpdb;
         $user_id               = $args['user_id'] ?? \get_current_user_id();
         $limit                 = $args['limit'] ?? 10;
-        $order_statuses        = $args['order_statuses'] ?? [ 'wc-completed', 'wc-processing' ];
-        $order_statuses_string = implode( ',', array_map( function ( $status ) {
-            return '"' . $status . '"';
-        }, $order_statuses ) );
+        $statuses        = $args['status'] ?? 'any';
+        if ( is_array( $statuses ) ) {
+            $statuses_string  = implode(
+                ',',
+                array_map(
+                    function ( $status ) {
+                        return '"' . $status . '"';
+                    },
+                    $statuses
+                )
+            );
+            $status_condition = sprintf(
+                'AND posts.post_status IN ( %1$s )',
+                $statuses_string
+            );
+        } else {
+            $status_condition = ( $statuses === 'any' ) ? '' : sprintf(
+                'AND posts.post_status = %1$s',
+                $statuses
+            );
+
+        }
 
         try {
             $prepare = $wpdb->prepare(
@@ -120,14 +138,14 @@ abstract class WC
         LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
         WHERE posts.post_type = 'shop_order'
           AND posts.post_author = %1\$s
-          AND posts.post_status IN ( %2\$s )
+          %2\$s
           AND order_items.order_item_type = 'line_item'
           AND order_item_meta.meta_key = '_product_id'
           AND order_item_meta.meta_value = %3\$s
         ORDER BY order_items.order_id DESC
         LIMIT %4\$s",
                 $user_id,
-                $order_statuses_string,
+                $status_condition,
                 $product_id,
                 $limit
             );
@@ -138,5 +156,68 @@ abstract class WC
 
             return [];
         }
+    }
+
+    /**
+     * 取得商品圖片
+     *
+     * @param \WC_Product $product 商品
+     * @param string|null $size 尺寸 full | single-post-thumbnail
+     * @param string|null $default_image 預設圖片
+     *
+     * @return string
+     */
+    public static function get_image_url_by_product(
+        \WC_Product $product,
+        ?string $size = 'full',
+        ?string $default_image = ''
+    ): string {
+        $product_image = \wp_get_attachment_image_src(
+            \get_post_thumbnail_id( $product->get_id() ),
+            $size
+        );
+
+        if ( ! $product_image || ! is_array( $product_image ) ){
+            $product_image_url = $default_image ? $default_image : "https://placehold.co/800x600?text=%3Cimg%20/%3E";
+        } else {
+            $product_image_url = $product_image[0];
+        }
+
+        return $product_image_url;
+    }
+
+    /**
+     * 檢查用戶是否購買過指定商品
+     *
+     * @param int|array  $target_product_ids
+     * @param array|null $args
+     *
+     * @return bool
+     */
+    public static function has_bought( int|array $target_product_ids, ?array $args = [] ) {
+        $has_bought = false;
+
+        $customer_orders = \wc_get_orders(
+            [
+                'limit'       => - 1,
+                'customer_id' => $args['user_id'] ?? get_current_user_id(),
+                'status'      => $args['status'] ?? [ 'wc-completed' ],
+            ]
+        );
+        foreach ( $customer_orders as $order ) {
+            foreach ( $order->get_items() as $item ) {
+                /**
+                 * @var \WC_Order_Item_Product $item
+                 */
+                $product_id = $item->get_product_id();
+
+                // Your condition related to your 2 specific products Ids
+                if ( in_array( $product_id, $target_product_ids ) ) {
+                    $has_bought = true;
+                }
+            }
+        }
+
+        return $has_bought;
     }
 }

@@ -196,14 +196,14 @@ abstract class General {
         \J7\WpUtils\Classes\Log::info(
             sprintf(
                 '
-		 %1$s 與 %2$s 的效能比較
-		 %1$s 花費時間: %3$s 豪秒
-		 %2$s 花費時間: %4$s 豪秒
+		 效能比較
+		 %1$s 花費時間: %2$s 豪秒
+		 %3$s 花費時間: %4$s 豪秒
 		 差異: %5$s 秒 
 		 %6$s %7$s%%',
                 $from_result['function_name'],
-                $to_result['function_name'],
                 $from_result['execution_time'],
+                $to_result['function_name'],
                 $to_result['execution_time'],
                 $execution_time_diff > 0 ? "+{$execution_time_diff}" : "{$execution_time_diff}",
                 $execution_time_diff > 0 ? '❌ 變慢了' : '✅ 提升了',
