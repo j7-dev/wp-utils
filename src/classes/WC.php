@@ -191,6 +191,8 @@ abstract class WC
      *
      * @param int|array  $target_product_ids
      * @param array|null $args
+     * - user_id int 使用者 ID，預設 current_user_id
+     * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed' ]
      *
      * @return bool
      */
