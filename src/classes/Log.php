@@ -1,6 +1,7 @@
 <?php
 /**
  * Log class
+ * 方便印出 Error Log
  *
  * @package J7\WpUtils
  */
