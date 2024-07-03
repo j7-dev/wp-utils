@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "975bb8b9ef8f70c9084c9494afc9f257",
+    "content-hash": "5e6799cc153509ffe8c5ab72e8b5cace",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/j7-dev/tgm-plugin-activation-forked.git",
-                "reference": "c1a5f4c4286c624d3161dfe230eb22a256cd093a"
+                "reference": "b40e832ed1655dd660772b683ba8b7d6bddd7a62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/j7-dev/tgm-plugin-activation-forked/zipball/c1a5f4c4286c624d3161dfe230eb22a256cd093a",
-                "reference": "c1a5f4c4286c624d3161dfe230eb22a256cd093a",
+                "url": "https://api.github.com/repos/j7-dev/tgm-plugin-activation-forked/zipball/b40e832ed1655dd660772b683ba8b7d6bddd7a62",
+                "reference": "b40e832ed1655dd660772b683ba8b7d6bddd7a62",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "issues": "https://github.com/j7-dev/tgm-plugin-activation-forked/issues",
                 "source": "https://github.com/j7-dev/tgm-plugin-activation-forked"
             },
-            "time": "2024-06-10T10:48:54+00:00"
+            "time": "2024-07-03T04:41:48+00:00"
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
@@ -271,12 +271,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "d727caa32cd3362690f5606bdc997c158d2a5137"
+                "reference": "4a305210f0dd5e6eeba775c4ffbeaefa19a37229"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/d727caa32cd3362690f5606bdc997c158d2a5137",
-                "reference": "d727caa32cd3362690f5606bdc997c158d2a5137",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/4a305210f0dd5e6eeba775c4ffbeaefa19a37229",
+                "reference": "4a305210f0dd5e6eeba775c4ffbeaefa19a37229",
                 "shasum": ""
             },
             "require": {
@@ -352,7 +352,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-05-23T07:27:46+00:00"
+            "time": "2024-06-09T12:33:11+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
