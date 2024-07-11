@@ -25,18 +25,18 @@ final class Upload {
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
 	 */
-	protected $apis = array(
-		array(
+	protected $apis = [
+		[
 			'endpoint' => 'upload',
 			'method'   => 'post',
-		),
-	);
+		],
+	];
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_upload' ) );
+		\add_action( 'rest_api_init', [ $this, 'register_api_upload' ] );
 	}
 
 	/**
@@ -76,19 +76,19 @@ final class Upload {
 				require_once 'wp-admin/includes/media.php';
 			}
 
-			$upload_results   = array();
-			$upload_overrides = array( 'test_form' => false );
-			$_FILES           = array();
+			$upload_results   = [];
+			$upload_overrides = [ 'test_form' => false ];
+			$_FILES           = [];
 			// 遍歷每個上傳的檔案
 			foreach ( $file_params['files']['tmp_name'] as $key => $tmp_name ) {
 				if ( ! empty( $tmp_name ) ) {
-					$file = array(
+					$file = [
 						'name'     => $file_params['files']['name'][ $key ],
 						'type'     => $file_params['files']['type'][ $key ],
 						'tmp_name' => $tmp_name,
 						'error'    => $file_params['files']['error'][ $key ],
 						'size'     => $file_params['files']['size'][ $key ],
-					);
+					];
 
 					$_FILES[ $key ] = $file;
 
@@ -102,11 +102,11 @@ final class Upload {
 						$upload_result['size'] = $file['size'];
 						if ( isset( $upload_result['error'] ) ) {
 							return new \WP_REST_Response(
-								array(
+								[
 									'code'    => 'upload_error',
 									'message' => $upload_result['error'],
 									'data'    => $upload_result,
-								),
+								],
 								400
 							);
 						}
@@ -120,22 +120,22 @@ final class Upload {
 						if ( \is_wp_error( $attachment_id ) ) {
 							// 處理錯誤
 							return new \WP_REST_Response(
-								array(
+								[
 									'code'    => 'upload_error',
 									'message' => $attachment_id->get_error_message(),
 									'data'    => $upload_result,
-								),
+								],
 								400
 							);
 						}
 
-						$upload_result = array(
+						$upload_result = [
 							'id'   => (string) $attachment_id,
 							'url'  => \wp_get_attachment_url( $attachment_id ),
 							'type' => $file['type'],
 							'name' => $file['name'],
 							'size' => $file['size'],
-						);
+						];
 					}
 
 					$upload_results[] = $upload_result;
@@ -144,11 +144,11 @@ final class Upload {
 
 			// 返回上傳成功的訊息
 			return \rest_ensure_response(
-				array(
+				[
 					'code'    => 'upload_success',
 					'message' => '檔案上傳成功',
 					'data'    => $upload_results,
-				)
+				]
 			);
 
 		}

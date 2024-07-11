@@ -39,9 +39,9 @@ abstract class Log {
 	 *               'pagination' — an associative array with pagination details, including
 	 *               total number of logs, total pages, current page, and logs per page.
 	 */
-	public static function get_logs( $args = array() ) {
+	public static function get_logs( $args = [] ) {
 		global $wpdb;
-		$defaults = array(
+		$defaults = [
 			'numberposts' => 10, // 每页显示的日志数量
 			'offset'      => 0, // 跳过的日志数量
 			'orderby'     => 'date', // 排序字段
@@ -49,7 +49,7 @@ abstract class Log {
 			'user_id'     => '', // 用户ID查询
 			'modified_by' => '', // 修改者ID查询
 			'type'        => '', // 日志类型查询
-		);
+		];
 
 		$args = \wp_parse_args( $args, $defaults );
 
@@ -64,7 +64,7 @@ abstract class Log {
 		$table_name = $wpdb->prefix . Plugin::LOG_TABLE_NAME;
 
 		// 构建WHERE子句
-		$where = array();
+		$where = [];
 		if ( ! empty( $user_id ) ) {
 			$where[] = "user_id = '$user_id'";
 		}
@@ -111,17 +111,17 @@ abstract class Log {
 		}
 
 		// 准备分页信息
-		$pagination = array(
+		$pagination = [
 			'total'      => (int) $total,
 			'totalPages' => (int) $total_pages,
 			'current'    => (int) $current,
 			'pageSize'   => (int) $page_size,
-		);
+		];
 
-		$data = array(
+		$data = [
 			'list'       => $logs,
 			'pagination' => $pagination,
-		);
+		];
 
 		return $data;
 	}
@@ -136,7 +136,7 @@ abstract class Log {
 	 *
 	 * @return void
 	 */
-	public static function insert_user_log( $user_id = 0, $args = array(), $points = 0, $points_slug = '' ) {
+	public static function insert_user_log( $user_id = 0, $args = [], $points = 0, $points_slug = '' ) {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . Plugin::LOG_TABLE_NAME;
@@ -145,7 +145,7 @@ abstract class Log {
 			$new_balance = (float) ( $args['new_balance'] ?? \get_user_meta( $user_id, $points_slug, true ) );
 			$result      = $wpdb->insert(
 				$table_name,
-				array(
+				[
 					'title'         => \sanitize_text_field( $args['title'] ?? 'No Title' ),
 					'type'          => \sanitize_text_field( $args['type'] ?? '' ),
 					'user_id'       => $user_id,
@@ -154,7 +154,7 @@ abstract class Log {
 					'point_changed' => number_format( $args['point_changed'] ?? '', 2 ),
 					'new_balance'   => number_format( $new_balance, 2 ),
 					'date'          => \current_time( 'mysql' ),
-				)
+				]
 			);
 
 			if ( ! $result ) {

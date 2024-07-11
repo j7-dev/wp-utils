@@ -15,16 +15,15 @@ if (class_exists('WC')) {
 /**
  * WC class
  */
-abstract class WC
-{
+abstract class WC {
+
 
 	/**
 	 * Is HPOS enabled
 	 *
 	 * @return bool
 	 */
-	public static function is_hpos_enabled(): bool
-	{
+	public static function is_hpos_enabled(): bool {
 		return class_exists(\Automattic\WooCommerce\Utilities\OrderUtil::class) && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
 	}
 
@@ -36,8 +35,7 @@ abstract class WC
 	 * @param int $limit Limit.
 	 * @return array
 	 */
-	public static function get_top_sales_products($limit = 10)
-	{
+	public static function get_top_sales_products( $limit = 10 ) {
 		global $wpdb;
 		// 执行查询
 		$top_selling_products = $wpdb->get_results(
@@ -54,16 +52,16 @@ abstract class WC
 		);
 
 		$formatted_top_selling_products = array_map(
-			function ($product) {
+			function ( $product ) {
 				$product_id   = $product->post_id;
 				$product_name = \get_the_title($product_id);
 				$total_sales  = $product->total_sales;
 
-				return array(
+				return [
 					'id'          => (string) $product_id,
 					'name'        => $product_name,
 					'total_sales' => (float) $total_sales,
-				);
+				];
 			},
 			$top_selling_products
 		);
@@ -79,59 +77,58 @@ abstract class WC
 	 * @param \WC_Product $product Product.
 	 * @return array
 	 */
-	public static function get_formatted_meta_data(\WC_Product $product): array
-	{
+	public static function get_formatted_meta_data( \WC_Product $product ): array {
 		$meta_data           = $product->get_meta_data();
-		$formatted_meta_data = array();
+		$formatted_meta_data = [];
 		foreach ($meta_data as $meta) {
-			$formatted_meta_data[$meta->key] = $meta->value;
+			$formatted_meta_data[ $meta->key ] = $meta->value;
 		}
 
 		return $formatted_meta_data;
 	}
 
-    /**
-     * 用產品反查訂單
-     * TODO 支援 HPOS
-     *
-     * @param int        $product_id 產品 ID
-     * @param array|null $args 參數
-     * - user_id int 使用者 ID，預設 current_user_id
-     * - limit int 查詢筆數，預設 10
-     * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed', 'wc-processing' ]
-     *
-     * @return array string[] order_ids
-     */
-    public static function get_order_ids_by_product_id( int $product_id, ?array $args ): array {
-        global $wpdb;
-        $user_id               = $args['user_id'] ?? \get_current_user_id();
-        $limit                 = $args['limit'] ?? 10;
-        $statuses        = $args['status'] ?? 'any';
-        if ( is_array( $statuses ) ) {
-            $statuses_string  = implode(
-                ',',
-                array_map(
-                    function ( $status ) {
-                        return '"' . $status . '"';
-                    },
-                    $statuses
-                )
-            );
-            $status_condition = sprintf(
-                'AND posts.post_status IN ( %1$s )',
-                $statuses_string
-            );
-        } else {
-            $status_condition = ( $statuses === 'any' ) ? '' : sprintf(
-                'AND posts.post_status = %1$s',
-                $statuses
-            );
+	/**
+	 * 用產品反查訂單
+	 * TODO 支援 HPOS
+	 *
+	 * @param int        $product_id 產品 ID
+	 * @param array|null $args 參數
+	 * - user_id int 使用者 ID，預設 current_user_id
+	 * - limit int 查詢筆數，預設 10
+	 * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed', 'wc-processing' ]
+	 *
+	 * @return array string[] order_ids
+	 */
+	public static function get_order_ids_by_product_id( int $product_id, ?array $args ): array {
+		global $wpdb;
+		$user_id  = $args['user_id'] ?? \get_current_user_id();
+		$limit    = $args['limit'] ?? 10;
+		$statuses = $args['status'] ?? 'any';
+		if ( is_array( $statuses ) ) {
+			$statuses_string  = implode(
+				',',
+				array_map(
+					function ( $status ) {
+						return '"' . $status . '"';
+					},
+					$statuses
+				)
+			);
+			$status_condition = sprintf(
+				'AND posts.post_status IN ( %1$s )',
+				$statuses_string
+			);
+		} else {
+			$status_condition = ( $statuses === 'any' ) ? '' : sprintf(
+				'AND posts.post_status = %1$s',
+				$statuses
+			);
 
-        }
+		}
 
-        try {
-            $prepare = $wpdb->prepare(
-                "
+		try {
+			$prepare = $wpdb->prepare(
+				"
         SELECT order_items.order_id
         FROM {$wpdb->prefix}woocommerce_order_items as order_items
         LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta ON order_items.order_item_id = order_item_meta.order_item_id
@@ -144,84 +141,83 @@ abstract class WC
           AND order_item_meta.meta_value = %3\$s
         ORDER BY order_items.order_id DESC
         LIMIT %4\$s",
-                $user_id,
-                $status_condition,
-                $product_id,
-                $limit
-            );
+				$user_id,
+				$status_condition,
+				$product_id,
+				$limit
+			);
 
-            return $wpdb->get_col( str_replace( '\"', '"', $prepare ) );
-        } catch ( \Exception $e ) {
-            \J7\WpUtils\Classes\Log::info( $e->getMessage() );
+			return $wpdb->get_col( str_replace( '\"', '"', $prepare ) );
+		} catch ( \Exception $e ) {
+			\J7\WpUtils\Classes\Log::info( $e->getMessage() );
 
-            return [];
-        }
-    }
+			return [];
+		}
+	}
 
-    /**
-     * 取得商品圖片
-     *
-     * @param \WC_Product $product 商品
-     * @param string|null $size 尺寸 full | single-post-thumbnail
-     * @param string|null $default_image 預設圖片
-     *
-     * @return string
-     */
-    public static function get_image_url_by_product(
-        \WC_Product $product,
-        ?string $size = 'full',
-        ?string $default_image = ''
-    ): string {
-        $product_image = \wp_get_attachment_image_src(
-            \get_post_thumbnail_id( $product->get_id() ),
-            $size
-        );
+	/**
+	 * 取得商品圖片
+	 *
+	 * @param \WC_Product $product 商品
+	 * @param string|null $size 尺寸 full | single-post-thumbnail
+	 * @param string|null $default_image 預設圖片
+	 *
+	 * @return string
+	 */
+	public static function get_image_url_by_product(
+		\WC_Product $product,
+		?string $size = 'full',
+		?string $default_image = ''
+	): string {
+		$product_image = \wp_get_attachment_image_src(
+			\get_post_thumbnail_id( $product->get_id() ),
+			$size
+		);
 
-        if ( ! $product_image || ! is_array( $product_image ) ){
-            $product_image_url = $default_image ? $default_image : "https://placehold.co/800x600?text=%3Cimg%20/%3E";
-        } else {
-            $product_image_url = $product_image[0];
-        }
+		if ( ! $product_image || ! is_array( $product_image ) ) {
+			$product_image_url = $default_image ? $default_image : 'https://placehold.co/800x600?text=%3Cimg%20/%3E';
+		} else {
+			$product_image_url = $product_image[0];
+		}
 
-        return $product_image_url;
-    }
+		return $product_image_url;
+	}
 
-    /**
-     * 檢查用戶是否購買過指定商品
-     *
-     * @param int|array  $target_product_ids
-     * @param array|null $args
-     * - user_id int 使用者 ID，預設 current_user_id
-     * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed' ]
-     *
-     * @return bool
-     */
-    public static function has_bought( int|array $target_product_ids, ?array $args = [] ) {
-        $has_bought = false;
+	/**
+	 * 檢查用戶是否購買過指定商品
+	 *
+	 * @param int|array  $target_product_ids
+	 * @param array|null $args
+	 * - user_id int 使用者 ID，預設 current_user_id
+	 * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed' ]
+	 *
+	 * @return bool
+	 */
+	public static function has_bought( int|array $target_product_ids, ?array $args = [] ) {
+		$has_bought = false;
 
-        $customer_orders = \wc_get_orders(
-            [
-                'limit'       => - 1,
-                'customer_id' => $args['user_id'] ?? get_current_user_id(),
-                'status'      => $args['status'] ?? [ 'wc-completed' ],
-            ]
-        );
-        foreach ( $customer_orders as $order ) {
-            foreach ( $order->get_items() as $item ) {
-                /**
-                 * @var \WC_Order_Item_Product $item
-                 */
-                $product_id = $item->get_product_id();
+		$customer_orders = \wc_get_orders(
+			[
+				'limit'       => - 1,
+				'customer_id' => $args['user_id'] ?? get_current_user_id(),
+				'status'      => $args['status'] ?? [ 'wc-completed' ],
+			]
+		);
+		foreach ( $customer_orders as $order ) {
+			foreach ( $order->get_items() as $item ) {
+				/**
+				 * @var \WC_Order_Item_Product $item
+				 */
+				$product_id = $item->get_product_id();
 
-               if(is_array($target_product_ids)){
-                   $has_bought = in_array( $product_id, $target_product_ids );
-               }else{
-                   $has_bought =  $product_id === $target_product_ids;
-               }
+				if (is_array($target_product_ids)) {
+					$has_bought = in_array( $product_id, $target_product_ids );
+				} else {
+					$has_bought = $product_id === $target_product_ids;
+				}
+			}
+		}
 
-            }
-        }
-
-        return $has_bought;
-    }
+		return $has_bought;
+	}
 }

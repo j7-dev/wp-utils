@@ -50,11 +50,11 @@ trait ApiRegisterTrait {
 			\register_rest_route(
 				$namespace,
 				$api['endpoint'],
-				array(
+				[
 					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
+					'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
 					'permission_callback' => $permission_callback,
-				)
+				]
 			);
 		}
 	}

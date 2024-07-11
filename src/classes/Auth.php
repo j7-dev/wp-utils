@@ -38,13 +38,13 @@ abstract class Auth {
 	public static function check_basic_auth( $request ) {
 		// 檢查PHP_AUTH_USER和PHP_AUTH_PW是否設置
 		if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) || ! isset( $_SERVER['PHP_AUTH_PW'] ) ) {
-			return new \WP_Error( 'rest_forbidden', 'Authorization header missing', array( 'status' => 401 ) );
+			return new \WP_Error( 'rest_forbidden', 'Authorization header missing', [ 'status' => 401 ] );
 		}
 
 		// 驗證使用者名稱和密碼
 		$user = \wp_authenticate( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ); // phpcs:ignore
 		if ( \is_wp_error( $user ) ) {
-			return new \WP_Error( 'rest_forbidden', 'Invalid username or password', array( 'status' => 401 ) );
+			return new \WP_Error( 'rest_forbidden', 'Invalid username or password', [ 'status' => 401 ] );
 		}
 
 		return true;

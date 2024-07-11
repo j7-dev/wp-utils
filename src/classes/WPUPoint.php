@@ -18,10 +18,10 @@ if ( class_exists( 'WPUPoint ' ) ) {
  */
 final class WPUPoint {
 	public $id;
-	public $name = '';
+	public $name   = '';
 	public $status = 'publish';
-	public $slug = '';
-	public $order = 0;
+	public $slug   = '';
+	public $order  = 0;
 
 
 	/**
@@ -41,7 +41,7 @@ final class WPUPoint {
 	/**
 	 * 加多少點
 	 *
-	 * @param int $user_id - user id
+	 * @param int   $user_id - user id
 	 * @param array $args - args
 	 * @param float $points - points
 	 *
@@ -68,7 +68,7 @@ final class WPUPoint {
 	 * 直接更新點數到某個值
 	 *  TODO Mysql transaction
 	 *
-	 * @param int $user_id - user id
+	 * @param int   $user_id - user id
 	 * @param array $args - args
 	 * @param float $points - points
 	 *
@@ -107,13 +107,13 @@ final class WPUPoint {
 	/**
 	 * 扣多少點
 	 *
-	 * @param int $user_id - user id
+	 * @param int   $user_id - user id
 	 * @param array $args - args
 	 * @param float $points - points
 	 *
 	 * @return float updated points value
 	 */
-	public function deduct_points_to_user( int $user_id = 0, array $args = array(), float $points = 0 ): float {
+	public function deduct_points_to_user( int $user_id = 0, array $args = [], float $points = 0 ): float {
 		// If points are positive, turn them to negative
 		if ( $points > 0 ) {
 			$points *= - 1;

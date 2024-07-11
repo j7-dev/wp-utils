@@ -18,7 +18,7 @@ trait ContainerTrait {
 	 *
 	 * @var array
 	 */
-	protected $container = array();
+	protected $container = [];
 
 	/**
 	 * Get dynamic property from container.

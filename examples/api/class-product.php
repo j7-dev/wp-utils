@@ -21,7 +21,7 @@ final class Product {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_product' ) );
+		\add_action( 'rest_api_init', [ $this, 'register_api_product' ] );
 	}
 
 	/**
@@ -31,29 +31,29 @@ final class Product {
 	 */
 	public function register_api_product(): void {
 
-		$apis = array(
-			array(
+		$apis = [
+			[
 				'endpoint'            => 'products',
 				'method'              => 'get',
 				'permission_callback' => function () {
 					return \current_user_can( 'manage_options' );
 				},
-			),
-			array(
+			],
+			[
 				'endpoint'            => 'terms',
 				'method'              => 'get',
 				'permission_callback' => function () {
 					return \current_user_can( 'manage_options' );
 				},
-			),
-			array(
+			],
+			[
 				'endpoint'            => 'options',
 				'method'              => 'get',
 				'permission_callback' => function () {
 					return \current_user_can( 'manage_options' );
 				},
-			),
-		);
+			],
+		];
 
 		foreach ( $apis as $api ) {
 			// 用正則表達式替換 -, / 替換為 _
@@ -62,11 +62,11 @@ final class Product {
 			\register_rest_route(
 				'wp-utils/v1',
 				$api['endpoint'],
-				array(
+				[
 					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
+					'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
 					'permission_callback' => $api['permission_callback'],
-				)
+				]
 			);
 		}
 	}
@@ -80,18 +80,18 @@ final class Product {
 	 */
 	public function get_products_callback( $request ) { // phpcs:ignore
 
-		$params = $request->get_query_params() ?? array();
+		$params = $request->get_query_params() ?? [];
 
-		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
+		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
-		$default_args = array(
+		$default_args = [
 			'status'         => 'publish',
 			'paginate'       => true,
 			'posts_per_page' => 10,
 			'page'           => 1,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
-		);
+		];
 
 		$args = \wp_parse_args(
 			$params,
@@ -104,7 +104,7 @@ final class Product {
 
 		$products = $results->products;
 
-		$formatted_products = array_map( array( $this, 'format_product_details' ), $products );
+		$formatted_products = array_map( [ $this, 'format_product_details' ], $products );
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -128,7 +128,7 @@ final class Product {
 	public function format_product_details( $product , $with_description = false) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
-			return array();
+			return [];
 		}
 
 		$date_created  = $product->get_date_created();
@@ -140,25 +140,25 @@ final class Product {
 		$gallery_image_ids  = $product->get_gallery_image_ids();
 		$gallery_image_urls = array_map( 'wp_get_attachment_url', $gallery_image_ids );
 
-		$description_array = $with_description ? array(
+		$description_array = $with_description ? [
 			'description'       => $product->get_description(),
 			'short_description' => $product->get_short_description(),
-		) : array();
+		] : [];
 
 		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
 
 		$variation_ids = $product->get_children(); // get variations
-		$children      = array();
+		$children      = [];
 		if ( ! empty( $variation_ids ) ) {
 			$variation_products = array_map( 'wc_get_product', $variation_ids );
-			$children_details   = array_map( array( $this, 'format_product_details' ), $variation_products );
-			$children           = array(
+			$children_details   = array_map( [ $this, 'format_product_details' ], $variation_products );
+			$children           = [
 				'children'  => $children_details,
 				'parent_id' => (string) $product->get_id(),
-			);
+			];
 		}
 
-		$base_array = array(
+		$base_array = [
 			// Get Product General Info
 			'id'                 => (string) $product->get_id(),
 			'type'               => $product->get_type(),
@@ -213,7 +213,7 @@ final class Product {
 
 			// variations
 			// 'children'           => $children,
-		) + $children;
+		] + $children;
 
 		return array_merge(
 			$description_array,
@@ -231,18 +231,18 @@ final class Product {
 	 */
 	public function get_terms_callback( $request ) { // phpcs:ignore
 
-		$params = $request->get_query_params() ?? array();
+		$params = $request->get_query_params() ?? [];
 
-		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
+		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
 		// it seems no need to add post_per_page, get_terms will return all terms
-		$default_args = array(
+		$default_args = [
 			'taxonomy'   => 'product_cat',
 			'fields'     => 'id=>name',
 			'hide_empty' => true,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
-		);
+		];
 
 		$args = \wp_parse_args(
 			$params,
@@ -251,7 +251,7 @@ final class Product {
 
 		$terms = \get_terms( $args );
 
-		$formatted_terms = array_map( array( $this, 'format_terms' ), array_keys( $terms ), array_values( $terms ) );
+		$formatted_terms = array_map( [ $this, 'format_terms' ], array_keys( $terms ), array_values( $terms ) );
 
 		return $formatted_terms;
 	}
@@ -264,10 +264,10 @@ final class Product {
 	 * @return array
 	 */
 	public function format_terms( $key, $value ) {
-		return array(
+		return [
 			'id'   => (string) $key,
 			'name' => $value,
-		);
+		];
 	}
 
 	/**
@@ -279,36 +279,36 @@ final class Product {
 	public function get_options_callback( $request ) { // phpcs:ignore
 
 		// it seems no need to add post_per_page, get_terms will return all terms
-		$cat_args = array(
+		$cat_args = [
 			'taxonomy'   => 'product_cat',
 			'fields'     => 'id=>name',
 			'hide_empty' => true,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
-		);
+		];
 		$cats     = \get_terms( $cat_args );
 
-		$formatted_cats = array_map( array( $this, 'format_terms' ), array_keys( $cats ), array_values( $cats ) );
+		$formatted_cats = array_map( [ $this, 'format_terms' ], array_keys( $cats ), array_values( $cats ) );
 
-		$tag_args = array(
+		$tag_args = [
 			'taxonomy'   => 'product_tag',
 			'fields'     => 'id=>name',
 			'hide_empty' => true,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
-		);
+		];
 
 		$tags = \get_terms( $tag_args );
 
-		$formatted_tags = array_map( array( $this, 'format_terms' ), array_keys( $tags ), array_values( $tags ) );
+		$formatted_tags = array_map( [ $this, 'format_terms' ], array_keys( $tags ), array_values( $tags ) );
 
 		$top_sales_products = WC::get_top_sales_products( 5 );
 
-		return array(
+		return [
 			'product_cats'       => $formatted_cats,
 			'product_tags'       => $formatted_tags,
 			'top_sales_products' => $top_sales_products,
-		);
+		];
 	}
 }
 

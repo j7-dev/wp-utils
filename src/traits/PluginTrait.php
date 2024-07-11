@@ -9,166 +9,163 @@
 namespace J7\WpUtils\Traits;
 
 if (trait_exists('PluginTrait')) {
-    return;
+	return;
 }
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
-trait PluginTrait
-{
+trait PluginTrait {
 
 
-    /**
-     * App Name
-     *
-     * @var string
-     */
-    public static $app_name = '';
 
-    /**
-     * Kebab Name
-     *
-     * @var string
-     */
-    public static $kebab = '';
+	/**
+	 * App Name
+	 *
+	 * @var string
+	 */
+	public static $app_name = '';
 
-    /**
-     * Snake Name
-     *
-     * @var string
-     */
-    public static $snake = '';
+	/**
+	 * Kebab Name
+	 *
+	 * @var string
+	 */
+	public static $kebab = '';
 
-    /**
-     * Github Repo URL
-     *
-     * @var string
-     */
-    public static $github_repo = '';
+	/**
+	 * Snake Name
+	 *
+	 * @var string
+	 */
+	public static $snake = '';
+
+	/**
+	 * Github Repo URL
+	 *
+	 * @var string
+	 */
+	public static $github_repo = '';
 
 
-    /**
-     * Plugin Update Checker Personal Access Token
-     *
-     * @var string
-     */
-    public static $puc_pat;
+	/**
+	 * Plugin Update Checker Personal Access Token
+	 *
+	 * @var string
+	 */
+	public static $puc_pat;
 
-    /**
-     * Plugin Directory
-     *
-     * @var string
-     */
-    public static $dir;
+	/**
+	 * Plugin Directory
+	 *
+	 * @var string
+	 */
+	public static $dir;
 
-    /**
-     * Plugin URL
-     *
-     * @var string
-     */
-    public static $url;
+	/**
+	 * Plugin URL
+	 *
+	 * @var string
+	 */
+	public static $url;
 
-    /**
-     * Plugin Version
-     *
-     * @var string
-     */
-    public static $version;
+	/**
+	 * Plugin Version
+	 *
+	 * @var string
+	 */
+	public static $version;
 
-    /**
-     * Required plugins
-     *
-     * @var array
-     */
-    public $required_plugins = array(
-        // array(
-        // 'name'     => 'WooCommerce',
-        // 'slug'     => 'woocommerce',
-        // 'required' => true,
-        // 'version'  => '7.6.0',
-        // ),
-        // array(
-        // 'name'     => 'WP Toolkit',
-        // 'slug'     => 'wp-toolkit',
-        // 'source'   => 'https://github.com/j7-dev/wp-toolkit/releases/latest/download/wp-toolkit.zip',
-        // 'required' => true,
-        // ),
-    );
+	/**
+	 * Required plugins
+	 *
+	 * @var array
+	 */
+	public $required_plugins = [
+		// array(
+		// 'name'     => 'WooCommerce',
+		// 'slug'     => 'woocommerce',
+		// 'required' => true,
+		// 'version'  => '7.6.0',
+		// ),
+		// array(
+		// 'name'     => 'WP Toolkit',
+		// 'slug'     => 'wp-toolkit',
+		// 'source'   => 'https://github.com/j7-dev/wp-toolkit/releases/latest/download/wp-toolkit.zip',
+		// 'required' => true,
+		// ),
+	];
 
-    /**
-     * Callback after check required plugins
-     *
-     * @var array
-     */
-    protected static $callback;
+	/**
+	 * Callback after check required plugins
+	 *
+	 * @var array
+	 */
+	protected static $callback;
 
-    /**
-     * Callback Args
-     *
-     * @var array
-     */
-    protected static $callback_args = array();
+	/**
+	 * Callback Args
+	 *
+	 * @var array
+	 */
+	protected static $callback_args = [];
 
-    /**
-     * Plugin Entry File
-     *
-     * @var string
-     */
-    protected static $plugin_entry_path;
+	/**
+	 * Plugin Entry File
+	 *
+	 * @var string
+	 */
+	protected static $plugin_entry_path;
 
-    /**
-     * Init
-     * Set the app_name, github_repo, callback, callback_args
-     *
-     * @param array $args The arguments.
-     *
-     * @return void
-     * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '', 'callback' => array($this, 'func') ) );
-     */
-    final public function init(array $args): void
-    {
+	/**
+	 * Init
+	 * Set the app_name, github_repo, callback, callback_args
+	 *
+	 * @param array $args The arguments.
+	 *
+	 * @return void
+	 * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '', 'callback' => array($this, 'func') ) );
+	 */
+	final public function init( array $args ): void {
 
-        $this->set_const($args);
+		$this->set_const($args);
 
-        \register_activation_hook(self::$plugin_entry_path, array($this, 'activate'));
-        \register_deactivation_hook(self::$plugin_entry_path, array($this, 'deactivate'));
-        \add_action('plugins_loaded', array($this, 'check_required_plugins'));
-        \add_action( 'admin_menu', array( $this, 'add_debug_submenu_page' ) );
+		\register_activation_hook(self::$plugin_entry_path, [ $this, 'activate' ]);
+		\register_deactivation_hook(self::$plugin_entry_path, [ $this, 'deactivate' ]);
+		\add_action('plugins_loaded', [ $this, 'check_required_plugins' ]);
+		\add_action( 'admin_menu', [ $this, 'add_debug_submenu_page' ] );
 
-        $this->register_required_plugins();
-        $this->set_puc_pat();
-        $this->plugin_update_checker();
+		$this->register_required_plugins();
+		$this->set_puc_pat();
+		$this->plugin_update_checker();
+	}
 
-    }
+	/**
+	 * Set const
+	 * Set the app_name, github_repo
+	 *
+	 * @param array $args The arguments.
+	 *
+	 * @return void
+	 * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '' ) );
+	 */
+	final public function set_const( array $args ): void {
+		self::$app_name      = $args['app_name'];
+		self::$kebab         = strtolower(str_replace(' ', '-', $args['app_name']));
+		self::$snake         = strtolower(str_replace(' ', '_', $args['app_name']));
+		self::$github_repo   = $args['github_repo'];
+		self::$callback      = $args['callback'];
+		self::$callback_args = $args['callback_args'] ?? [];
 
-    /**
-     * Set const
-     * Set the app_name, github_repo
-     *
-     * @param array $args The arguments.
-     *
-     * @return void
-     * @example set_const( array( 'app_name' => 'My App', 'github_repo' => '' ) );
-     */
-    final public function set_const(array $args): void
-    {
-        self::$app_name = $args['app_name'];
-        self::$kebab = strtolower(str_replace(' ', '-', $args['app_name']));
-        self::$snake = strtolower(str_replace(' ', '_', $args['app_name']));
-        self::$github_repo = $args['github_repo'];
-        self::$callback = $args['callback'];
-        self::$callback_args = $args['callback_args'] ?? array();
+		$reflector               = new \ReflectionClass(get_called_class());
+		self::$plugin_entry_path = $reflector?->getFileName();
+	}
 
-        $reflector = new \ReflectionClass(get_called_class());
-        self::$plugin_entry_path = $reflector?->getFileName();
-    }
-
-    /**
-     * Register required plugins
-     *
-     * @return void
-     */
-    final public function register_required_plugins(): void
+	/**
+	 * Register required plugins
+	 *
+	 * @return void
+	 */
+	final public function register_required_plugins(): void
     { // phpcs:ignore
         // phpcs:disable
         $config = array(

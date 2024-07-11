@@ -1,5 +1,4 @@
 <?php
-
 /**
  * WP class
  *
@@ -143,7 +142,7 @@ abstract class WP {
 	 * - data: array
 	 * - meta_data: array
 	 */
-	public static function separator( array $args, ?string $obj = 'post', ?array $files = array() ): array {
+	public static function separator( array $args, ?string $obj = 'post', ?array $files = [] ): array {
 		$data_fields = self::get_data_fields( $obj );
 
 		if ( ! ! $files ) {
@@ -160,8 +159,8 @@ abstract class WP {
 		}
 
 		// 將資料拆成 data 與 meta_data
-		$data      = array();
-		$meta_data = array();
+		$data      = [];
+		$meta_data = [];
 
 		foreach ( $args as $key => $value ) {
 			if ( \in_array( $key, $data_fields, true ) ) {
@@ -171,10 +170,10 @@ abstract class WP {
 			}
 		}
 
-		return array(
+		return [
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		);
+		];
 	}
 
 	/**
@@ -184,95 +183,115 @@ abstract class WP {
 	 * @return string[]
 	 */
 	public static function get_data_fields( ?string $obj = 'post' ) {
-		switch ( $obj ) {
-			case 'post':
-				return array(
-					'ID',
-					'post_author',
-					'post_date',
-					'post_date_gmt',
-					'post_content',
-					'post_content_filtered',
-					'post_title',
-					'post_excerpt',
-					'post_status',
-					'post_type',
-					'comment_status',
-					'ping_status',
-					'post_password',
-					'post_name',
-					'to_ping',
-					'pinged',
-					'post_parent',
-					'menu_order',
-					'post_mime_type',
-					'guid',
-					'import_id',
-					'post_category',
-					'tags_input',
-					'tax_input',
-					'page_template',
-				);
-			case 'product':
-				return array(
-					'attributes',
-					'average_rating',
-					'backorders',
-					'catalog_visibility',
-					'category_ids',
-					'cross_sell_ids',
-					'date_created',
-					'date_modified',
-					'date_on_sale_from',
-					'date_on_sale_to',
-					'default_attributes',
-					'defaults',
-					'description',
-					'download_expiry',
-					'download_limit',
-					'downloadable',
-					'downloads',
-					'featured',
-					'gallery_image_ids',
-					'height',
-					'id',
-					'image_id',
-					'length',
-					'low_stock_amount',
-					'manage_stock',
-					'menu_order',
-					'meta_data',
-					'name',
-					'object_read',
-					'parent_id',
-					'post_password',
-					'price',
-					'props',
-					'rating_counts',
-					'regular_price',
-					'review_count',
-					'reviews_allowed',
-					'sale_price',
-					'shipping_class_id',
-					'short_description',
-					'sku',
-					'slug',
-					'sold_individually',
-					'status',
-					'stock',
-					'stock_status',
-					'tag_ids',
-					'tax_class',
-					'tax_status',
-					'total_sales',
-					'upsell_ids',
-					'virtual',
-					'weight',
-					'width',
-				);
-			default:
-				return array();
-		}
+
+		return match ( $obj ) {
+			'post' => [
+				'ID',
+				'post_author',
+				'post_date',
+				'post_date_gmt',
+				'post_content',
+				'post_content_filtered',
+				'post_title',
+				'post_excerpt',
+				'post_status',
+				'post_type',
+				'comment_status',
+				'ping_status',
+				'post_password',
+				'post_name',
+				'to_ping',
+				'pinged',
+				'post_parent',
+				'menu_order',
+				'post_mime_type',
+				'guid',
+				'import_id',
+				'post_category',
+				'tags_input',
+				'tax_input',
+				'page_template',
+			],
+			'product' => [
+				'attributes',
+				'average_rating',
+				'backorders',
+				'catalog_visibility',
+				'category_ids',
+				'cross_sell_ids',
+				'date_created',
+				'date_modified',
+				'date_on_sale_from',
+				'date_on_sale_to',
+				'default_attributes',
+				'defaults',
+				'description',
+				'download_expiry',
+				'download_limit',
+				'downloadable',
+				'downloads',
+				'featured',
+				'gallery_image_ids',
+				'height',
+				'id',
+				'image_id',
+				'length',
+				'low_stock_amount',
+				'manage_stock',
+				'menu_order',
+				'meta_data',
+				'name',
+				'object_read',
+				'parent_id',
+				'post_password',
+				'price',
+				'props',
+				'rating_counts',
+				'regular_price',
+				'review_count',
+				'reviews_allowed',
+				'sale_price',
+				'shipping_class_id',
+				'short_description',
+				'sku',
+				'slug',
+				'sold_individually',
+				'status',
+				'stock',
+				'stock_status',
+				'tag_ids',
+				'tax_class',
+				'tax_status',
+				'total_sales',
+				'upsell_ids',
+				'virtual',
+				'weight',
+				'width',
+			],
+			'user' => [
+				'ID',
+				'user_pass',
+				'user_login',
+				'user_nicename',
+				'user_url',
+				'user_email',
+				'display_name',
+				'nickname',
+				'first_name',
+				'last_name',
+				'description',
+				'rich_editing',
+				'syntax_highlighting',
+				'comment_shortcuts',
+				'admin_color',
+				'use_ssl',
+				'user_registered',
+				'show_admin_bar_front',
+				'role',
+				'locale',
+			],
+			default => [],
+		};
 	}
 
 	/**
@@ -285,10 +304,10 @@ abstract class WP {
 	 */
 	public static function get_image_info( string $attachment_id ) {
 		$image_url = \wp_get_attachment_url( $attachment_id );
-		return array(
+		return [
 			'id'  => $attachment_id,
 			'url' => $image_url,
-		);
+		];
 	}
 
 
@@ -328,10 +347,10 @@ abstract class WP {
 	 * @throws \WP_Error  - 上傳錯誤.
 	 */
 	public static function handle_single_files_to_media( $file, $upload_only = false ) {
-		$upload_results   = array();
-		$upload_overrides = array( 'test_form' => false );
+		$upload_results   = [];
+		$upload_overrides = [ 'test_form' => false ];
 
-		$_FILES         = array();
+		$_FILES         = [];
 		$_FILES['file'] = $file;
 
 		if ( $upload_only ) {
@@ -356,13 +375,13 @@ abstract class WP {
 				throw new \WP_Error( 'upload_error', $attachment_id->get_error_message(), 400 );
 			}
 
-			$upload_result = array(
+			$upload_result = [
 				'id'   => (string) $attachment_id,
 				'url'  => \wp_get_attachment_url( $attachment_id ),
 				'type' => $file['type'],
 				'name' => $file['name'],
 				'size' => $file['size'],
-			);
+			];
 		}
 
 		$upload_results[] = $upload_result;
@@ -379,20 +398,20 @@ abstract class WP {
 	 * @throws \WP_Error - 上傳錯誤.
 	 */
 	public static function handle_multiple_files_to_media( $files, $upload_only = false ) {
-		$upload_results   = array();
-		$upload_overrides = array( 'test_form' => false );
-		$_FILES           = array();
+		$upload_results   = [];
+		$upload_overrides = [ 'test_form' => false ];
+		$_FILES           = [];
 
 		// 遍歷每個上傳的檔案
 		foreach ( $files['tmp_name'] as $key => $tmp_name ) {
 			if ( ! empty( $tmp_name ) ) {
-				$file = array(
+				$file = [
 					'name'     => $files['name'][ $key ],
 					'type'     => $files['type'][ $key ],
 					'tmp_name' => $tmp_name,
 					'error'    => $files['error'][ $key ],
 					'size'     => $files['size'][ $key ],
-				);
+				];
 
 				$_FILES[ $key ] = $file;
 
@@ -418,13 +437,13 @@ abstract class WP {
 						throw new \WP_Error( 'upload_error', $attachment_id->get_error_message(), 400 );
 					}
 
-					$upload_result = array(
+					$upload_result = [
 						'id'   => (string) $attachment_id,
 						'url'  => \wp_get_attachment_url( $attachment_id ),
 						'type' => $file['type'],
 						'name' => $file['name'],
 						'size' => $file['size'],
-					);
+					];
 				}
 
 				$upload_results[] = $upload_result;
