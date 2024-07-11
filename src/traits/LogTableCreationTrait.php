@@ -35,7 +35,7 @@ trait LogTableCreationTrait {
 			$charset_collate = $wpdb->get_charset_collate();
 
 			$sql = "CREATE TABLE $table_name (
-									id mediumint(9) NOT NULL AUTO_INCREMENT,
+									id bigint(20) NOT NULL AUTO_INCREMENT,
 									title text NOT NULL,
 									type tinytext NOT NULL,
 									user_id bigint(20) NOT NULL,
