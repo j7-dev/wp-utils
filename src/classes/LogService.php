@@ -46,6 +46,8 @@ final class LogService {
 			'purchase', // 購買
 			'modify', // 修改
 			'cron', // 定時任務
+			'system', // 系統
+			'manual', // 手動
 		];
 
 		return $log_types;

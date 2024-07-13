@@ -78,7 +78,7 @@ final class PointService {
 	 * @param string $point_slug Point slug
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws Exception Exception.
 	 */
 	public function insert_log( int $user_id, array $args, float $points, string $point_slug ): void {
 		$this->log_instance->insert_user_log($user_id, $args, $points, $point_slug);

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin trait
  *
@@ -15,8 +14,6 @@ if (trait_exists('PluginTrait')) {
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 trait PluginTrait {
-
-
 
 	/**
 	 * App Name
@@ -74,6 +71,20 @@ trait PluginTrait {
 	 * @var string
 	 */
 	public static $version;
+
+	/**
+	 * Template Path
+	 *
+	 * @var string
+	 */
+	public static $template_path = '/inc';
+
+	/**
+	 * Template Page Names
+	 *
+	 * @var array
+	 */
+	public static $template_page_names = [ '404' ];
 
 	/**
 	 * Required plugins
@@ -155,6 +166,12 @@ trait PluginTrait {
 		self::$github_repo   = $args['github_repo'];
 		self::$callback      = $args['callback'];
 		self::$callback_args = $args['callback_args'] ?? [];
+		if (isset($args['template_path'])) {
+			self::$template_path = $args['template_path'];
+		}
+		if (isset($args['template_page_names'])) {
+			self::$template_page_names = $args['template_page_names'];
+		}
 
 		$reflector               = new \ReflectionClass(get_called_class());
 		self::$plugin_entry_path = $reflector?->getFileName();
@@ -389,6 +406,90 @@ trait PluginTrait {
         echo '<p>只顯示 <code>/wp-content/debug.log</code> 最後 1000 行</p>';
         echo '<pre style="line-height: 0.75;">' . $this->read_debug_log() . '</pre></div>'; // 使用 <pre> 标签格式化文本输出
     }
+
+			/**
+	 * 從指定的模板路徑讀取模板文件並渲染數據
+	 *
+	 * @param string $name 指定路徑裡面的文件名
+	 * @param mixed  $args 要渲染到模板中的數據
+	 * @param bool   $output 是否輸出
+	 * @param bool   $load_once 是否只載入一次
+	 *
+	 * @return ?string
+	 * @throws \Exception 如果模板文件不存在.
+	 */
+	public static function get(
+		string $name,
+		mixed $args = null,
+		?bool $output = true,
+		?bool $load_once = false,
+	): ?string {
+		$result = self::safe_get( $name, $args, $output, $load_once );
+		if ( '' === $result ) {
+			throw new \Exception( "模板文件 {$name} 不存在" );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * 從指定的模板路徑讀取模板文件並渲染數據
+	 *
+	 * @param string $name 指定路徑裡面的文件名
+	 * @param mixed  $args 要渲染到模板中的數據
+	 * @param bool   $echo 是否輸出
+	 * @param bool   $load_once 是否只載入一次
+	 *
+	 * @return string|false|null
+	 * @throws \Exception 如果模板文件不存在.
+	 */
+	public static function safe_get(
+		string $name,
+		mixed $args = null,
+		?bool $echo = true,
+		?bool $load_once = false,
+	): string|false|null {
+
+		// 如果 $name 是以 page name 開頭的，那就去 page folder 裡面找
+		$is_page = false;
+		foreach ( self::$template_page_names as $page_name ) {
+			if ( str_starts_with( $name, $page_name ) ) {
+				$is_page = true;
+				break;
+			}
+		}
+
+		if ( $is_page ) {
+			$template_path = self::$dir . self::$template_path .  '/templates/pages/' . $name;
+		} else { // 不是區域名稱就去 components 裡面找
+			$template_path = self::$dir . self::$template_path .  '/templates/components/' . $name;
+		}
+
+		// 檢查模板文件是否存在
+		if ( file_exists( "{$template_path}.php" ) ) {
+			if ( $echo ) {
+				\load_template( "{$template_path}.php", $load_once, $args );
+
+				return null;
+			}
+			ob_start();
+			\load_template( "{$template_path}.php", $load_once, $args );
+
+			return ob_get_clean();
+		} elseif ( file_exists( "{$template_path}/index.php" ) ) {
+			if ( $echo ) {
+				\load_template( "{$template_path}/index.php", $load_once, $args );
+
+				return null;
+			}
+			ob_start();
+			\load_template( "{$template_path}/index.php", $load_once, $args );
+
+			return ob_get_clean();
+		}
+
+		return '';
+	}
 
     /**
      * Activate
