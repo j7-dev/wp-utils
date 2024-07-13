@@ -1,6 +1,6 @@
 <?php
 /**
- * WPUPointUtils  class
+ * PointService  class
  * 點數系統初始化，創建 CPT
  *
  * @package J7\WpUtils
@@ -10,14 +10,14 @@ namespace J7\WpUtils\Classes;
 
 use Exception;
 
-if (class_exists('WPUPointUtils ')) {
+if (class_exists('PointService')) {
 	return;
 }
 
 /**
  * Class Point
  */
-final class WPUPointUtils {
+final class PointService {
 
 	use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -27,11 +27,11 @@ final class WPUPointUtils {
 	/**
 	 * Log instance
 	 *
-	 * @var WPULogUtils
+	 * @var LogService
 	 */
-	public WPULogUtils $log_instance;
+	public LogService $log_instance;
 
-	public function init( WPULogUtils $log_instance ): void {
+	public function init( LogService $log_instance ): void {
 		\add_action('init', [ $this, 'register_post_type' ], 10);
 		\add_action('init', [ $this, 'create_default_point' ], 20);
 		$this->log_instance = $log_instance;
@@ -49,7 +49,7 @@ final class WPUPointUtils {
 	 *
 	 * @param string|null $post_status Post status (default: publish)
 	 *
-	 * @return array WPUPoint[]
+	 * @return array Point[]
 	 */
 	public function get_all_points( ?string $post_status = 'publish' ): array {
 		$all_point_posts = \get_posts(
@@ -63,7 +63,7 @@ final class WPUPointUtils {
 
 		return array_map(
 			function ( $post ) {
-				return new WPUPoint($post);
+				return new Point($post);
 			},
 			$all_point_posts
 		);
@@ -113,52 +113,52 @@ final class WPUPointUtils {
 				'Point Cover Image',
 				'Overrides the “Featured Image” phrase for this post type. Added in 4.3',
 				'wp-utils'
-				),
+			),
 			'set_featured_image'    => _x(
 				'Set cover image',
 				'Overrides the “Set featured image” phrase for this post type. Added in 4.3',
 				'wp-utils'
-				),
+			),
 			'remove_featured_image' => _x(
 				'Remove cover image',
 				'Overrides the “Remove featured image” phrase for this post type. Added in 4.3',
 				'wp-utils'
-				),
+			),
 			'use_featured_image'    => _x(
 				'Use as cover image',
 				'Overrides the “Use as featured image” phrase for this post type. Added in 4.3',
 				'wp-utils'
-				),
+			),
 			'archives'              => _x(
 				'Point archives',
 				'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4',
 				'wp-utils'
-				),
+			),
 			'insert_into_item'      => _x(
 				'Insert into book',
 				'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4',
 				'wp-utils'
-				),
+			),
 			'uploaded_to_this_item' => _x(
 				'Uploaded to this book',
 				'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4',
 				'wp-utils'
-				),
+			),
 			'filter_items_list'     => _x(
 				'Filter books list',
 				'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4',
 				'wp-utils'
-				),
+			),
 			'items_list_navigation' => _x(
 				'Points list navigation',
 				'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4',
 				'wp-utils'
-				),
+			),
 			'items_list'            => _x(
 				'Points list',
 				'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4',
 				'wp-utils'
-				),
+			),
 		];
 
 		$args = [
@@ -184,9 +184,9 @@ final class WPUPointUtils {
 	 *
 	 * @deprecated
 	 *
-	 * @return WPUPoint|null
+	 * @return Point|null
 	 */
-	public function get_default_point(): ?WPUPoint {
+	public function get_default_point(): ?Point {
 		return $this->default_point;
 	}
 
@@ -195,9 +195,9 @@ final class WPUPointUtils {
 	 *
 	 * @param string $slug Point slug
 	 *
-	 * @return WPUPoint|null
+	 * @return Point|null
 	 */
-	public function get_point_by_slug( string $slug ): ?WPUPoint {
+	public function get_point_by_slug( string $slug ): ?Point {
 		$all_points = $this->get_all_points();
 		$point      = \array_filter(
 			$all_points,
@@ -256,11 +256,11 @@ final class WPUPointUtils {
 				'numberposts' => 1,
 				'order'       => 'ASC',
 			]
-			);
+		);
 
 		if (!!$posts && is_array($posts)) {
 			$post                = $posts[0];
-			$point               = new WPUPoint($post);
+			$point               = new Point($post);
 			$this->default_point = $point;
 		} else {
 			// create default member_lv

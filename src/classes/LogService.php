@@ -1,6 +1,6 @@
 <?php
 /**
- * WPULogUtils  class
+ * LogService  class
  * LOG 系統初始化
  * 能輕鬆創建 & 操作 log table
  *
@@ -9,14 +9,14 @@
 
 namespace J7\WpUtils\Classes;
 
-if (class_exists('WPULogUtils ')) {
+if (class_exists('LogService')) {
 	return;
 }
 
 /**
- * Class WPULogUtils
+ * Class LogService
  */
-final class WPULogUtils {
+final class LogService {
 
 
 

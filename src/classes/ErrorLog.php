@@ -8,14 +8,14 @@
 
 namespace J7\WpUtils\Classes;
 
-if ( class_exists( 'Log' ) ) {
+if ( class_exists( 'ErrorLog' ) ) {
 	return;
 }
 
 /**
  * Log class
  */
-abstract class Log {
+abstract class ErrorLog {
 
 	/**
 	 * Log a message.

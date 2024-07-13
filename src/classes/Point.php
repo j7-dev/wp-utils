@@ -1,6 +1,6 @@
 <?php
 /**
- * WPUPoint  class
+ * Point  class
  * 點數物件
  *
  * @package J7\WpUtils
@@ -8,7 +8,7 @@
 
 namespace J7\WpUtils\Classes;
 
-if ( class_exists( 'WPUPoint ' ) ) {
+if ( class_exists( 'Point' ) ) {
 	return;
 }
 
@@ -16,7 +16,7 @@ if ( class_exists( 'WPUPoint ' ) ) {
 /**
  * Class Point
  */
-final class WPUPoint {
+final class Point {
 	public $id;
 	public $name   = '';
 	public $status = 'publish';
