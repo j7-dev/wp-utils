@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "473ed60ae9ed2da18ded02aef591b9d3",
+    "content-hash": "71b1230d6022f2d0915de4ee06618975",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
@@ -188,16 +188,16 @@
         },
         {
             "name": "php-stubs/woocommerce-stubs",
-            "version": "v9.0.0",
+            "version": "v9.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/woocommerce-stubs.git",
-                "reference": "ccfc447c39a48886146fd3cef66d0e6f2db7fa2b"
+                "reference": "2c95c633362d1f4f531f69e5db63bb19399d8b58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/ccfc447c39a48886146fd3cef66d0e6f2db7fa2b",
-                "reference": "ccfc447c39a48886146fd3cef66d0e6f2db7fa2b",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/2c95c633362d1f4f531f69e5db63bb19399d8b58",
+                "reference": "2c95c633362d1f4f531f69e5db63bb19399d8b58",
                 "shasum": ""
             },
             "require": {
@@ -226,9 +226,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/woocommerce-stubs/issues",
-                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v9.0.0"
+                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v9.1.0"
             },
-            "time": "2024-06-18T15:46:13+00:00"
+            "time": "2024-07-11T10:55:02+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -558,12 +558,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "126239cabf8bf36c86f0431c92d942aa41ee88bb"
+                "reference": "a68db8b1d924267a7d09450d38173c92aefc277a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/126239cabf8bf36c86f0431c92d942aa41ee88bb",
-                "reference": "126239cabf8bf36c86f0431c92d942aa41ee88bb",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a68db8b1d924267a7d09450d38173c92aefc277a",
+                "reference": "a68db8b1d924267a7d09450d38173c92aefc277a",
                 "shasum": ""
             },
             "require": {
@@ -609,7 +609,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-11T10:04:49+00:00"
+            "time": "2024-07-13T11:20:12+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

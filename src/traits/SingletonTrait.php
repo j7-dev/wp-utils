@@ -23,11 +23,13 @@ trait SingletonTrait {
 	/**
 	 * Get the singleton instance
 	 *
+	 * @param mixed ...$args Arguments
+	 *
 	 * @return self
 	 */
-	public static function instance() { // phpcs:ignore
+	public static function instance(...$args) { // phpcs:ignore
 		if ( null === self::$instance ) {
-			self::$instance = new self();
+			self::$instance = new self(...$args);
 		}
 
 		return self::$instance;

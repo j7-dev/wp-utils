@@ -19,6 +19,7 @@ if (class_exists('WPULogUtils ')) {
 final class WPULogUtils {
 
 
+
 	/**
 	 * Log table name
 	 *
