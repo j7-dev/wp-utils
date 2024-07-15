@@ -175,6 +175,14 @@ trait PluginTrait {
 
 		$reflector               = new \ReflectionClass(get_called_class());
 		self::$plugin_entry_path = $reflector?->getFileName();
+
+		self::$dir = \untrailingslashit(\wp_normalize_path(\plugin_dir_path(self::$plugin_entry_path)));
+		self::$url = \untrailingslashit(\plugin_dir_url(self::$plugin_entry_path));
+		if (!\function_exists('get_plugin_data')) {
+			require_once \ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		$plugin_data   = \get_plugin_data(self::$plugin_entry_path);
+		self::$version = $plugin_data['Version'];
 	}
 
 	/**
@@ -333,14 +341,6 @@ trait PluginTrait {
         $is_j7rp_complete = $instance->is_j7rp_complete();
 
         if ($is_j7rp_complete) {
-            self::$dir = \untrailingslashit(\wp_normalize_path(\plugin_dir_path(self::$plugin_entry_path)));
-            self::$url = \untrailingslashit(\plugin_dir_url(self::$plugin_entry_path));
-            if (!\function_exists('get_plugin_data')) {
-                require_once \ABSPATH . 'wp-admin/includes/plugin.php';
-            }
-            $plugin_data = \get_plugin_data(self::$plugin_entry_path);
-            self::$version = $plugin_data['Version'];
-
             if (is_callable(self::$callback)) {
                 call_user_func_array(self::$callback, self::$callback_args);
             }
