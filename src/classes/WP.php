@@ -16,8 +16,6 @@ if ( class_exists( 'WP' ) ) {
  */
 abstract class WP {
 
-
-
 	/**
 	 * Admin do_shortcode function.
 	 * 讓你可以在 wp-admin 後台也使用 do_shortcode
@@ -74,13 +72,13 @@ abstract class WP {
 				$value[ $key ] = self::sanitize_text_field_deep( $item );
 			}
 			return $value;
+		}
+
+		// if not array, sanitize the value
+		if ( $allow_br ) {
+			return \sanitize_textarea_field( $value );
 		} else {
-			// if not array, sanitize the value
-			if ( $allow_br ) {
-				return \sanitize_textarea_field( $value );
-			} else {
-				return \sanitize_text_field( $value );
-			}
+			return \sanitize_text_field( $value );
 		}
 	}
 
@@ -90,8 +88,9 @@ abstract class WP {
 	 * @param array $params - 要檢查的參數 assoc array
 	 * @param array $required_params - string[] 必要參數
 	 * @return true|\WP_Error
+	 * @throws \WP_Error - 如果缺少必要參數.
 	 */
-	public static function include_required_params( array $params, array $required_params ) {
+	public static function include_required_params( array $params, array $required_params ): bool|\WP_Error {
 		$missing_params = array_diff( $required_params, array_keys( $params ) );
 		if ( ! empty( $missing_params ) ) {
 			throw new \WP_Error( 'missing_required_params', \wp_json_encode( $missing_params ), 400 );
@@ -246,6 +245,7 @@ abstract class WP {
 				'post_password',
 				'price',
 				'props',
+				'purchase_note',
 				'rating_counts',
 				'regular_price',
 				'review_count',
@@ -298,11 +298,9 @@ abstract class WP {
 	 * 取得 image info
 	 *
 	 * @param string $attachment_id - 附件 ID
-	 * @return array
-	 * - id: string
-	 * - url: string
+	 * @return array{id: string, url: string}
 	 */
-	public static function get_image_info( string $attachment_id ) {
+	public static function get_image_info( string $attachment_id ):array {
 		$image_url = \wp_get_attachment_url( $attachment_id );
 		return [
 			'id'  => $attachment_id,
