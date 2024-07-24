@@ -185,7 +185,7 @@ final class LogService {
 
 		$modified_by = \absint($args['modified_by'] ?? '');
 
-		$expire_date = \sanitize_text_field($args['expire_date']) ?? '';
+		$expire_date = \sanitize_text_field($args['expire_date'] ?? '');
 
 		$expire_date = !!$expire_date ? \gmdate('Y-m-d H:i:s', strtotime($args['expire_date'])) : null;
 
