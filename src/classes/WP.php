@@ -63,12 +63,16 @@ abstract class WP {
 	 *
 	 * @param mixed $value Value to sanitize
 	 * @param bool  $allow_br 是否允許換行 \n \r，預設為 true，如果為 false，則會用 sanitize_text_field
+	 * @param array $skip_keys - 要跳過的 key，如果符合就不做任何 sanitize
 	 * @return array|string
 	 */
-	public static function sanitize_text_field_deep( $value, $allow_br = true ) {
+	public static function sanitize_text_field_deep( $value, $allow_br = true, $skip_keys = [] ) {
 		if ( is_array( $value ) ) {
 			// if array, sanitize each element
 			foreach ( $value as $key => $item ) {
+				if ( in_array( $key, $skip_keys, true ) ) {
+					continue;
+				}
 				$value[ $key ] = self::sanitize_text_field_deep( $item );
 			}
 			return $value;
@@ -300,7 +304,7 @@ abstract class WP {
 	 * @param string $attachment_id - 附件 ID
 	 * @return array{id: string, url: string}
 	 */
-	public static function get_image_info( string $attachment_id ):array {
+	public static function get_image_info( string $attachment_id ): array {
 		$image_url = \wp_get_attachment_url( $attachment_id );
 		return [
 			'id'  => $attachment_id,
