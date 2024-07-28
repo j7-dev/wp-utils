@@ -185,8 +185,8 @@ abstract class WC {
 	/**
 	 * 檢查用戶是否購買過指定商品
 	 *
-	 * @param int|array  $target_product_ids
-	 * @param array|null $args
+	 * @param int|array<int>                            $target_product_ids 目標商品 ID
+	 * @param array{user_id:string, status:string}|null $args 參數
 	 * - user_id int 使用者 ID，預設 current_user_id
 	 * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed' ]
 	 *
@@ -198,7 +198,7 @@ abstract class WC {
 		$customer_orders = \wc_get_orders(
 			[
 				'limit'       => - 1,
-				'customer_id' => $args['user_id'] ?? get_current_user_id(),
+				'customer_id' => $args['user_id'] ?? \get_current_user_id(),
 				'status'      => $args['status'] ?? [ 'wc-completed' ],
 			]
 		);
@@ -218,5 +218,33 @@ abstract class WC {
 		}
 
 		return $has_bought;
+	}
+
+	/**
+	 * 取得商品屬性
+	 *
+	 * @param \WC_Product $product 商品
+	 * @return array{name:string, options:array, position:int}[]
+	 */
+	public static function get_product_attribute_array( \WC_Product $product ): array {
+		$attributes = $product->get_attributes(); // get attributes object
+
+		$attributes_arr = [];
+
+		foreach ( $attributes as $key => $attribute ) {
+			if ( $attribute instanceof \WC_Product_Attribute ) {
+				$attributes_arr[] = [
+					'name'     => $attribute->get_name(),
+					'options'  => $attribute->get_options(),
+					'position' => $attribute->get_position(),
+				];
+			}
+
+			if ( is_string( $key ) && is_string( $attribute ) ) {
+				$attributes_arr[ urldecode( $key ) ] = $attribute;
+			}
+		}
+
+		return $attributes_arr;
 	}
 }
