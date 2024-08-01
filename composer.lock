@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71b1230d6022f2d0915de4ee06618975",
+    "content-hash": "bd3c66f3a02ee56e87c40e93dc477353",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
@@ -55,6 +55,65 @@
                 "source": "https://github.com/j7-dev/tgm-plugin-activation-forked"
             },
             "time": "2024-07-03T04:41:48+00:00"
+        },
+        {
+            "name": "j7-dev/wp-plugin-trait",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/j7-dev/wp-plugin-trait.git",
+                "reference": "861efed5721e0b8c036206b3876ed8e858be0283"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/861efed5721e0b8c036206b3876ed8e858be0283",
+                "reference": "861efed5721e0b8c036206b3876ed8e858be0283",
+                "shasum": ""
+            },
+            "require": {
+                "j7-dev/tgm-plugin-activation-forked": "1.2.4",
+                "yahnis-elsts/plugin-update-checker": "5.3"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "@stable",
+                "php-stubs/woocommerce-stubs": "^9.0",
+                "php-stubs/wordpress-stubs": "^6.5",
+                "phpcompatibility/php-compatibility": "@stable",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^1.11",
+                "squizlabs/php_codesniffer": "@stable",
+                "wp-coding-standards/wpcs": "@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "J7\\WpUtils\\Traits\\": "src/traits/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "JerryLiu",
+                    "email": "j7.dev.gg@gmail.com",
+                    "homepage": "https://github.com/j7-dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "traits for WordPress plugin development",
+            "homepage": "https://github.com/j7-dev",
+            "keywords": [
+                "classes",
+                "traits",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/j7-dev/wp-plugin-trait/issues",
+                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/0.0.1"
+            },
+            "time": "2024-07-31T13:58:06+00:00"
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
@@ -232,27 +291,28 @@
         },
         {
             "name": "php-stubs/wordpress-stubs",
-            "version": "v6.5.3",
+            "version": "v6.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/wordpress-stubs.git",
-                "reference": "e611a83292d02055a25f83291a98fadd0c21e092"
+                "reference": "86e8753e89d59849276dcdd91b9a7dd78bb4abe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/wordpress-stubs/zipball/e611a83292d02055a25f83291a98fadd0c21e092",
-                "reference": "e611a83292d02055a25f83291a98fadd0c21e092",
+                "url": "https://api.github.com/repos/php-stubs/wordpress-stubs/zipball/86e8753e89d59849276dcdd91b9a7dd78bb4abe2",
+                "reference": "86e8753e89d59849276dcdd91b9a7dd78bb4abe2",
                 "shasum": ""
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
                 "nikic/php-parser": "^4.13",
-                "php": "^7.4 || ~8.0.0",
+                "php": "^7.4 || ^8.0",
                 "php-stubs/generator": "^0.8.3",
-                "phpdocumentor/reflection-docblock": "5.3",
+                "phpdocumentor/reflection-docblock": "^5.4.1",
                 "phpstan/phpstan": "^1.10.49",
                 "phpunit/phpunit": "^9.5",
-                "szepeviktor/phpcs-psr-12-neutron-hybrid-ruleset": "^0.11"
+                "szepeviktor/phpcs-psr-12-neutron-hybrid-ruleset": "^1.0",
+                "wp-coding-standards/wpcs": "3.1.0 as 2.3.0"
             },
             "suggest": {
                 "paragonie/sodium_compat": "Pure PHP implementation of libsodium",
@@ -273,9 +333,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/wordpress-stubs/issues",
-                "source": "https://github.com/php-stubs/wordpress-stubs/tree/v6.5.3"
+                "source": "https://github.com/php-stubs/wordpress-stubs/tree/v6.6.0"
             },
-            "time": "2024-05-08T02:12:31+00:00"
+            "time": "2024-07-17T08:50:38+00:00"
         },
         {
             "name": "phpcompatibility/php-compatibility",
@@ -345,12 +405,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
-                "reference": "6dcc44351983b9dbddf9012a3533804768ca4bbb"
+                "reference": "de3789a59ee046291bb196c03862c871a692dc75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/6dcc44351983b9dbddf9012a3533804768ca4bbb",
-                "reference": "6dcc44351983b9dbddf9012a3533804768ca4bbb",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/de3789a59ee046291bb196c03862c871a692dc75",
+                "reference": "de3789a59ee046291bb196c03862c871a692dc75",
                 "shasum": ""
             },
             "require": {
@@ -416,7 +476,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-04-24T13:22:43+00:00"
+            "time": "2024-07-23T06:25:32+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -424,12 +484,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "4a305210f0dd5e6eeba775c4ffbeaefa19a37229"
+                "reference": "2616376fd8ae9a065a73808235f010d6c3f114b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/4a305210f0dd5e6eeba775c4ffbeaefa19a37229",
-                "reference": "4a305210f0dd5e6eeba775c4ffbeaefa19a37229",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/2616376fd8ae9a065a73808235f010d6c3f114b4",
+                "reference": "2616376fd8ae9a065a73808235f010d6c3f114b4",
                 "shasum": ""
             },
             "require": {
@@ -505,7 +565,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-06-09T12:33:11+00:00"
+            "time": "2024-07-27T08:14:47+00:00"
         },
         {
             "name": "phpstan/extension-installer",
@@ -558,12 +618,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "a68db8b1d924267a7d09450d38173c92aefc277a"
+                "reference": "4318276cd9e139f9710098716243829de601a5f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a68db8b1d924267a7d09450d38173c92aefc277a",
-                "reference": "a68db8b1d924267a7d09450d38173c92aefc277a",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4318276cd9e139f9710098716243829de601a5f6",
+                "reference": "4318276cd9e139f9710098716243829de601a5f6",
                 "shasum": ""
             },
             "require": {
@@ -609,20 +669,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-13T11:20:12+00:00"
+            "time": "2024-07-31T08:52:33+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.10.1",
+            "version": "3.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "8f90f7a53ce271935282967f53d0894f8f1ff877"
+                "reference": "86e5f5dd9a840c46810ebe5ff1885581c42a3017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/8f90f7a53ce271935282967f53d0894f8f1ff877",
-                "reference": "8f90f7a53ce271935282967f53d0894f8f1ff877",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/86e5f5dd9a840c46810ebe5ff1885581c42a3017",
+                "reference": "86e5f5dd9a840c46810ebe5ff1885581c42a3017",
                 "shasum": ""
             },
             "require": {
@@ -689,7 +749,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-05-22T21:24:41+00:00"
+            "time": "2024-07-21T23:26:44+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
