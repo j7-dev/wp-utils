@@ -22,7 +22,7 @@ abstract class File {
 	 * @param array $file 上傳的 CSV 檔
 	 * @return array 解析後的 CSV 數據
 	 */
-	public static function parse_uploaded_csv( $file ): array {
+	public static function parse_csv( $file ): array {
 		// 檢查文件是否存在
 		if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
 			return '文件上傳失敗或不存在';
