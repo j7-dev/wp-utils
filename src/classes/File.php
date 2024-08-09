@@ -67,12 +67,12 @@ abstract class File {
 	 * 以 streaming 方式解析 CSV 檔案
 	 *
 	 * @param array $file 上傳的 CSV 檔案
-	 * @param int   $offset 起始行號 (從 0 開始)
+	 * @param int   $batch 批次，從 0 開始
 	 * @param int   $batch_size 每批次讀取的行數
 	 * @return array 解析後的 CSV 資料
 	 * @throws \Exception 如果文件上傳失敗或不存在, 或無法打開文件.
 	 */
-	public static function parse_csv_streaming( $file, $offset = 0, $batch_size = 1000 ): array {
+	public static function parse_csv_streaming( $file, $batch = 0, $batch_size = 1000 ): array {
 		// 檢查文件是否存在
 		if (!isset($file['tmp_name'])) {
 			throw new \Exception('文件上傳失敗或不存在');
@@ -84,10 +84,11 @@ abstract class File {
 			throw new \Exception('無法打開文件');
 		}
 
+		$offset    = $batch * $batch_size;
 		$data      = [];
 		$row       = 0;
 		$start_row = $offset === 0 ? 1 : $offset; // 加 1 是為了跳過標題行
-		$end_row   = $offset + $batch_size;
+		$end_row   = ( $batch +1 ) + $batch_size;
 
 		// 逐行讀取 CSV
 		while (( $fileop = fgetcsv($handle, 0, ',') ) !== false) {
