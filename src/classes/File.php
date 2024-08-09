@@ -88,7 +88,7 @@ abstract class File {
 		$data      = [];
 		$row       = 0;
 		$start_row = $offset === 0 ? 1 : $offset; // 加 1 是為了跳過標題行
-		$end_row   = ( $batch +1 ) + $batch_size;
+		$end_row   = ( $batch + 1 ) * $batch_size;
 
 		// 逐行讀取 CSV
 		while (( $fileop = fgetcsv($handle, 0, ',') ) !== false) {
