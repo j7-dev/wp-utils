@@ -266,4 +266,26 @@ abstract class General {
 			'function_name'  => $function_name,
 		];
 	}
+
+	/**
+	 * 檢查單前網址是否在特定關鍵字內
+	 *
+	 * @param array $keywords 關鍵字
+	 * @return bool
+	 */
+	public static function in_url( array $keywords ): bool {
+	$request_uri = $_SERVER['REQUEST_URI'] ?? ''; // phpcs:ignore
+		if (!$request_uri) {
+			return false;
+		}
+		$in_url = false;
+
+		foreach ($keywords as $keyword) {
+			if (strpos($request_uri, $keyword) !== false) {
+				$in_url = true;
+				break;
+			}
+			return $in_url;
+		}
+	}
 }
