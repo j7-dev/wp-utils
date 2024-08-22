@@ -285,7 +285,7 @@ abstract class General {
 				$in_url = true;
 				break;
 			}
-			return $in_url;
 		}
+		return $in_url;
 	}
 }
