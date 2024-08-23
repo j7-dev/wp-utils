@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd3c66f3a02ee56e87c40e93dc477353",
+    "content-hash": "1a0badba3603ff21cf9a0dfa05275bf9",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
@@ -58,16 +58,16 @@
         },
         {
             "name": "j7-dev/wp-plugin-trait",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/j7-dev/wp-plugin-trait.git",
-                "reference": "861efed5721e0b8c036206b3876ed8e858be0283"
+                "reference": "ff6a0b3a2cc0a369eeba1eb71341ba0c25b689d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/861efed5721e0b8c036206b3876ed8e858be0283",
-                "reference": "861efed5721e0b8c036206b3876ed8e858be0283",
+                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/ff6a0b3a2cc0a369eeba1eb71341ba0c25b689d7",
+                "reference": "ff6a0b3a2cc0a369eeba1eb71341ba0c25b689d7",
                 "shasum": ""
             },
             "require": {
@@ -111,9 +111,9 @@
             ],
             "support": {
                 "issues": "https://github.com/j7-dev/wp-plugin-trait/issues",
-                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/0.0.1"
+                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/0.0.2"
             },
-            "time": "2024-07-31T13:58:06+00:00"
+            "time": "2024-08-23T10:30:08+00:00"
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
@@ -247,16 +247,16 @@
         },
         {
             "name": "php-stubs/woocommerce-stubs",
-            "version": "v9.1.0",
+            "version": "v9.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/woocommerce-stubs.git",
-                "reference": "2c95c633362d1f4f531f69e5db63bb19399d8b58"
+                "reference": "8dc04f7198e31be7c6f2dfef8739379b3c7dfb26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/2c95c633362d1f4f531f69e5db63bb19399d8b58",
-                "reference": "2c95c633362d1f4f531f69e5db63bb19399d8b58",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/8dc04f7198e31be7c6f2dfef8739379b3c7dfb26",
+                "reference": "8dc04f7198e31be7c6f2dfef8739379b3c7dfb26",
                 "shasum": ""
             },
             "require": {
@@ -285,9 +285,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/woocommerce-stubs/issues",
-                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v9.1.0"
+                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v9.2.1"
             },
-            "time": "2024-07-11T10:55:02+00:00"
+            "time": "2024-08-21T18:36:51+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -484,12 +484,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
-                "reference": "2616376fd8ae9a065a73808235f010d6c3f114b4"
+                "reference": "8a1f3f533b9e359f4438c7c7dd46bb35a6ffcb89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/2616376fd8ae9a065a73808235f010d6c3f114b4",
-                "reference": "2616376fd8ae9a065a73808235f010d6c3f114b4",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/8a1f3f533b9e359f4438c7c7dd46bb35a6ffcb89",
+                "reference": "8a1f3f533b9e359f4438c7c7dd46bb35a6ffcb89",
                 "shasum": ""
             },
             "require": {
@@ -565,7 +565,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-07-27T08:14:47+00:00"
+            "time": "2024-08-19T08:51:38+00:00"
         },
         {
             "name": "phpstan/extension-installer",
@@ -618,12 +618,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "4318276cd9e139f9710098716243829de601a5f6"
+                "reference": "9dfb132a92e6a123b4055fbddd80e20faf592ff6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4318276cd9e139f9710098716243829de601a5f6",
-                "reference": "4318276cd9e139f9710098716243829de601a5f6",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9dfb132a92e6a123b4055fbddd80e20faf592ff6",
+                "reference": "9dfb132a92e6a123b4055fbddd80e20faf592ff6",
                 "shasum": ""
             },
             "require": {
@@ -669,7 +669,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-31T08:52:33+00:00"
+            "time": "2024-08-23T09:46:06+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
