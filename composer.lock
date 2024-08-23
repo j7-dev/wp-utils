@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a0badba3603ff21cf9a0dfa05275bf9",
+    "content-hash": "2c40f2e5a75c2570dbd8c0f481b32c49",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
@@ -58,16 +58,16 @@
         },
         {
             "name": "j7-dev/wp-plugin-trait",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/j7-dev/wp-plugin-trait.git",
-                "reference": "ff6a0b3a2cc0a369eeba1eb71341ba0c25b689d7"
+                "reference": "09de118cd7bf9f65bff97ba02a9cfc095583a6f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/ff6a0b3a2cc0a369eeba1eb71341ba0c25b689d7",
-                "reference": "ff6a0b3a2cc0a369eeba1eb71341ba0c25b689d7",
+                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/09de118cd7bf9f65bff97ba02a9cfc095583a6f1",
+                "reference": "09de118cd7bf9f65bff97ba02a9cfc095583a6f1",
                 "shasum": ""
             },
             "require": {
@@ -111,9 +111,9 @@
             ],
             "support": {
                 "issues": "https://github.com/j7-dev/wp-plugin-trait/issues",
-                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/0.0.2"
+                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/0.0.3"
             },
-            "time": "2024-08-23T10:30:08+00:00"
+            "time": "2024-08-23T10:55:17+00:00"
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
