@@ -471,4 +471,20 @@ abstract class WP {
 
 		return $upload_results;
 	}
+
+	/**
+	 * 判斷內容是否包含短碼
+	 *
+	 * @param string $content 內容
+	 *
+	 * @return bool
+	 */
+	public static function has_shortcode( string $content ): bool {
+
+		if ( str_contains( $content, '[' ) && str_contains( $content, ']' ) ) {
+			return true;
+		}
+
+		return false;
+	}
 }

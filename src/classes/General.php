@@ -288,4 +288,25 @@ abstract class General {
 		}
 		return $in_url;
 	}
+
+	/**
+	 * 格式化數組，將 '[]' 轉為空數組。
+	 *
+	 * 遍歷數組，將值為 '[]' 的項目轉換為空數組。
+	 *
+	 * @param array $arr 原始數組。
+	 * @return array 轉換後的數組。
+	 */
+	public static function format_empty_array( array $arr ): array {
+		$formatted_array = [];
+		foreach ($arr as $key => $value) {
+			if ( '[]' === $value) {
+				$formatted_array[ $key ] = [];
+			} else {
+				$formatted_array[ $key ] = $value;
+			}
+		}
+
+		return $formatted_array;
+	}
 }

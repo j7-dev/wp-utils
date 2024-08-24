@@ -247,4 +247,54 @@ abstract class WC {
 
 		return $attributes_arr;
 	}
+
+	/**
+	 * 取得產品價格 HTML
+	 * Why need this?
+	 * - 因為 WooCommerce 的價格有時候會因為翻譯問題造成跑版
+	 *
+	 * @param \WC_Product $product WooCommerce 產品實例。
+	 *
+	 * @return string 產品價格的 HTML 字串。
+	 */
+	public static function get_price_html( \WC_Product $product ): string {
+		$regular_price = $product->get_regular_price(); // 可能為 0 也可能為 ""
+		$sale_price    = $product->get_sale_price(); // 可能為 0 也可能為 ""
+
+		if ('' === $regular_price && '' === $sale_price) {
+			return '';
+		}
+
+		if ( '' === $sale_price) {
+			return sprintf(
+				/*html*/'
+		<span class="regular-price">
+				<span class="woocommerce-Price-amount amount">
+					%1$s
+				</span>
+		</span>
+		',
+				\wc_price($regular_price),
+				);
+		}
+
+		return sprintf(
+		/*html*/'
+		<span class="sale-price">
+			<del aria-hidden="true">
+				<span class="woocommerce-Price-amount amount">
+					%1$s
+				</span>
+			</del>
+			<ins>
+				<span class="woocommerce-Price-amount amount">
+					%2$s
+				</span>
+			</ins>
+		</span>
+		',
+		\wc_price($regular_price),
+		\wc_price($sale_price)
+		);
+	}
 }
