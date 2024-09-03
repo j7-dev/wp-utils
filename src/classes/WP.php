@@ -91,13 +91,12 @@ abstract class WP {
 	 *
 	 * @param array $params - 要檢查的參數 assoc array
 	 * @param array $required_params - string[] 必要參數
-	 * @return true|\WP_Error
-	 * @throws \WP_Error - 如果缺少必要參數.
+	 * @return true|\WP_Error  - 如果缺少必要參數. 返回 WP_Error
 	 */
 	public static function include_required_params( array $params, array $required_params ): bool|\WP_Error {
 		$missing_params = array_diff( $required_params, array_keys( $params ) );
 		if ( ! empty( $missing_params ) ) {
-			throw new \WP_Error( 'missing_required_params', \wp_json_encode( $missing_params ), 400 );
+			return new \WP_Error( 'missing_required_params', \wp_json_encode( $missing_params ), [ 'status' => 400 ] );
 		}
 		return true;
 	}
@@ -362,8 +361,7 @@ abstract class WP {
 	 *
 	 * @param array $file - $_FILES
 	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array - 上傳結果
-	 * @throws \WP_Error  - 上傳錯誤.
+	 * @return array|\WP_Error - 上傳結果
 	 */
 	public static function handle_single_files_to_media( $file, $upload_only = false ) {
 		$upload_results   = [];
@@ -381,7 +379,7 @@ abstract class WP {
 			$upload_result['name'] = $file['name'];
 			$upload_result['size'] = $file['size'];
 			if ( isset( $upload_result['error'] ) ) {
-				throw new \WP_Error( 'upload_error', $upload_result['error'], 400 );
+				return new \WP_Error( 'upload_error', $upload_result['error'], [ 'status' => 400 ] );
 			}
 		} else {
 			// 將檔案上傳到媒體庫
@@ -391,7 +389,7 @@ abstract class WP {
 			);
 
 			if ( \is_wp_error( $attachment_id ) ) {
-				throw new \WP_Error( 'upload_error', $attachment_id->get_error_message(), 400 );
+				return new \WP_Error( 'upload_error', $attachment_id->get_error_message(), [ 'status' => 400 ] );
 			}
 
 			$upload_result = [
@@ -413,8 +411,7 @@ abstract class WP {
 	 *
 	 * @param array $files - $_FILES
 	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array
-	 * @throws \WP_Error - 上傳錯誤.
+	 * @return array|\WP_Error
 	 */
 	public static function handle_multiple_files_to_media( $files, $upload_only = false ) {
 		$upload_results   = [];
@@ -443,7 +440,7 @@ abstract class WP {
 					$upload_result['name'] = $file['name'];
 					$upload_result['size'] = $file['size'];
 					if ( isset( $upload_result['error'] ) ) {
-						throw new \WP_Error( 'upload_error', $upload_result['error'], 400 );
+						return new \WP_Error( 'upload_error', $upload_result['error'], [ 'status' => 400 ] );
 					}
 				} else {
 					// 將檔案上傳到媒體庫
@@ -453,7 +450,7 @@ abstract class WP {
 					);
 
 					if ( \is_wp_error( $attachment_id ) ) {
-						throw new \WP_Error( 'upload_error', $attachment_id->get_error_message(), 400 );
+						return new \WP_Error( 'upload_error', $attachment_id->get_error_message(), [ 'status' => 400 ] );
 					}
 
 					$upload_result = [

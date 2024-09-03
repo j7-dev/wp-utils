@@ -171,7 +171,6 @@ final class LogService {
 	 * @param string $points_slug The points slug to log.
 	 *
 	 * @return void
-	 * @throws \WP_Error Exception.
 	 * @throws \Exception Exception.
 	 */
 	public function insert_user_log( $user_id = 0, $args = [], $points = 0, $points_slug = '' ): void {
@@ -180,7 +179,7 @@ final class LogService {
 		$table_name = $wpdb->prefix . $this->table_name;
 
 		if (!$points_slug) {
-			throw new \WP_Error('invalid_points_slug', '沒有指定 points slug');
+			throw new \Exception('invalid_points_slug', '沒有指定 points slug');
 		}
 
 		$modified_by = \absint($args['modified_by'] ?? '');
@@ -207,7 +206,7 @@ final class LogService {
 			);
 
 			if (!$result) {
-				throw new \WP_Error('insert_log_error', '插入 LOG 失敗');
+				throw new \Exception('insert_log_error', '插入 LOG 失敗');
 			}
 		} catch (\Throwable $th) {
 			throw new \Exception($th->getMessage());
