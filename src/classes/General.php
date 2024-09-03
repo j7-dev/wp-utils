@@ -25,7 +25,7 @@ abstract class General {
 	public static function json_parse( $json_string, $default_value = [], $assoc = true ) {
 		$output = '';
 		try {
-			$output = json_decode( str_replace( '\\', '', $json_string ), $assoc );
+			$output = json_decode( $json_string, $assoc, 512, JSON_UNESCAPED_UNICODE );
 		} catch ( \Throwable $th ) {
 			$output = $default_value;
 		} finally {
