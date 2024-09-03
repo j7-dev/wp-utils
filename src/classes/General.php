@@ -19,13 +19,13 @@ abstract class General {
 	 * JSON Parse
 	 *
 	 * @param string $json_string The string to parse.
-	 * @param array  $default_value The default value.
+	 * @param mixed  $default_value The default value.
 	 * @return mixed The parsed value.
 	 */
-	public static function json_parse( $json_string, $default_value = [] ) {
+	public static function json_parse( $json_string, $default_value = [], $assoc = true ) {
 		$output = '';
 		try {
-			$output = json_decode( str_replace( '\\', '', $json_string ) );
+			$output = json_decode( str_replace( '\\', '', $json_string ), $assoc );
 		} catch ( \Throwable $th ) {
 			$output = $default_value;
 		} finally {
