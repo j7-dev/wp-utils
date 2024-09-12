@@ -32,12 +32,14 @@ abstract class Auth {
 	 *       )
 	 * );
 	 * @see https://developer.wordpress.org/reference/functions/user_can/
-	 * @param string $capability 權限名稱
-	 * @param mixed  ...$args 額外的參數
+	 * @param \WP_REST_Request $request - the request object. 由 permission_callback 傳入，但這邊不會用到
+	 * @param string           $capability 權限名稱
+	 * @param mixed            ...$args 額外的參數
 	 *
 	 * @return \WP_Error|bool
+	 * @phpstan-ignore-next-line
 	 */
-	public static function check_basic_auth( $capability = 'manage_options', ...$args ): \WP_Error|bool {
+	public static function check_basic_auth( $request, $capability = 'manage_options', ...$args ): \WP_Error|bool {
 		// 驗證使用者名稱和密碼
 		$user = self::get_user_by_basic_auth();
 		if ( \is_wp_error( $user ) ) {
