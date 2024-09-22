@@ -1,6 +1,6 @@
 {
 	"name": "j7-dev/wp-utils",
-	"version": "0.2.26",
+	"version": "0.2.27",
 	"description": "Various WordPress classes and traits for WordPress",
 	"homepage": "https://github.com/j7-dev",
 	"type": "library",
@@ -35,17 +35,17 @@
 	"require": {
 		"j7-dev/tgm-plugin-activation-forked": "1.2.4",
 		"yahnis-elsts/plugin-update-checker": "5.3",
-		"j7-dev/wp-plugin-trait": "0.0.5"
+		"j7-dev/wp-plugin-trait": "0.0.6"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "@stable",
 		"wp-coding-standards/wpcs": "@stable",
 		"dealerdirect/phpcodesniffer-composer-installer": "@stable",
 		"phpcompatibility/php-compatibility": "@stable",
-		"phpstan/phpstan": "^1.11",
-		"php-stubs/woocommerce-stubs": "^9.0",
-		"php-stubs/wordpress-stubs": "^6.5",
-		"phpstan/extension-installer": "^1.4"
+		"phpstan/phpstan": "^1.11.9",
+		"php-stubs/woocommerce-stubs": "^9.1",
+		"php-stubs/wordpress-stubs": "^6.6",
+		"phpstan/extension-installer": "^1.4.1"
 	},
 	"scripts": {
 		"lint": "phpcs"
