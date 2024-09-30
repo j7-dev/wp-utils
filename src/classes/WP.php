@@ -105,10 +105,10 @@ abstract class WP {
 	/**
 	 * 將關聯陣列顯示為 HTML
 	 *
-	 * @param array $arr - array
+	 * @param array<mixed> $arr - array
 	 * @return string
 	 */
-	public static function array_to_html( array $arr ): string {
+	public static function array_to_table( array $arr ): string {
 
 		$style = '
 		display: grid;
@@ -129,6 +129,19 @@ abstract class WP {
 		}
 		$html .= '</div>';
 
+		return $html;
+	}
+
+	/**
+	 * 將關聯陣列顯示為 HTML
+	 *
+	 * @deprecated 1.0.0 使用 array_to_table 取代
+	 *
+	 * @param array<mixed> $arr - array
+	 * @return string
+	 */
+	public static function array_to_html( array $arr ): string {
+		$html = self::array_to_table( $arr );
 		return $html;
 	}
 
