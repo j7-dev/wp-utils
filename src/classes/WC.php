@@ -148,7 +148,7 @@ abstract class WC {
 
 			return $wpdb->get_col( str_replace( '\"', '"', $prepare ) );
 		} catch ( \Exception $e ) {
-			\J7\WpUtils\Classes\Log::info( $e->getMessage() );
+			\J7\WpUtils\Classes\ErrorLog::info( $e->getMessage() );
 
 			return [];
 		}
@@ -267,19 +267,19 @@ abstract class WC {
 
 		if ( '' === $sale_price) {
 			return sprintf(
-				/*html*/'
+				/*html*/                '
 		<span class="regular-price">
 				<span class="woocommerce-Price-amount amount">
 					%1$s
 				</span>
 		</span>
 		',
-				\wc_price($regular_price),
-				);
+				\wc_price( (float) $regular_price),
+			);
 		}
 
 		return sprintf(
-		/*html*/'
+		/*html*/            '
 		<span class="sale-price">
 			<del aria-hidden="true">
 				<span class="woocommerce-Price-amount amount">
@@ -293,8 +293,69 @@ abstract class WC {
 			</ins>
 		</span>
 		',
-		\wc_price($regular_price),
-		\wc_price($sale_price)
+			\wc_price( (float) $regular_price),
+			\wc_price( (float) $sale_price)
 		);
+	}
+
+	/**
+	 * 複製訂單
+	 *
+	 * @param int $order_id 要複製的訂單 ID。
+	 * @return int 新訂單的 ID。
+	 * @throws \Exception 訂單不存在時拋出例外。
+	 */
+	public static function copy_order( int $order_id ): int {
+		$order = \wc_get_order( $order_id );
+		if ( ! ( $order instanceof \WC_Order ) ) {
+			throw new \Exception( '訂單不存在' );
+		}
+
+		// 創建新訂單
+		$new_order = new \WC_Order();
+
+		// 複製訂單的所有 props
+		$props = $order->get_data();
+		unset($props['id']);
+		$new_order->set_props($props);
+
+		// 複製訂單的所有 meta data
+		/**
+		 * @var \WC_Meta_Data[] $meta_data
+		 */
+		$meta_data = $order->get_meta_data();
+		foreach ($meta_data as $meta) {
+			$new_order->update_meta_data( (string) $meta->__get('key'), (string) $meta->__get('value'));
+		}
+
+		// 複製訂單項目
+		foreach ($order->get_items() as $item) {
+			$new_order->add_item($item);
+		}
+
+		// 複製運費項目
+		foreach ($order->get_items('shipping') as $item) {
+			$new_order->add_item($item);
+		}
+
+		// 複製稅金項目
+		foreach ($order->get_items('tax') as $item) {
+			$new_order->add_item($item);
+		}
+
+		// 複製優惠券項目
+		foreach ($order->get_items('coupon') as $item) {
+			$new_order->add_item($item);
+		}
+
+		// 複製手續費項目
+		foreach ($order->get_items('fee') as $item) {
+			$new_order->add_item($item);
+		}
+
+		// 儲存新訂單
+		$new_order->save();
+
+		return $new_order->get_id();
 	}
 }
