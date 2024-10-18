@@ -136,4 +136,56 @@ abstract class Product {
 			],
 		];
 	}
+
+	/**
+	 * 更新 meta array
+	 *
+	 * @param int           $id 商品 ID
+	 * @param string        $meta_key meta key
+	 * @param array<string> $meta_values meta value array
+	 * @return bool|\WP_Error
+	 */
+	public static function update_meta_array( int $id, string $meta_key, array $meta_values ): bool|\WP_Error {
+		$product = \wc_get_product( $id );
+		if ( ! $product ) {
+			return new \WP_Error( 'product_not_found', '商品不存在', [ 'status' => 404 ] );
+		}
+
+		// 先刪除原本的 meta data
+		$product->delete_meta_data( $meta_key );
+		foreach ( $meta_values as $meta_value ) {
+			$product->add_meta_data( $meta_key, $meta_value, false );
+		}
+		$product->save_meta_data();
+		return true;
+	}
+
+
+	/**
+	 * 添加 meta array
+	 *
+	 * @param int           $id 商品 ID
+	 * @param string        $meta_key meta key
+	 * @param array<string> $meta_values meta value array
+	 * @return bool|\WP_Error
+	 */
+	public static function add_meta_array( int $id, string $meta_key, array $meta_values ): bool|\WP_Error {
+		$product = \wc_get_product( $id );
+		if ( ! $product ) {
+			return new \WP_Error( 'product_not_found', '商品不存在', [ 'status' => 404 ] );
+		}
+
+		$origin_meta_values = \get_post_meta( $id, $meta_key, false );
+
+		foreach ( $meta_values as $meta_value ) {
+			// 檢查 $origin_meta_values 是否已經包含 $meta_value
+			if (\in_array($meta_value, $origin_meta_values)) {
+				continue;
+			}
+
+			$product->add_meta_data( $meta_key, $meta_value, false );
+		}
+		$product->save_meta_data();
+		return true;
+	}
 }
