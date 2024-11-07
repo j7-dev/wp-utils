@@ -497,4 +497,51 @@ abstract class WP {
 
 		return false;
 	}
+
+
+	/**
+	 * Converter 轉換器
+	 * 把 key 轉換/重新命名，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
+	 * 如果不轉換的欄位就指定為 key => null
+	 *
+	 * 前端圖片欄位就傳 'image_ids' string[] 就好
+	 *
+	 * @param array $args    Arguments.
+	 * @param array $fields_mapper 欄位轉換器
+	 *
+	 * @return array
+	 */
+	public static function converter( array $args, ?array $fields_mapper = [] ): array {
+		$default_fields_mapper = [
+			'id'                => 'ID',
+			'name'              => 'post_title',
+			'slug'              => 'post_name',
+			'description'       => 'post_content',
+			'short_description' => 'post_excerpt',
+			'status'            => 'post_status',
+			'category_ids'      => 'post_category',
+			'tag_ids'           => 'tags_input',
+			'parent_id'         => 'post_parent',
+			'depth'             => 'unset',
+		];
+
+		$fields_mapper = \wp_parse_args(
+			$fields_mapper,
+			$default_fields_mapper,
+		);
+
+		$formatted_args = [];
+		foreach ($args as $key => $value) {
+			if (in_array($key, array_keys($fields_mapper), true)) {
+				if (null === $fields_mapper[ $key ]) {
+					continue;
+				}
+				$formatted_args[ $fields_mapper[ $key ] ] = $value;
+			} else {
+				$formatted_args[ $key ] = $value;
+			}
+		}
+
+		return $formatted_args;
+	}
 }

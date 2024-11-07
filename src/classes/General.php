@@ -20,6 +20,7 @@ abstract class General {
 	 *
 	 * @param string $json_string The string to parse.
 	 * @param mixed  $default_value The default value.
+	 * @param bool   $assoc 是否轉為關聯數組，預設 true
 	 * @return mixed The parsed value.
 	 */
 	public static function json_parse( $json_string, $default_value = [], $assoc = true ) {
@@ -178,7 +179,7 @@ abstract class General {
 	 * -- return mixed
 	 * -- execution_time float
 	 * - execution_time_diff float 執行時間差異.
-	 * @throws \Exception
+	 * @throws \Exception 不是可呼叫的函數
 	 */
 	public static function compare_performance(
 		array $from_fn_array,
@@ -221,7 +222,7 @@ abstract class General {
 	/**
 	 * 測試函數執行時間
 	 *
-	 * @param array     $fn_array
+	 * @param array     $fn_array 函數
 	 * - callback callable function
 	 * - args array 參數
 	 * @param int|null  $precision 精確度，預設 5
@@ -230,7 +231,7 @@ abstract class General {
 	 * @return array
 	 * - return mixed
 	 * - execution_time float
-	 * @throws \Exception
+	 * @throws \Exception 不是可呼叫的函數
 	 */
 	public static function performance( array $fn_array, ?int $precision = 5, ?bool $print_log = true ): array {
 		$callback      = $fn_array['callback'] ?? '';
@@ -290,7 +291,7 @@ abstract class General {
 	}
 
 	/**
-	 * 格式化數組，將 '[]' 轉為空數組。
+	 * 格式化單層 key-value數組，將 '[]' 轉為空數組。
 	 *
 	 * 遍歷數組，將值為 '[]' 的項目轉換為空數組。
 	 *
