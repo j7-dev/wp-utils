@@ -153,15 +153,16 @@ abstract class WP {
 	 * @param array       $args - 原始資料
 	 * @param string|null $obj - 'post' | 'term' | 'user' | 'product'
 	 * @param array|null  $files - file 物件
-	 * @return array
-	 * - data: array
-	 * - meta_data: array
+	 * @return array{data: array, meta_data: array}|\WP_Error
 	 */
-	public static function separator( array $args, ?string $obj = 'post', ?array $files = [] ): array {
+	public static function separator( array $args, ?string $obj = 'post', ?array $files = [] ): array|\WP_Error {
 		$data_fields = self::get_data_fields( $obj );
 
 		if ( ! ! $files ) {
-			$upload_results    = self::files_to_media( $files );
+			$upload_results = self::files_to_media( $files );
+			if ( \is_wp_error( $upload_results ) ) {
+				return $upload_results;
+			}
 			$image_id          = $upload_results[0]['id'] ?? null;
 			$gallery_image_ids = array_map( fn( $result ) => $result['id'], array_slice( $upload_results, 1 ) );
 
@@ -348,9 +349,9 @@ abstract class WP {
 	 *
 	 * @param array $files - $_FILES
 	 * @param bool  $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return \array
+	 * @return array|\WP_Error
 	 */
-	public static function files_to_media( $files, $upload_only = false ) {
+	public static function files_to_media( $files, $upload_only = false ): array|\WP_Error {
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
 			require_once 'wp-admin/includes/image.php';
@@ -376,7 +377,7 @@ abstract class WP {
 	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
 	 * @return array|\WP_Error - 上傳結果
 	 */
-	public static function handle_single_files_to_media( $file, $upload_only = false ) {
+	public static function handle_single_files_to_media( $file, $upload_only = false ):array|\WP_Error {
 		$upload_results   = [];
 		$upload_overrides = [ 'test_form' => false ];
 
