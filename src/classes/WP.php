@@ -159,7 +159,7 @@ abstract class WP {
 		$data_fields = self::get_data_fields( $obj );
 
 		if ( ! ! $files ) {
-			$upload_results = self::files_to_media( $files );
+			$upload_results = self::upload_files_to_media( $files );
 			if ( \is_wp_error( $upload_results ) ) {
 				return $upload_results;
 			}
@@ -347,11 +347,11 @@ abstract class WP {
 	/**
 	 * 將檔案上傳到媒體庫
 	 *
-	 * @param array $files - $_FILES
-	 * @param bool  $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array|\WP_Error
+	 * @param array{tmp_name: string|string[], name: string|string[], type: string|string[], error: string|string[], size: string|string[]} $files - $_FILES
+	 * @param bool                                                                                                                          $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
+	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error
 	 */
-	public static function files_to_media( $files, $upload_only = false ): array|\WP_Error {
+	public static function upload_files_to_media( $files, $upload_only = false ): array|\WP_Error {
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
 			require_once 'wp-admin/includes/image.php';
@@ -371,13 +371,92 @@ abstract class WP {
 	}
 
 	/**
+	 * 將 base64 圖片上傳到媒體庫
+	 *
+	 * @param string $base64_img Base64 encoded image.
+	 * @param string $filename - 檔案名稱
+	 * @return int Attachment ID.
+	 * @throws \Exception 如果圖片格式不支援或儲存失敗
+	 */
+	public static function upload_base64_image_to_media( string $base64_img, string $filename = 'unknown' ): int {
+		// Upload dir
+		$upload_dir  = \wp_upload_dir();
+		$upload_path = str_replace('/', DIRECTORY_SEPARATOR, $upload_dir['path']) . DIRECTORY_SEPARATOR;
+
+		// 檢測圖片格式
+		preg_match('/data:image\/(.*?);base64,/', $base64_img, $image_extension);
+
+		// 獲取檔案格式
+		$file_type = '';
+		$extension = '';
+		if (isset($image_extension[1])) {
+			$extension = $image_extension[1];
+			switch ($extension) {
+				case 'jpeg':
+				case 'jpg':
+					$file_type = 'image/jpeg';
+					$extension = 'jpg';
+					break;
+				case 'png':
+					$file_type = 'image/png';
+					break;
+				case 'gif':
+					$file_type = 'image/gif';
+					break;
+				case 'webp':
+					$file_type = 'image/webp';
+					break;
+				default:
+					throw new \Exception('不支援的圖片格式');
+			}
+		} else {
+			throw new \Exception('無效的 base64 圖片格式');
+		}
+
+		// 移除 base64 頭部標識
+		$img     = preg_replace('/data:image\/(.*?);base64,/', '', $base64_img);
+		$img     = str_replace(' ', '+', $img);
+		$decoded = base64_decode($img);
+
+		// 使用原始的副檔名
+		$filename        = "{$filename}.{$extension}";
+		$hashed_filename = md5($filename . microtime()) . '_' . $filename;
+
+		// 儲存圖片到上傳目錄
+		$upload_file = file_put_contents($upload_path . $hashed_filename, $decoded);
+
+		if (!$upload_file) {
+			throw new \Exception('圖片儲存失敗');
+		}
+
+		$attachment = [
+			'post_mime_type' => $file_type,
+			'post_title'     => preg_replace('/\.[^.]+$/', '', basename($hashed_filename)),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+			'guid'           => $upload_dir['url'] . '/' . basename($hashed_filename),
+		];
+
+		$attach_id = \wp_insert_attachment($attachment, $upload_dir['path'] . '/' . $hashed_filename);
+
+		// 如果是圖片，生成縮圖
+		if ($attach_id && function_exists('wp_generate_attachment_metadata')) {
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+			$attach_data = \wp_generate_attachment_metadata($attach_id, $upload_dir['path'] . '/' . $hashed_filename);
+			\wp_update_attachment_metadata($attach_id, $attach_data);
+		}
+
+		return $attach_id;
+	}
+
+	/**
 	 * 將單個檔案上傳到媒體庫
 	 *
-	 * @param array $file - $_FILES
-	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array|\WP_Error - 上傳結果
+	 * @param array{tmp_name: string, name: string, type: string, error: string, size: string} $file - $_FILES
+	 * @param ?bool                                                                            $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
+	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error- 上傳結果
 	 */
-	public static function handle_single_files_to_media( $file, $upload_only = false ):array|\WP_Error {
+	public static function handle_single_files_to_media( $file, $upload_only = false ): array|\WP_Error {
 		$upload_results   = [];
 		$upload_overrides = [ 'test_form' => false ];
 
@@ -423,9 +502,9 @@ abstract class WP {
 	/**
 	 * 將多個檔案上傳到媒體庫
 	 *
-	 * @param array $files - $_FILES
-	 * @param ?bool $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array|\WP_Error
+	 * @param array{tmp_name: string[], name: string[], type: string[], error: string[], size: string[]} $files - $_FILES
+	 * @param ?bool                                                                                      $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
+	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error
 	 */
 	public static function handle_multiple_files_to_media( $files, $upload_only = false ) {
 		$upload_results   = [];
