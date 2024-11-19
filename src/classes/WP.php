@@ -159,7 +159,7 @@ abstract class WP {
 		$data_fields = self::get_data_fields( $obj );
 
 		if ( ! ! $files ) {
-			$upload_results = self::upload_files_to_media( $files );
+			$upload_results = self::upload_files( $files );
 			if ( \is_wp_error( $upload_results ) ) {
 				return $upload_results;
 			}
@@ -351,7 +351,7 @@ abstract class WP {
 	 * @param bool                                                                                                                          $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
 	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error
 	 */
-	public static function upload_files_to_media( $files, $upload_only = false ): array|\WP_Error {
+	public static function upload_files( $files, $upload_only = false ): array|\WP_Error {
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
 			require_once 'wp-admin/includes/image.php';
@@ -371,14 +371,15 @@ abstract class WP {
 	}
 
 	/**
-	 * 將 base64 圖片上傳到媒體庫
+	 * Upload base64 image to media
 	 *
-	 * @param string $base64_img Base64 encoded image.
-	 * @param string $filename - 檔案名稱
-	 * @return int Attachment ID.
-	 * @throws \Exception 如果圖片格式不支援或儲存失敗
+	 * @param string $base64_img Base64 image.
+	 * @param string $filename Filename.
+	 * @param ?bool  $upload_only Upload only.
+	 * @return array{id: string|null, url: string, type: string, name: string, size: string}
+	 * @throws \Exception 圖片格式錯誤
 	 */
-	public static function upload_base64_image_to_media( string $base64_img, string $filename = 'unknown' ): int {
+	public static function upload_single_base64_image( string $base64_img, string $filename = 'unknown', $upload_only = false ): array {
 		// Upload dir
 		$upload_dir  = \wp_upload_dir();
 		$upload_path = str_replace('/', DIRECTORY_SEPARATOR, $upload_dir['path']) . DIRECTORY_SEPARATOR;
@@ -437,6 +438,16 @@ abstract class WP {
 			'guid'           => $upload_dir['url'] . '/' . basename($hashed_filename),
 		];
 
+		if ($upload_only) {
+			return [
+				'id'   => null,
+				'url'  => $attachment['guid'],
+				'type' => $attachment['post_mime_type'],
+				'name' => $attachment['post_title'],
+				'size' => $upload_file,
+			];
+		}
+
 		$attach_id = \wp_insert_attachment($attachment, $upload_dir['path'] . '/' . $hashed_filename);
 
 		// 如果是圖片，生成縮圖
@@ -446,7 +457,13 @@ abstract class WP {
 			\wp_update_attachment_metadata($attach_id, $attach_data);
 		}
 
-		return $attach_id;
+		return [
+			'id'   => $attach_id,
+			'url'  => $attachment['guid'],
+			'type' => $attachment['post_mime_type'],
+			'name' => $attachment['post_title'],
+			'size' => $upload_file,
+		];
 	}
 
 	/**
