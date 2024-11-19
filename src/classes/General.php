@@ -310,4 +310,39 @@ abstract class General {
 
 		return $formatted_array;
 	}
+
+
+
+	/**
+	 * 針對台灣地區網路環境優化的 IP 獲取函數
+	 * 適用於: 中華電信/遠傳/台灣大哥大等 ISP 的光纖/4G/5G 網路
+	 *
+	 * @return string|null
+	 */
+	public static function get_client_ip(): string|null {
+		$ip_headers = [
+			'HTTP_CLIENT_IP',
+			'HTTP_X_FORWARDED_FOR',
+			'HTTP_X_FORWARDED',
+			'HTTP_X_CLUSTER_CLIENT_IP',
+			'HTTP_FORWARDED_FOR',
+			'HTTP_FORWARDED',
+			'REMOTE_ADDR',
+		];
+
+		foreach ($ip_headers as $header) {
+			if (!empty($_SERVER[ $header ])) {
+				$ip = $_SERVER[ $header ]; // phpcs:ignore
+				if (strpos($ip, ',') !== false) {
+					$ips = explode(',', $ip);
+					$ip  = trim($ips[0]);
+				}
+				if (filter_var($ip, FILTER_VALIDATE_IP)) {
+					return $ip;
+				}
+			}
+		}
+
+		return null;
+	}
 }
