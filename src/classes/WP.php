@@ -656,4 +656,22 @@ abstract class WP {
 		}
 		return $date_time->getTimestamp();
 	}
+
+
+	/**
+	 * Array Find
+	 *
+	 * @param array<array-key, mixed> $array 陣列
+	 * @param callable                $callback 回調函數
+	 *
+	 * @return mixed|null
+	 */
+	public static function array_find( array $array, callable $callback ) {
+		foreach ( $array as $key => $item ) {
+			if ( $callback( $item, $key ) ) {
+				return $item;
+			}
+		}
+		return null;
+	}
 }
