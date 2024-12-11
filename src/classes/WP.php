@@ -650,4 +650,27 @@ abstract class WP {
 		}
 		return $date_time->getTimestamp();
 	}
+
+
+	/**
+	 * 判斷資料庫 table 是否存在
+	 *
+	 * @param string $table_name 表格名稱 (含 wp_ 前綴)
+	 * @return bool
+	 */
+	public static function is_table_exists( string $table_name ): bool {
+		global $wpdb;
+		$exists = $wpdb->get_var(
+		$wpdb->prepare(
+		'SELECT EXISTS (
+            SELECT 1 FROM information_schema.tables
+            WHERE table_schema = %s
+            AND table_name = %s
+        )',
+		DB_NAME,
+		$table_name
+		)
+		);
+		return !!$exists;
+	}
 }
