@@ -1,66 +1,36 @@
 <?php
 /**
- * ApiBase class
+ * ApiRegisterTrait class
  * 註冊 API
  *
  * @package J7\WpUtils
  */
 
-namespace J7\WpUtils\Classes;
+namespace J7\WpUtils\Traits;
 
-if ( class_exists( 'ApiBase' ) ) {
+if ( trait_exists( 'ApiRegisterTrait' ) ) {
 	return;
 }
 
 /**
- * Class ApiBase
+ * Class ApiRegisterTrait
+ * DELETE
+ *
+ * @deprecated from v0.1.1 ApiBase，預計 v0.2.0 完全棄用
  */
-abstract class ApiBase {
-
-	/**
-	 * APIs
-	 *
-	 * @var array{endpoint:string,method:string,permission_callback: callable|null }[]
-	 * - endpoint: string
-	 * - method: 'get' | 'post' | 'patch' | 'delete'
-	 * - permission_callback : callable
-	 */
-	protected $apis = [
-		// [
-		// 'endpoint'            => 'posts',
-		// 'method'              => 'get',
-		// 'permission_callback' => null,
-		// ],
-	];
-
-	/**
-	 * Namespace
-	 *
-	 * @var string
-	 */
-	protected $namespace = '';
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action(
-			'rest_api_init',
-			fn() => $this->register_apis(
-			$this->apis,
-			$this->namespace,
-			fn() => \current_user_can( 'manage_options' )
-			)
-			);
-	}
+trait ApiRegisterTrait {
 
 	/**
 	 * Register APIs
 	 * 預設的 permission_callback 是 '__return_true'，即不做任何權限檢查
 	 *
-	 * @param array{endpoint:string,method:string,permission_callback:callable|null}[] $apis api
-	 * @param ?string                                                                  $namespace Namespace.
-	 * @param ?callable                                                                $default_permission_callback Default permission callback.
+	 * @param array     $apis api has following keys:
+	 * - endpoint: string
+	 * - method: 'get' | 'post' | 'patch' | 'delete'
+	 * - permission_callback : callable
+	 *
+	 * @param ?string   $namespace Namespace.
+	 * @param ?callable $default_permission_callback Default permission callback.
 	 * @return void
 	 */
 	final protected function register_apis( array $apis, ?string $namespace = 'wp-utils/v1', ?callable $default_permission_callback = null ): void {
