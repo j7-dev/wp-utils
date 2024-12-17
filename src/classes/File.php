@@ -118,7 +118,7 @@ abstract class File {
 	 * 用 $attachment_id 取得附件檔案
 	 *
 	 * @param int $attachment_id 附件 ID
-	 * @return array 附件檔案
+	 * @return array{name: string, tmp_name: string, error: int, size: int} 附件檔案
 	 */
 	public static function get_file_by_id( int $attachment_id ): array {
 		$file_path = \get_attached_file($attachment_id);
