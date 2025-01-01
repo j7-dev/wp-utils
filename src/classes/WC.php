@@ -32,7 +32,7 @@ abstract class WC {
 	 * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_products-and-WC_Product_Query
 	 *
 	 * @param int $limit Limit.
-	 * @return array
+	 * @return array<int, array{id:string, name:string, total_sales:float}>
 	 */
 	public static function get_top_sales_products( $limit = 10 ) {
 		global $wpdb;
@@ -50,7 +50,8 @@ abstract class WC {
 			)
 		);
 
-		$formatted_top_selling_products = array_map(
+		$formatted_top_selling_products = array_values(
+			array_map(
 			function ( $product ) {
 				$product_id   = $product->post_id;
 				$product_name = \get_the_title($product_id);
@@ -63,7 +64,8 @@ abstract class WC {
 				];
 			},
 			$top_selling_products
-		);
+		)
+			);
 
 		return $formatted_top_selling_products;
 	}
