@@ -43,6 +43,10 @@ abstract class Auth {
 		// 驗證使用者名稱和密碼
 		$user = self::get_user_by_basic_auth();
 		if ( \is_wp_error( $user ) ) {
+			$error_data           = $user->get_error_data();
+			$error_data           = is_array( $error_data ) ? $error_data : [];
+			$error_data['status'] = 401;
+			$user->add_data( $error_data );
 			return $user;
 		}
 
