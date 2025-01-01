@@ -16,7 +16,7 @@ if ( class_exists( 'Point' ) ) {
 /**
  * Class Point
  */
-final class Point {
+class Point {
 	public $id;
 	public $name   = '';
 	public $status = 'publish';

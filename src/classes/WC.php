@@ -148,7 +148,7 @@ abstract class WC {
 				$limit
 			);
 
-			return $wpdb->get_col( str_replace( '\"', '"', $prepare ) );
+			return $wpdb->get_col( str_replace( '\"', '"', $prepare ) ); // phpcs:ignore
 		} catch ( \Exception $e ) {
 			\J7\WpUtils\Classes\ErrorLog::info( $e->getMessage() );
 

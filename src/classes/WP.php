@@ -199,7 +199,6 @@ abstract class WP {
 	 * @return string[]
 	 */
 	public static function get_data_fields( ?string $obj = 'post' ) {
-
 		return match ( $obj ) {
 			'post' => [
 				'ID',
@@ -587,12 +586,7 @@ abstract class WP {
 	 * @return bool
 	 */
 	public static function has_shortcode( string $content ): bool {
-
-		if ( str_contains( $content, '[' ) && str_contains( $content, ']' ) ) {
-			return true;
-		}
-
-		return false;
+		return ( \str_contains( $content, '[' ) && \str_contains( $content, ']' ) );
 	}
 
 
@@ -644,7 +638,7 @@ abstract class WP {
 
 
 	/**
-	 * 將字串轉換成 timestamp
+	 * 將 local 時間字串轉換成 timestamp
 	 *
 	 * @param string $date_string 時間字串
 	 * @return int|null
@@ -655,5 +649,28 @@ abstract class WP {
 			return null;
 		}
 		return $date_time->getTimestamp();
+	}
+
+
+	/**
+	 * 判斷資料庫 table 是否存在
+	 *
+	 * @param string $table_name 表格名稱 (含 wp_ 前綴)
+	 * @return bool
+	 */
+	public static function is_table_exists( string $table_name ): bool {
+		global $wpdb;
+		$exists = $wpdb->get_var(
+		$wpdb->prepare(
+		'SELECT EXISTS (
+            SELECT 1 FROM information_schema.tables
+            WHERE table_schema = %s
+            AND table_name = %s
+        )',
+		DB_NAME,
+		$table_name
+		)
+		);
+		return !!$exists;
 	}
 }
