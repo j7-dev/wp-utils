@@ -1,9 +1,9 @@
 <?php
 /**
  * ApiBase class
- * 註冊 API
- *
- * @package J7\WpUtils
+ * 用法:
+ * 1. 繼承 ApiBase 類別
+ * 2. parent class 指定 $apis 和 $namespace 就好
  */
 
 namespace J7\WpUtils\Classes;

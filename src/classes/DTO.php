@@ -27,12 +27,18 @@ abstract class DTO {
 	 * Constructor
 	 *
 	 * @param array<string,mixed> $input The data to set.
+	 * @param bool                $strict Whether to throw an error if the property is not defined.
 	 *
 	 * @return void
+	 * @throws \Error If the property is not defined and strict is true.
 	 */
-	public function __construct( array $input = [] ) {
+	public function __construct( array $input = [], bool $strict = true ) {
 		$this->data = $input;
 		foreach ( $input as $key => $value ) {
+			if (!property_exists($this, $key) && $strict) {
+				$class_name = static::class;
+				throw new \Error("Undefined property: {$class_name}::\${$key}.");
+			}
 			$this->$key = $value;
 		}
 	}
