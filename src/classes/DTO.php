@@ -35,9 +35,13 @@ abstract class DTO {
 	public function __construct( array $input = [], bool $strict = true ) {
 		$this->data = $input;
 		foreach ( $input as $key => $value ) {
-			if (!property_exists($this, $key) && $strict) {
+			if (!property_exists($this, $key)) {
 				$class_name = static::class;
-				throw new \Error("Undefined property: {$class_name}::\${$key}.");
+				$message    = "Undefined property: {$class_name}::\${$key}.";
+				if ($strict) {
+					throw new \Error($message);
+				}
+				error_log($message);
 			}
 			$this->$key = $value;
 		}
@@ -92,5 +96,35 @@ abstract class DTO {
 	 */
 	public function __isset( string $property ): bool {
 		return array_key_exists($property, $this->data);
+	}
+
+
+	/**
+	 * Parse data to DTO
+	 *
+	 * @param mixed $data The data to parse.
+	 * @param bool  $strict Whether to throw an error if the property is not defined.
+	 *
+	 * @return self
+	 */
+	public static function parse( mixed $data, ?bool $strict = true ): self {
+		return new static($data, $strict); // @phpstan-ignore-line
+	}
+
+	/**
+	 * Parse array to DTO array
+	 *
+	 * @param array<string,mixed> $input The data to parse.
+	 * @param bool                $strict Whether to throw an error if the property is not defined.
+	 *
+	 * @return array<int,self>
+	 */
+	public static function parse_array( array $input, ?bool $strict = true ): array {
+		return array_values(
+			array_map(
+				fn ( $item ) => static::parse($item, $strict),
+				$input
+			)
+			);
 	}
 }
