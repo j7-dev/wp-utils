@@ -105,9 +105,9 @@ abstract class DTO {
 	 * @param mixed $data The data to parse.
 	 * @param bool  $strict Whether to throw an error if the property is not defined.
 	 *
-	 * @return self
+	 * @return static
 	 */
-	public static function parse( mixed $data, ?bool $strict = true ): self {
+	public static function parse( mixed $data, ?bool $strict = true ): static {
 		return new static($data, $strict); // @phpstan-ignore-line
 	}
 
@@ -117,7 +117,7 @@ abstract class DTO {
 	 * @param array<string,mixed> $input The data to parse.
 	 * @param bool                $strict Whether to throw an error if the property is not defined.
 	 *
-	 * @return array<int,self>
+	 * @return array<int,static>
 	 */
 	public static function parse_array( array $input, ?bool $strict = true ): array {
 		return array_values(
