@@ -360,4 +360,26 @@ abstract class WC {
 
 		return $new_order->get_id();
 	}
+
+
+	/**
+	 * 印出 WC Logger
+	 *
+	 * @since 0.3.5
+	 * @param mixed                $message 要印出的訊息
+	 * @param string|null          $title 標題
+	 * @param string|null          $level 等級
+	 * @param array<string, mixed> $args 其他參數 source 代表檔名，預設為 debugger
+	 */
+	public static function log( $message, ?string $title = '', ?string $level = 'info', ?array $args = [] ): void {
+
+		$default_args = [ 'source' => 'debugger' ];
+		$args         = \wp_parse_args($args, $default_args);
+
+		ob_start();
+		var_dump($message);
+		$log   = new \WC_Logger();
+		$level = method_exists($log, $level) ? $level : 'info';
+		$log->$level($title . ': ' . ob_get_clean(), $args);
+	}
 }

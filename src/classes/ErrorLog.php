@@ -2,8 +2,6 @@
 /**
  * Log class
  * 方便印出 Error Log
- *
- * @package J7\WpUtils
  */
 
 namespace J7\WpUtils\Classes;
@@ -14,19 +12,22 @@ if ( class_exists( 'ErrorLog' ) ) {
 
 /**
  * Log class
+ *
+ * @deprecated 0.3.5
  */
 abstract class ErrorLog {
-
 	/**
 	 * Log a message.
 	 *
 	 * @param mixed  $message The message to log.
 	 * @param string $level The log level.
 	 * @param string $context The context of the message.
+	 * @deprecated 0.3.5
 	 *
 	 * @return void
 	 */
-	protected static function log( $message, string $level = 'info', ?string $context = '' ): void {
+	protected static function log_old( $message, string $level = 'info', ?string $context = '' ): void {
+
 		$emoji = match ( $level ) {
 			'info' => '📘 ',
 			'error' => '❌ ',
@@ -56,7 +57,7 @@ abstract class ErrorLog {
 	 * Stringify the message.
 	 *
 	 * @param mixed $message The message to stringify.
-	 *
+	 * @deprecated 0.3.5
 	 * @return string The stringified message.
 	 */
 	public static function stringify( $message ): string {
@@ -70,11 +71,11 @@ abstract class ErrorLog {
 	 *
 	 * @param mixed  $message The message to log.
 	 * @param string $context The context of the message.
-	 *
+	 * @deprecated 0.3.5
 	 * @return void
 	 */
 	public static function info( $message, ?string $context = '' ): void {
-		self::log( $message, 'info', $context );
+		self::log_old( $message, 'info', $context );
 	}
 
 	/**
@@ -82,11 +83,11 @@ abstract class ErrorLog {
 	 *
 	 * @param mixed  $message The message to log.
 	 * @param string $context The context of the message.
-	 *
+	 * @deprecated 0.3.5
 	 * @return void
 	 */
 	public static function error( $message, ?string $context = '' ): void {
-		self::log( $message, 'error', $context );
+		self::log_old( $message, 'error', $context );
 	}
 
 	/**
@@ -94,10 +95,11 @@ abstract class ErrorLog {
 	 *
 	 * @param mixed  $message The message to log.
 	 * @param string $context The context of the message.
+	 * @deprecated 0.3.5
 	 *
 	 * @return void
 	 */
 	public static function debug( $message, ?string $context = '' ): void {
-		self::log( $message, 'debug', $context );
+		self::log_old( $message, 'debug', $context );
 	}
 }

@@ -351,6 +351,7 @@ abstract class General {
 	 *
 	 * @param array<array-key, mixed> $array 陣列
 	 * @param callable                $callback 回調函數
+	 * @since 0.3.5
 	 *
 	 * @return mixed|null
 	 */
