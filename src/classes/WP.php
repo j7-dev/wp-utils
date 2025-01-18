@@ -22,11 +22,11 @@ abstract class WP {
 	 *
 	 * @example: WP::admin_do_shortcode( '[your-shortcode]' );
 	 *
-	 * @param mixed $content The shortcode
-	 * @param bool  $ignore_html Whether to ignore HTML tags.
-	 * @return mixed The processed content.
+	 * @param string $content The shortcode
+	 * @param ?bool  $ignore_html Whether to ignore HTML tags.
+	 * @return string The processed content.
 	 */
-	public static function admin_do_shortcode( $content, $ignore_html = false ) {
+	public static function admin_do_shortcode( string $content, ?bool $ignore_html = false ) {
 		global $shortcode_tags;
 
 		if ( false === strpos( $content, '[' ) ) {
