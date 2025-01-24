@@ -330,13 +330,16 @@ abstract class WP {
 	/**
 	 * 取得 image info
 	 *
-	 * @param string $attachment_id - 附件 ID
-	 * @return array{id: string, url: string}
+	 * @param string|int $attachment_id - 附件 ID
+	 * @return array{id: string, url: string}|null
 	 */
-	public static function get_image_info( string $attachment_id ): array {
-		$image_url = \wp_get_attachment_url( $attachment_id );
+	public static function get_image_info( $attachment_id ): array|null {
+		$image_url = \wp_get_attachment_url( (int) $attachment_id );
+		if ( ! $image_url ) {
+			return null;
+		}
 		return [
-			'id'  => $attachment_id,
+			'id'  => (string) $attachment_id,
 			'url' => $image_url,
 		];
 	}
