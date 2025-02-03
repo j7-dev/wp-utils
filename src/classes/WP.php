@@ -150,26 +150,32 @@ abstract class WP {
 	 * 分隔器，將陣列轉換成 data 與 meta data
 	 * 因為 WP / WC 的資料通常區分成 data 與 meta data
 	 *
-	 * @param array       $args - 原始資料
-	 * @param string|null $obj - 'post' | 'term' | 'user' | 'product'
-	 * @param array|null  $files - file 物件
-	 * @return array{data: array, meta_data: array}|\WP_Error
+	 * @param array<string, mixed>                                                                                                               $args - 原始資料
+	 * @param string|null                                                                                                                        $obj_type - 'post' | 'term' | 'user' | 'product'
+	 * @param array{tmp_name: string|string[], name: string|string[], type: string|string[], error: string|string[], size: string|string[]}|null $files - file 物件
+	 * @return array{data: array<string, mixed>, meta_data: array<string, mixed>}|\WP_Error
 	 */
-	public static function separator( array $args, ?string $obj = 'post', ?array $files = [] ): array|\WP_Error {
-		$data_fields = self::get_data_fields( $obj );
+	public static function separator( array $args, ?string $obj_type = 'post', ?array $files = null ): array|\WP_Error {
 
-		if ( ! ! $files ) {
+		if ( $files ) {
 			$upload_results = self::upload_files( $files );
 			if ( \is_wp_error( $upload_results ) ) {
 				return $upload_results;
 			}
-			$image_id          = $upload_results[0]['id'] ?? null;
-			$gallery_image_ids = array_map( fn( $result ) => $result['id'], array_slice( $upload_results, 1 ) );
+			$image_id = $upload_results[0]['id'] ?? null;
 
-			if ( ! ! $image_id ) {
-				$args['image_id'] = $image_id;
+			// 依照不同物件類型存入不同欄位
+			if ( $image_id ) {
+				$image_key = match ( $obj_type ) {
+					'product' => 'image_id',
+					'post' => '_thumbnail_id',
+					default => '_thumbnail_id',
+				};
+				$args[ $image_key ] = $image_id;
 			}
-			if ( ! ! $gallery_image_ids ) {
+			// 如果上傳了多個檔案，例如商品 gallery 圖片
+			if ( count( $upload_results ) > 1 ) {
+				$gallery_image_ids         = array_map( fn( $result ) => $result['id'], array_slice( $upload_results, 1 ) );
 				$args['gallery_image_ids'] = $gallery_image_ids;
 			}
 		}
@@ -178,6 +184,7 @@ abstract class WP {
 		$data      = [];
 		$meta_data = [];
 
+		$data_fields = self::get_data_fields( $obj_type );
 		foreach ( $args as $key => $value ) {
 			if ( \in_array( $key, $data_fields, true ) ) {
 				$data[ $key ] = $value;
@@ -353,7 +360,7 @@ abstract class WP {
 	 * @param bool                                                                                                                          $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
 	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error
 	 */
-	public static function upload_files( $files, $upload_only = false ): array|\WP_Error {
+	public static function upload_files( array $files, ?bool $upload_only = false ): array|\WP_Error {
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
 			require_once 'wp-admin/includes/image.php';
@@ -364,8 +371,10 @@ abstract class WP {
 		$is_multiple_files = is_array( $files['tmp_name'] );
 
 		if ( $is_multiple_files ) {
+			/** @var array{tmp_name:string[], name:string[], type:string[], error:string[], size:string[]} $files */
 			$upload_results = self::handle_multiple_files_to_media( $files, $upload_only );
 		} else {
+			/** @var array{tmp_name:string, name:string, type:string, error:string, size:string} $files */
 			$upload_results = self::handle_single_files_to_media( $files, $upload_only );
 		}
 
@@ -378,7 +387,7 @@ abstract class WP {
 	 * @param string $base64_img Base64 image.
 	 * @param string $filename Filename.
 	 * @param ?bool  $upload_only Upload only.
-	 * @return array{id: string|null, url: string, type: string, name: string, size: string}
+	 * @return array{id: int<0, max>|null, url: non-falsy-string, type: 'image/gif'|'image/jpeg'|'image/png'|'image/webp', name: string|null, size: int<1, max>}
 	 * @throws \Exception 圖片格式錯誤
 	 */
 	public static function upload_single_base64_image( string $base64_img, string $filename = 'unknown', $upload_only = false ): array {
@@ -417,6 +426,7 @@ abstract class WP {
 		}
 
 		// 移除 base64 頭部標識
+		/** @var string $img */
 		$img     = preg_replace('/data:image\/(.*?);base64,/', '', $base64_img);
 		$img     = str_replace(' ', '+', $img);
 		$decoded = base64_decode($img);
@@ -473,9 +483,9 @@ abstract class WP {
 	 *
 	 * @param array{tmp_name: string, name: string, type: string, error: string, size: string} $file - $_FILES
 	 * @param ?bool                                                                            $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error- 上傳結果
+	 * @return array{0: array{id: string|null, url: string, type: string, name: string, size: string}}|\WP_Error
 	 */
-	public static function handle_single_files_to_media( $file, $upload_only = false ): array|\WP_Error {
+	public static function handle_single_files_to_media( array $file, ?bool $upload_only = false ): array|\WP_Error {
 		$upload_results   = [];
 		$upload_overrides = [ 'test_form' => false ];
 
@@ -515,6 +525,7 @@ abstract class WP {
 
 		$upload_results[] = $upload_result;
 
+		/** @var array{0: array{id: string|null, url: string, type: string, name: string, size: string}} */
 		return $upload_results;
 	}
 
@@ -578,6 +589,7 @@ abstract class WP {
 			}
 		}
 
+		/** @var array<int, array{id: string|null, url: string, type: string, name: string, size: string}> */
 		return $upload_results;
 	}
 
@@ -600,10 +612,10 @@ abstract class WP {
 	 *
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
-	 * @param array $args    Arguments.
-	 * @param array $fields_mapper 欄位轉換器
+	 * @param array<string, mixed>  $args    Arguments.
+	 * @param array<string, string> $fields_mapper 欄位轉換器
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function converter( array $args, ?array $fields_mapper = [] ): array {
 		$default_fields_mapper = [
@@ -620,7 +632,7 @@ abstract class WP {
 		];
 
 		$fields_mapper = \wp_parse_args(
-			$fields_mapper,
+			$fields_mapper, // @phpstan-ignore-line
 			$default_fields_mapper,
 		);
 
