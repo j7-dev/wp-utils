@@ -45,13 +45,14 @@ abstract class WP {
 			return $content;
 		}
 
+		/** @var bool $ignore_html */
 		$content = \do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
 
 		$pattern = \get_shortcode_regex( $tagnames );
-		$content = preg_replace_callback( "/$pattern/", 'do_shortcode_tag', $content );
+		$content = preg_replace_callback( "/$pattern/", 'do_shortcode_tag', $content ); // @phpstan-ignore-line
 
 		// Always restore square braces so we don't break things like <!--[if IE ]>.
-		$content = \unescape_invalid_shortcodes( $content );
+		$content = \unescape_invalid_shortcodes( (string) $content );
 
 		return $content;
 	}
@@ -61,10 +62,10 @@ abstract class WP {
 	 * Sanitize Array
 	 * Sanitize 一個深層的關聯陣列
 	 *
-	 * @param mixed $value Value to sanitize
-	 * @param bool  $allow_br 是否允許換行 \n \r，預設為 true，如果為 false，則會用 sanitize_text_field
-	 * @param array $skip_keys - 要跳過的 key，如果符合就不做任何 sanitize
-	 * @return array|string
+	 * @param mixed         $value Value to sanitize
+	 * @param bool          $allow_br 是否允許換行 \n \r，預設為 true，如果為 false，則會用 sanitize_text_field
+	 * @param array<string> $skip_keys - 要跳過的 key，如果符合就不做任何 sanitize
+	 * @return array<string, mixed>|string
 	 */
 	public static function sanitize_text_field_deep( $value, $allow_br = true, $skip_keys = [] ) {
 		if ( is_array( $value ) ) {
@@ -80,8 +81,10 @@ abstract class WP {
 
 		// if not array, sanitize the value
 		if ( $allow_br ) {
+			/** @var string $value */
 			return \sanitize_textarea_field( $value );
 		} else {
+			/** @var string $value */
 			return \sanitize_text_field( $value );
 		}
 	}
@@ -89,14 +92,15 @@ abstract class WP {
 	/**
 	 * 檢查關聯陣列是否包含了必要參數
 	 *
-	 * @param array $params - 要檢查的參數 assoc array
-	 * @param array $required_params - string[] 必要參數
-	 * @return true|\WP_Error  - 如果缺少必要參數. 返回 WP_Error
+	 * @param array<string, mixed> $params - 要檢查的參數 assoc array
+	 * @param array<string>        $required_params - string[] 必要參數
+	 * @return true
+	 * @throws \Exception 缺少必要參數
 	 */
-	public static function include_required_params( array $params, array $required_params ): bool|\WP_Error {
+	public static function include_required_params( array $params, array $required_params ): bool {
 		$missing_params = array_diff( $required_params, array_keys( $params ) );
 		if ( ! empty( $missing_params ) ) {
-			return new \WP_Error( 'missing_required_params', \wp_json_encode( $missing_params ), [ 'status' => 400 ] );
+			throw new \Exception( '缺少必要參數: ' . \wp_json_encode( $missing_params ) );
 		}
 		return true;
 	}
@@ -153,16 +157,14 @@ abstract class WP {
 	 * @param array<string, mixed>                                                                                                               $args - 原始資料
 	 * @param string|null                                                                                                                        $obj_type - 'post' | 'term' | 'user' | 'product'
 	 * @param array{tmp_name: string|string[], name: string|string[], type: string|string[], error: string|string[], size: string|string[]}|null $files - file 物件
-	 * @return array{data: array<string, mixed>, meta_data: array<string, mixed>}|\WP_Error
+	 * @return array{data: array<string, mixed>, meta_data: array<string, mixed>}
+	 * @throws \Exception 上傳失敗
 	 */
-	public static function separator( array $args, ?string $obj_type = 'post', ?array $files = null ): array|\WP_Error {
+	public static function separator( array $args, ?string $obj_type = 'post', ?array $files = null ): array {
 
 		if ( $files ) {
 			$upload_results = self::upload_files( $files );
-			if ( \is_wp_error( $upload_results ) ) {
-				return $upload_results;
-			}
-			$image_id = $upload_results[0]['id'] ?? null;
+			$image_id       = $upload_results[0]['id'] ?? null;
 
 			// 依照不同物件類型存入不同欄位
 			if ( $image_id ) {
@@ -358,9 +360,9 @@ abstract class WP {
 	 *
 	 * @param array{tmp_name: string|string[], name: string|string[], type: string|string[], error: string|string[], size: string|string[]} $files - $_FILES
 	 * @param bool                                                                                                                          $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error
+	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>
 	 */
-	public static function upload_files( array $files, ?bool $upload_only = false ): array|\WP_Error {
+	public static function upload_files( array $files, ?bool $upload_only = false ): array {
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
 			require_once 'wp-admin/includes/image.php';
@@ -483,9 +485,10 @@ abstract class WP {
 	 *
 	 * @param array{tmp_name: string, name: string, type: string, error: string, size: string} $file - $_FILES
 	 * @param ?bool                                                                            $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array{0: array{id: string|null, url: string, type: string, name: string, size: string}}|\WP_Error
+	 * @return array{0: array{id: string|null, url: string, type: string, name: string, size: string}}
+	 * @throws \Exception 上傳失敗
 	 */
-	public static function handle_single_files_to_media( array $file, ?bool $upload_only = false ): array|\WP_Error {
+	public static function handle_single_files_to_media( array $file, ?bool $upload_only = false ): array {
 		$upload_results   = [];
 		$upload_overrides = [ 'test_form' => false ];
 
@@ -501,7 +504,7 @@ abstract class WP {
 			$upload_result['name'] = $file['name'];
 			$upload_result['size'] = $file['size'];
 			if ( isset( $upload_result['error'] ) ) {
-				return new \WP_Error( 'upload_error', $upload_result['error'], [ 'status' => 400 ] );
+				throw new \Exception( $upload_result['error'] );
 			}
 		} else {
 			// 將檔案上傳到媒體庫
@@ -511,7 +514,7 @@ abstract class WP {
 			);
 
 			if ( \is_wp_error( $attachment_id ) ) {
-				return new \WP_Error( 'upload_error', $attachment_id->get_error_message(), [ 'status' => 400 ] );
+				throw new \Exception( $attachment_id->get_error_message() );
 			}
 
 			$upload_result = [
@@ -534,7 +537,8 @@ abstract class WP {
 	 *
 	 * @param array{tmp_name: string[], name: string[], type: string[], error: string[], size: string[]} $files - $_FILES
 	 * @param ?bool                                                                                      $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
-	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>|\WP_Error
+	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>
+	 * @throws \Exception 上傳失敗
 	 */
 	public static function handle_multiple_files_to_media( $files, $upload_only = false ) {
 		$upload_results   = [];
@@ -563,7 +567,7 @@ abstract class WP {
 					$upload_result['name'] = $file['name'];
 					$upload_result['size'] = $file['size'];
 					if ( isset( $upload_result['error'] ) ) {
-						return new \WP_Error( 'upload_error', $upload_result['error'], [ 'status' => 400 ] );
+						throw new \Exception( $upload_result['error'] );
 					}
 				} else {
 					// 將檔案上傳到媒體庫
@@ -573,7 +577,7 @@ abstract class WP {
 					);
 
 					if ( \is_wp_error( $attachment_id ) ) {
-						return new \WP_Error( 'upload_error', $attachment_id->get_error_message(), [ 'status' => 400 ] );
+						throw new \Exception( $attachment_id->get_error_message() );
 					}
 
 					$upload_result = [
