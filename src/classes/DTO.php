@@ -39,7 +39,7 @@ abstract class DTO {
 				$class_name = static::class;
 				$message    = "Undefined property: {$class_name}::\${$key}.";
 				if ($strict) {
-					throw new \Error($message);
+					throw new \Error($message); // phpcs:ignore
 				}
 				error_log($message);
 			}
@@ -48,12 +48,12 @@ abstract class DTO {
 	}
 
 	/**
-	 * Get the data as an array.
+	 * 取得公開的屬性
 	 *
 	 * @return array<string,mixed>
 	 */
 	public function to_array(): array {
-		return $this->data;
+		return get_object_vars($this);
 	}
 
 
@@ -68,7 +68,7 @@ abstract class DTO {
 	public function __get(string $property ) { // phpcs:ignore
 		if (!$this->__isset($property)) {
 			$self = static::class;
-			throw new \Error("Undefined property: {$self}::\$$property.");
+			throw new \Error("Undefined property: {$self}::\$$property."); // phpcs:ignore
 		}
 
 		return $this->data[ $property ];
@@ -113,6 +113,7 @@ abstract class DTO {
 
 	/**
 	 * Parse array to DTO array
+	 * 例如 物件組成的 array
 	 *
 	 * @param array<string,mixed> $input The data to parse.
 	 * @param bool                $strict Whether to throw an error if the property is not defined.

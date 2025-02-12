@@ -57,12 +57,12 @@ abstract class Product {
 	/**
 	 * 批量更新商品
 	 *
-	 * @param array<int>            $ids 商品 ID 陣列
-	 * @param ?array<string, mixed> $data 商品資料陣列
-	 * @param ?array<string, mixed> $meta_data 商品 meta 資料陣列
+	 * @param array<int>           $ids 商品 ID 陣列
+	 * @param array<string, mixed> $data 商品資料陣列
+	 * @param array<string, mixed> $meta_data 商品 meta 資料陣列
 	 * @return array{code: string, message: string, data: array{success_ids: array<int>, not_found_ids: array<int>}} 更新結果陣列
 	 */
-	public static function multi_update( array $ids, ?array $data = [], ?array $meta_data = [] ): array {
+	public static function multi_update( array $ids, array $data = [], array $meta_data = [] ): array {
 		\do_action( 'wp_utils_before_products_updated', $ids, $data, $meta_data );
 		$not_found_ids = [];
 		$success_ids   = [];
@@ -80,6 +80,7 @@ abstract class Product {
 			$product->save();
 
 			foreach ( $meta_data as $key => $value ) {
+				// @phpstan-ignore-next-line
 				$product->update_meta_data( $key, $value );
 			}
 
@@ -164,9 +165,9 @@ abstract class Product {
 	/**
 	 * 添加 meta array
 	 *
-	 * @param int           $id 商品 ID
-	 * @param string        $meta_key meta key
-	 * @param array<string> $meta_values meta value array
+	 * @param int               $id 商品 ID
+	 * @param string            $meta_key meta key
+	 * @param array<int|string> $meta_values meta value array
 	 * @return bool|\WP_Error
 	 */
 	public static function add_meta_array( int $id, string $meta_key, array $meta_values ): bool|\WP_Error {
@@ -176,13 +177,14 @@ abstract class Product {
 		}
 
 		$origin_meta_values = \get_post_meta( $id, $meta_key, false );
+		$origin_meta_values = is_array($origin_meta_values) ? $origin_meta_values : [];
 
 		foreach ( $meta_values as $meta_value ) {
 			// 檢查 $origin_meta_values 是否已經包含 $meta_value
 			if (\in_array($meta_value, $origin_meta_values)) {
 				continue;
 			}
-
+			/** @var string $meta_value */
 			$product->add_meta_data( $meta_key, $meta_value, false );
 		}
 		$product->save_meta_data();

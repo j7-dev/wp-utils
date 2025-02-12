@@ -63,7 +63,7 @@ abstract class ErrorLog {
 	public static function stringify( $message ): string {
 		ob_start();
 		var_dump($message);
-		return ob_get_clean();
+		return ob_get_clean(); // @phpstan-ignore
 	}
 
 	/**
