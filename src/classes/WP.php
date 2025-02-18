@@ -361,6 +361,7 @@ abstract class WP {
 	 * @param array{tmp_name: string|string[], name: string|string[], type: string|string[], error: string|string[], size: string|string[]} $files - $_FILES
 	 * @param bool                                                                                                                          $upload_only - 是否只上傳到 wp-content/uploads 而不新增到媒體庫
 	 * @return array<int, array{id: string|null, url: string, type: string, name: string, size: string}>
+	 * @throws \Exception 上傳失敗
 	 */
 	public static function upload_files( array $files, ?bool $upload_only = false ): array {
 
@@ -690,6 +691,6 @@ abstract class WP {
 		$table_name
 		)
 		);
-		return !!$exists;
+		return (bool) $exists;
 	}
 }

@@ -48,12 +48,19 @@ abstract class DTO {
 	}
 
 	/**
-	 * 取得公開的屬性
+	 * 取得公開的屬性 array
 	 *
 	 * @return array<string,mixed>
 	 */
 	public function to_array(): array {
-		return get_object_vars($this);
+		$reflection = new \ReflectionClass($this);
+		$props      = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+		$result = [];
+		foreach ($props as $prop) {
+			$result[ $prop->getName() ] = $prop->getValue($this);
+		}
+		return $result;
 	}
 
 

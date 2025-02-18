@@ -76,7 +76,7 @@ abstract class WC {
 	 * 原本是 WC_Meta_Data[]，轉換成 key => value 的 array
 	 *
 	 * @param \WC_Product $product Product.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function get_formatted_meta_data( \WC_Product $product ): array {
 		$meta_data           = $product->get_meta_data();
