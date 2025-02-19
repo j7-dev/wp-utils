@@ -41,7 +41,6 @@ abstract class DTO {
 				if ($strict) {
 					throw new \Error($message); // phpcs:ignore
 				}
-				error_log($message);
 			}
 			$this->$key = $value;
 		}
