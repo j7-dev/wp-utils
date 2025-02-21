@@ -1,6 +1,6 @@
 {
 	"name": "j7-dev/wp-utils",
-	"version": "0.3.17",
+	"version": "0.3.18",
 	"description": "Various WordPress classes and traits for WordPress",
 	"homepage": "https://github.com/j7-dev",
 	"type": "library",
@@ -35,7 +35,7 @@
 	"require": {
 		"j7-dev/tgm-plugin-activation-forked": "1.2.5",
 		"yahnis-elsts/plugin-update-checker": "5.3",
-		"j7-dev/wp-plugin-trait": "0.2.6"
+		"j7-dev/wp-plugin-trait": "0.2.7"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "@stable",
