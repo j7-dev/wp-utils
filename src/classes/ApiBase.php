@@ -8,6 +8,8 @@
 
 namespace J7\WpUtils\Classes;
 
+use WP_REST_Response;
+
 if ( class_exists( 'ApiBase' ) ) {
 	return;
 }
@@ -80,15 +82,49 @@ abstract class ApiBase {
 				$permission_callback = $api['permission_callback'];
 			}
 
+			/** @var callable $callback */
+			$callback = [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ];
+
 			\register_rest_route(
 				$namespace,
 				$api['endpoint'],
 				[
 					'methods'             => $api['method'],
-					'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
+					'callback'            => function ( $request ) use ( $callback ) {
+						return $this->try(  $callback, $request );
+					},
 					'permission_callback' => $permission_callback,
 				]
 			);
+		}
+	}
+
+	/**
+	 * 嘗試執行回調函數並返回響應
+	 *
+	 * @param callable         $callback 要執行的回調函數
+	 * @param \WP_REST_Request $request  請求對象
+	 * @return \WP_REST_Response 響應對象
+	 * @throws \Exception 如果回調函數拋出異常，則捕獲異常並返回500錯誤響應
+	 * @phpstan-ignore-next-line
+	 */
+	public function try( $callback, $request ) {
+		try {
+			return call_user_func( $callback, $request );
+		} catch (\Exception $e) {
+			$method = $request->get_method();
+			$data   = match ( $method ) {
+				'GET' => $request->get_query_params(),
+				default => $request->get_json_params() ?: $request->get_body_params(),
+			};
+			return new WP_REST_Response(
+					[
+						'code'    => $e->getCode(),
+						'message' => $e->getMessage(),
+						'data'    => $data,
+					],
+					500
+				);
 		}
 	}
 }
