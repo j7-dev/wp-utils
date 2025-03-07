@@ -332,6 +332,70 @@ abstract class WP {
 				'comment_meta',
 				'user_id',
 			],
+			'order' => [
+				'address',
+				'billing',
+				'billing_address',
+				'billing_address_1',
+				'billing_address_2',
+				'billing_city',
+				'billing_company',
+				'billing_country',
+				'billing_email',
+				'billing_first_name',
+				'billing_last_name',
+				'billing_phone',
+				'billing_postcode',
+				'billing_state',
+				'cart_hash',
+				'cart_tax',
+				'created_via',
+				'currency',
+				'customer_id',
+				'customer_ip_address',
+				'customer_note',
+				'customer_user_agent',
+				'date_completed',
+				'date_created',
+				'date_modified',
+				'date_paid',
+				'defaults',
+				'discount_tax',
+				'discount_total',
+				'download_permissions_granted',
+				'id',
+				'meta_data',
+				'new_order_email_sent',
+				'object_read',
+				'order_key',
+				'order_stock_reduced',
+				'parent_id',
+				'payment_method',
+				'payment_method_title',
+				'prices_include_tax',
+				'props',
+				'recorded_coupon_usage_counts',
+				'recorded_sales',
+				'shipping',
+				'shipping_address',
+				'shipping_address_1',
+				'shipping_address_2',
+				'shipping_city',
+				'shipping_company',
+				'shipping_country',
+				'shipping_first_name',
+				'shipping_last_name',
+				'shipping_phone',
+				'shipping_postcode',
+				'shipping_state',
+				'shipping_tax',
+				'shipping_total',
+				'status',
+				'total',
+				'transaction_id',
+				'version',
+				'order_version',
+			],
 			default => [],
 		};
 	}
@@ -505,7 +569,7 @@ abstract class WP {
 			$upload_result['name'] = $file['name'];
 			$upload_result['size'] = $file['size'];
 			if ( isset( $upload_result['error'] ) ) {
-				throw new \Exception( $upload_result['error'] );
+				throw new \Exception( $upload_result['error'] ); // phpcs:ignore
 			}
 		} else {
 			// 將檔案上傳到媒體庫
@@ -515,7 +579,7 @@ abstract class WP {
 			);
 
 			if ( \is_wp_error( $attachment_id ) ) {
-				throw new \Exception( $attachment_id->get_error_message() );
+				throw new \Exception( $attachment_id->get_error_message() ); // phpcs:ignore
 			}
 
 			$upload_result = [
@@ -568,7 +632,7 @@ abstract class WP {
 					$upload_result['name'] = $file['name'];
 					$upload_result['size'] = $file['size'];
 					if ( isset( $upload_result['error'] ) ) {
-						throw new \Exception( $upload_result['error'] );
+						throw new \Exception( $upload_result['error'] );  // phpcs:ignore
 					}
 				} else {
 					// 將檔案上傳到媒體庫
@@ -578,7 +642,7 @@ abstract class WP {
 					);
 
 					if ( \is_wp_error( $attachment_id ) ) {
-						throw new \Exception( $attachment_id->get_error_message() );
+						throw new \Exception( $attachment_id->get_error_message() );  // phpcs:ignore
 					}
 
 					$upload_result = [
