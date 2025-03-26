@@ -159,24 +159,33 @@ abstract class WC {
 	/**
 	 * 取得商品圖片
 	 *
-	 * @param \WC_Product $product 商品
-	 * @param string|null $size 尺寸 full | single-post-thumbnail
-	 * @param string|null $default_image 預設圖片
+	 * @param \WC_Product|int $product_id 商品 ID
+	 * @param string          $size 尺寸 full | single-post-thumbnail
+	 * @param string          $default_image 預設圖片
 	 *
 	 * @return string
 	 */
 	public static function get_image_url_by_product(
-		\WC_Product $product,
-		?string $size = 'full',
-		?string $default_image = ''
+		\WC_Product|int $product_id,
+		string $size = 'full',
+		string $default_image = 'https://placehold.co/800x600?text=%3Cimg%20/%3E'
 	): string {
+		if ( !is_numeric( $product_id ) ) {
+			$product_id = $product_id->get_id();
+		}
+
+		$thumbnail_id = \get_post_thumbnail_id( $product_id  );
+		if ( ! $thumbnail_id ) {
+			return $default_image;
+		}
+
 		$product_image = \wp_get_attachment_image_src(
-			\get_post_thumbnail_id( $product->get_id() ),
+			$thumbnail_id,
 			$size
 		);
 
 		if ( ! $product_image || ! is_array( $product_image ) ) {
-			$product_image_url = $default_image ? $default_image : 'https://placehold.co/800x600?text=%3Cimg%20/%3E';
+			$product_image_url = $default_image;
 		} else {
 			$product_image_url = $product_image[0];
 		}
