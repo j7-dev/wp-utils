@@ -1,9 +1,4 @@
 <?php
-/**
- * DTO class
- *
- * @package J7\WpUtils
- */
 
 namespace J7\WpUtils\Classes;
 
@@ -16,12 +11,11 @@ if ( class_exists( 'DTO' ) ) {
  */
 abstract class DTO {
 
-	/**
-	 * Raw data
-	 *
-	 * @var array<string,mixed>
-	 */
-	private $data = [];
+	/** @var array<string,mixed> Raw data */
+	private $dto_data = [];
+
+	/** @var \WP_Error Error */
+	private \WP_Error $dto_error;
 
 	/**
 	 * Constructor
@@ -33,16 +27,24 @@ abstract class DTO {
 	 * @throws \Error If the property is not defined and strict is true.
 	 */
 	public function __construct( array $input = [], bool $strict = true ) {
-		$this->data = $input;
-		foreach ( $input as $key => $value ) {
-			if (!property_exists($this, $key)) {
-				$class_name = static::class;
-				$message    = "Undefined property: {$class_name}::\${$key}.";
-				if ($strict) {
-					throw new \Error($message); // phpcs:ignore
+		try {
+			$this->dto_error = new \WP_Error();
+			$this->dto_data  = $input;
+			foreach ( $input as $key => $value ) {
+				if (!property_exists($this, $key)) {
+					$class_name = static::class;
+					$this->dto_error->add( 'invalid_property', "Try to set undefined property: {$class_name}::\${$key}." );
 				}
+				$this->$key = $value;
 			}
-			$this->$key = $value;
+		} catch (\Throwable $th) {
+			$this->dto_error->add( $th->getCode(), $th->getMessage() );
+			// 如果是嚴格模式，則直接拋出錯誤而不進行捕獲
+			$error_messages = $this->dto_error->get_error_messages();
+			if ($strict && !empty($error_messages)) {
+				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
+			}
+			WC::log( $error_messages );
 		}
 	}
 
@@ -74,10 +76,10 @@ abstract class DTO {
 	public function __get(string $property ) { // phpcs:ignore
 		if (!$this->__isset($property)) {
 			$self = static::class;
-			throw new \Error("Undefined property: {$self}::\$$property."); // phpcs:ignore
+			$this->dto_error->add( 'invalid_property', "Try to get undefined property: {$self}::\$$property." );
 		}
 
-		return $this->data[ $property ];
+		return $this->dto_data[ $property ];
 	}
 
 	/**
@@ -90,7 +92,7 @@ abstract class DTO {
 	 * @throws \Error SimpleDTOs are immutable
 	 */
 	public function __set( string $property, $value ): void {
-		throw new \Error('SimpleDTOs are immutable. Create a new DTO to set a new value.');
+		$this->dto_error->add( 'immutable', 'SimpleDTOs are immutable. Create a new DTO to set a new value.' );
 	}
 
 	/**
@@ -101,7 +103,7 @@ abstract class DTO {
 	 * @return bool
 	 */
 	public function __isset( string $property ): bool {
-		return array_key_exists($property, $this->data);
+		return array_key_exists($property, $this->dto_data);
 	}
 
 
