@@ -166,21 +166,25 @@ abstract class WC {
 	 * @return string
 	 */
 	public static function get_image_url_by_product(
-		\WC_Product|int $product_id,
+		\WC_Product|int $product,
 		string $size = 'full',
 		string $default_image = 'https://placehold.co/800x600?text=%3Cimg%20/%3E'
 	): string {
-		if ( !is_numeric( $product_id ) ) {
-			$product_id = $product_id->get_id();
+		if ( is_numeric( $product ) ) {
+			$product = \wc_get_product( $product );
 		}
 
-		$thumbnail_id = \get_post_thumbnail_id( $product_id  );
-		if ( ! $thumbnail_id ) {
+		if (!$product) {
+			return $default_image;
+		}
+
+		$image_id = (int) $product->get_image_id();
+		if ( ! $image_id ) {
 			return $default_image;
 		}
 
 		$product_image = \wp_get_attachment_image_src(
-			$thumbnail_id,
+			$image_id,
 			$size
 		);
 
