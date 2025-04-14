@@ -45,7 +45,14 @@ abstract class DTO {
 			if ($strict && !empty($error_messages)) {
 				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
 			}
-			WC::log( $error_messages );
+			WC::log(
+				$error_messages,
+				'',
+				'error',
+				[
+					'source' => 'dto',
+				]
+				);
 		}
 	}
 
