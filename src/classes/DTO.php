@@ -12,10 +12,10 @@ if ( class_exists( 'DTO' ) ) {
 abstract class DTO {
 
 	/** @var array<string,mixed> Raw data */
-	private $dto_data = [];
+	protected array $dto_data = [];
 
 	/** @var \WP_Error Error */
-	private \WP_Error $dto_error;
+	protected \WP_Error $dto_error;
 
 	/**
 	 * Constructor
