@@ -30,7 +30,7 @@ abstract class DTO {
 		try {
 			$this->dto_error = new \WP_Error();
 			$this->dto_data  = $input;
-			$this->init();
+			$this->before_init();
 			foreach ( $input as $key => $value ) {
 				if (!property_exists($this, $key)) {
 					$class_name = static::class;
@@ -39,6 +39,7 @@ abstract class DTO {
 				$this->$key = $value;
 			}
 			$this->validate();
+			$this->after_init();
 		} catch (\Throwable $th) {
 			$this->dto_error->add( $th->getCode(), $th->getMessage() );
 			// 如果是嚴格模式，則直接拋出錯誤而不進行捕獲
@@ -151,9 +152,16 @@ abstract class DTO {
 	 *
 	 * @return void
 	 */
-	protected function init(): void {
+	protected function before_init(): void {
 	}
 
+	/**
+	 * Validate the DTO
+	 *
+	 * @return void
+	 */
+	protected function after_init(): void {
+	}
 
 	/**
 	 * Validate the DTO
