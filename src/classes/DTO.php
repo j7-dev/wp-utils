@@ -37,6 +37,7 @@ abstract class DTO {
 				}
 				$this->$key = $value;
 			}
+			$this->validate();
 		} catch (\Throwable $th) {
 			$this->dto_error->add( $th->getCode(), $th->getMessage() );
 			// 如果是嚴格模式，則直接拋出錯誤而不進行捕獲
@@ -135,5 +136,14 @@ abstract class DTO {
 				$input
 			)
 			);
+	}
+
+
+	/**
+	 * Validate the DTO
+	 *
+	 * @return void
+	 */
+	protected function validate(): void {
 	}
 }
