@@ -30,6 +30,7 @@ abstract class DTO {
 		try {
 			$this->dto_error = new \WP_Error();
 			$this->dto_data  = $input;
+			$this->init();
 			foreach ( $input as $key => $value ) {
 				if (!property_exists($this, $key)) {
 					$class_name = static::class;
@@ -143,6 +144,14 @@ abstract class DTO {
 				$input
 			)
 			);
+	}
+
+	/**
+	 * Validate the DTO
+	 *
+	 * @return void
+	 */
+	protected function init(): void {
 	}
 
 
