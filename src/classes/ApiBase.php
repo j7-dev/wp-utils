@@ -37,9 +37,6 @@ abstract class ApiBase {
 	 * @throws \Exception 如果 namespace 未設定，則拋出例外
 	 */
 	public function __construct() {
-		if ( ! $this->namespace ) {
-			throw new \Exception( 'namespace is required' );
-		}
 		\add_action( 'rest_api_init', [ $this, 'register_apis' ] );
 	}
 
@@ -59,6 +56,10 @@ abstract class ApiBase {
 	 * @return void
 	 */
 	public function register_apis(): void {
+
+		if ( ! $this->namespace ) {
+			throw new \Exception( 'namespace is required' );
+		}
 
 		foreach ( $this->apis as $api ) {
 			// 用正則表達式替換 -, / 替換為 _
