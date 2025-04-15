@@ -31,11 +31,7 @@ abstract class ApiBase {
 		// ],
 	];
 
-	/**
-	 * Constructor
-	 *
-	 * @throws \Exception 如果 namespace 未設定，則拋出例外
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_apis' ] );
 	}
@@ -45,7 +41,7 @@ abstract class ApiBase {
 	 *
 	 * @return bool
 	 */
-	protected function permission_callback(): bool {
+	public function permission_callback(): bool {
 		return \current_user_can( 'manage_woocommerce' );
 	}
 
@@ -54,6 +50,7 @@ abstract class ApiBase {
 	 * 預設的 permission_callback 是 '__return_true'，即不做任何權限檢查
 	 *
 	 * @return void
+	 * @throws \Exception 如果 namespace 未設定，則拋出例外
 	 */
 	public function register_apis(): void {
 
