@@ -19,14 +19,10 @@ if ( class_exists( 'ApiBase' ) ) {
  */
 abstract class ApiBase {
 
-	/**
-	 * APIs
-	 *
-	 * @var array{endpoint:string,method:string,permission_callback: callable|null }[]
-	 * - endpoint: string
-	 * - method: 'get' | 'post' | 'patch' | 'delete'
-	 * - permission_callback : callable
-	 */
+	/** @var string $namespace */
+	protected $namespace;
+
+	/** @var array{endpoint:string,method:string,permission_callback: callable|null }[] APIs */
 	protected $apis = [
 		// [
 		// 'endpoint'            => 'posts',
@@ -36,48 +32,41 @@ abstract class ApiBase {
 	];
 
 	/**
-	 * Namespace
+	 * Constructor
 	 *
-	 * @var string
-	 */
-	protected $namespace = '';
-
-	/**
-	 * Constructor.
+	 * @throws \Exception 如果 namespace 未設定，則拋出例外
 	 */
 	public function __construct() {
-		\add_action(
-			'rest_api_init',
-			fn() => $this->register_apis(
-			$this->apis,
-			$this->namespace,
-			fn() => \current_user_can( 'manage_options' )
-			)
-			);
+		if ( ! $this->namespace ) {
+			throw new \Exception( 'namespace is required' );
+		}
+		\add_action( 'rest_api_init', [ $this, 'register_apis' ] );
+	}
+
+	/**
+	 * 預設的 permission_callback 是 manage_woocommerce
+	 *
+	 * @return bool
+	 */
+	protected function permission_callback(): bool {
+		return \current_user_can( 'manage_woocommerce' );
 	}
 
 	/**
 	 * Register APIs
 	 * 預設的 permission_callback 是 '__return_true'，即不做任何權限檢查
 	 *
-	 * @param array{endpoint:string,method:string,permission_callback:callable|null}[] $apis api
-	 * @param string                                                                   $namespace Namespace.
-	 * @param ?callable                                                                $default_permission_callback Default permission callback.
 	 * @return void
 	 */
-	final protected function register_apis( array $apis, string $namespace = 'wp-utils/v1', ?callable $default_permission_callback = null ): void {
+	public function register_apis(): void {
 
-		foreach ( $apis as $api ) {
+		foreach ( $this->apis as $api ) {
 			// 用正則表達式替換 -, / 替換為 _
 			$endpoint_fn = str_replace( '(?P<id>\d+)', 'with_id', $api['endpoint'] );
 			$endpoint_fn = preg_replace( '/[-\/]/', '_', $endpoint_fn );
 
 			if ( ! isset( $api['permission_callback'] ) ) {
-				if ( is_callable( $default_permission_callback ) ) {
-					$permission_callback = $default_permission_callback;
-				} else {
-					$permission_callback = '__return_true';
-				}
+				$permission_callback = [ $this, 'permission_callback' ];
 			} else {
 				$permission_callback = $api['permission_callback'];
 			}
@@ -86,7 +75,7 @@ abstract class ApiBase {
 			$callback = [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ];
 
 			\register_rest_route(
-				$namespace,
+				$this->namespace,
 				$api['endpoint'],
 				[
 					'methods'             => $api['method'],
