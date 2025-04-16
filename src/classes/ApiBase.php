@@ -42,7 +42,7 @@ abstract class ApiBase {
 	 * @return bool
 	 */
 	public function permission_callback(): bool {
-		return \current_user_can( 'manage_woocommerce' );
+		return \current_user_can( 'manage_options' ) || \current_user_can( 'manage_woocommerce' );
 	}
 
 	/**
