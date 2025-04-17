@@ -380,19 +380,32 @@ abstract class WC {
 	 *
 	 * @since 0.3.5
 	 * @param mixed                $message 要印出的訊息
-	 * @param string|null          $title 標題
-	 * @param string|null          $level 等級
+	 * @param string               $title 標題
+	 * @param string               $level 等級
 	 * @param array<string, mixed> $args 其他參數 source 代表檔名，預設為 debugger
 	 */
-	public static function log( $message, ?string $title = '', ?string $level = 'info', ?array $args = [] ): void {
-
-		$default_args = [ 'source' => 'debugger' ];
-		$args         = \wp_parse_args($args, $default_args);
+	public static function log( $message, string $title = '', string $level = 'info', array $args = [] ): void {
 
 		ob_start();
 		var_dump($message);
-		$log   = new \WC_Logger();
-		$level = method_exists($log, $level) ? $level : 'info';
-		$log->$level($title . ': ' . ob_get_clean(), $args);
+		$formatted_message = (string) ob_get_clean();
+
+		if (!class_exists('\WC_Logger')) {
+			if ( defined( 'ABSPATH' ) ) {
+				$default_path      = \ABSPATH . 'wp-content';
+				$default_file_name = 'debug.log';
+				$log_in_file       = file_put_contents( "{$default_path}/{$default_file_name}", '[' . gmdate( 'Y-m-d H:i:s' ) . ' UTC]' . $formatted_message . PHP_EOL, FILE_APPEND );
+			} else {
+				// Write the log message using error_log()
+				error_log( $formatted_message );
+			}
+			return;
+		}
+
+		$default_args = [ 'source' => 'debugger' ];
+		$args         = \wp_parse_args($args, $default_args); // phpstan:ignore
+		$log          = new \WC_Logger();
+		$level        = method_exists($log, $level) ? $level : 'info';
+		$log->$level($title . ': ' . $formatted_message, $args);
 	}
 }
