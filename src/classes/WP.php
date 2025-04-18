@@ -396,6 +396,13 @@ abstract class WP {
 				'version',
 				'order_version',
 			],
+			'term' => [
+				'name',
+				'slug',
+				'description',
+				'alias_of',
+				'parent',
+			],
 			default => [],
 		};
 	}
