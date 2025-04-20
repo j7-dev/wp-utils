@@ -27,34 +27,34 @@ abstract class DTO {
 	 * @throws \Error If the property is not defined and strict is true.
 	 */
 	public function __construct( array $input = [], bool $strict = true ) {
-		try {
-			$this->dto_error = new \WP_Error();
-			$this->dto_data  = $input;
-			$this->before_init();
-			foreach ( $input as $key => $value ) {
-				if (!property_exists($this, $key)) {
-					$class_name = static::class;
-					$this->dto_error->add( 'invalid_property', "Try to set undefined property: {$class_name}::\${$key}." );
-				}
-				$this->$key = $value;
+
+		$this->dto_error = new \WP_Error();
+		$this->dto_data  = $input;
+		$this->before_init();
+		foreach ( $input as $key => $value ) {
+			if (!property_exists($this, $key)) {
+				$class_name = static::class;
+				$this->dto_error->add( 'invalid_property', "Try to set undefined property: {$class_name}::\${$key}." );
 			}
-			$this->validate();
-			$this->after_init();
-		} catch (\Throwable $th) {
-			$this->dto_error->add( $th->getCode(), $th->getMessage() );
-			// 如果是嚴格模式，則直接拋出錯誤而不進行捕獲
-			$error_messages = $this->dto_error->get_error_messages();
-			if ($strict && !empty($error_messages)) {
+			$this->$key = $value;
+		}
+		$this->validate();
+		$this->after_init();
+
+		// 如果有錯誤，則記錄錯誤
+		$error_messages = $this->dto_error->get_error_messages();
+
+		WC::log(
+			$error_messages,
+			'',
+			'error',
+			[
+				'source' => 'dto',
+			]
+		);
+		// 如果嚴格模式，則拋出錯誤
+		if ( $strict && $this->dto_error->has_errors() ) {
 				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
-			}
-			WC::log(
-				$error_messages,
-				'',
-				'error',
-				[
-					'source' => 'dto',
-				]
-				);
 		}
 	}
 
