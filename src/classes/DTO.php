@@ -41,20 +41,21 @@ abstract class DTO {
 		$this->validate();
 		$this->after_init();
 
-		// 如果有錯誤，則記錄錯誤
-		$error_messages = $this->dto_error->get_error_messages();
-
-		WC::log(
+		if ($this->dto_error->has_errors()) {
+			// 如果有錯誤，則記錄錯誤
+			$error_messages = $this->dto_error->get_error_messages();
+			WC::log(
 			$error_messages,
 			'',
 			'error',
 			[
 				'source' => 'dto',
 			]
-		);
-		// 如果嚴格模式，則拋出錯誤
-		if ( $strict && $this->dto_error->has_errors() ) {
+			);
+			// 如果嚴格模式，則拋出錯誤
+			if ( $strict ) {
 				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
+			}
 		}
 	}
 
