@@ -1,10 +1,4 @@
 <?php
-/**
- * ApiBase class
- * 用法:
- * 1. 繼承 ApiBase 類別
- * 2. parent class 指定 $apis 和 $namespace 就好
- */
 
 namespace J7\WpUtils\Classes;
 
@@ -15,19 +9,23 @@ if ( class_exists( 'ApiBase' ) ) {
 }
 
 /**
- * Class ApiBase
+ * ApiBase class
+ * 用法:
+ * 1. 繼承 ApiBase 類別
+ * 2. parent class 指定 $apis 和 $namespace 就好
  */
 abstract class ApiBase {
 
 	/** @var string $namespace */
 	protected $namespace;
 
-	/** @var array{endpoint:string,method:string,permission_callback: callable|null }[] APIs */
+	/** @var array{endpoint:string,method:string,permission_callback: callable|null,callback: callable|null}[] APIs */
 	protected $apis = [
 		// [
 		// 'endpoint'            => 'posts',
 		// 'method'              => 'get',
 		// 'permission_callback' => null,
+		// 'callback' => null,
 		// ],
 	];
 
@@ -71,6 +69,10 @@ abstract class ApiBase {
 
 			/** @var callable $callback */
 			$callback = [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ];
+
+			if ( is_callable( $api['callback'] ?? '' ) ) {
+				$callback = $api['callback'];
+			}
 
 			\register_rest_route(
 				$this->namespace,
