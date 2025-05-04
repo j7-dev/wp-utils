@@ -12,14 +12,14 @@ if ( class_exists( 'ApiBase' ) ) {
  * ApiBase class
  * 用法:
  * 1. 繼承 ApiBase 類別
- * 2. parent class 指定 $apis 和 $namespace 就好
+ * 2. child class 指定 $apis 和 $namespace 就好
  */
 abstract class ApiBase {
 
 	/** @var string $namespace */
 	protected $namespace;
 
-	/** @var array{endpoint:string,method:string,permission_callback: callable|null,callback: callable|null}[] APIs */
+	/** @var array{endpoint:string,method:string,permission_callback?: callable|null,callback?: callable|null}[] APIs */
 	protected $apis = [
 		// [
 		// 'endpoint'            => 'posts',
