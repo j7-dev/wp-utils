@@ -68,6 +68,9 @@ abstract class DTO {
 		$reflection = new \ReflectionClass($this);
 		$props      = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
 
+		// 過濾掉未定義的屬性
+		$props = array_filter($props, fn( $prop ) => array_key_exists($prop->getName(), $this->dto_data));
+
 		$result = [];
 		foreach ($props as $prop) {
 			$result[ $prop->getName() ] = $prop->getValue($this);
