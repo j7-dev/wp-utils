@@ -283,6 +283,7 @@ abstract class WP {
 				'sold_individually',
 				'status',
 				'stock',
+				'stock_quantity',
 				'stock_status',
 				'tag_ids',
 				'tax_class',
