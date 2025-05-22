@@ -378,34 +378,77 @@ abstract class WC {
 	/**
 	 * 印出 WC Logger
 	 *
-	 * @since 0.3.5
+	 * @deprecated 請改用 logger
 	 * @param mixed                $message 要印出的訊息
 	 * @param string               $title 標題
 	 * @param string               $level 等級
 	 * @param array<string, mixed> $args 其他參數 source 代表檔名，預設為 debugger
 	 */
 	public static function log( $message, string $title = '', string $level = 'info', array $args = [] ): void {
+		self::logger($title, $level, $message, (string) ( $args['source'] ?? 'debugger' ), (int) ( $args['trace_limit'] ?? 5 ));
+	}
 
-		ob_start();
-		var_dump($message);
-		$formatted_message = (string) ob_get_clean();
+
+	/**
+	 * 印出 WC Logger
+	 *
+	 * @param string $message 一句話講完此 logger 的用途
+	 * @param string $level 等級，預設 info
+	 * @param mixed  $args 要印出的參數，也可以為簡易 array 或 object
+	 * @param string $source Log 日誌檔名，預設 debugger
+	 * @param int    $trace_limit 調用堆疊追蹤數量限制，預設往上追 5 層，填入 0 則不進行 trace
+	 *
+	 * @return void
+	 * @since 0.3.40
+	 */
+	public static function logger( string $message = '', string $level = 'info', mixed $args = [], string $source = 'debugger', int $trace_limit = 5 ): void {
 
 		if (!class_exists('\WC_Logger')) {
 			if ( defined( 'ABSPATH' ) ) {
 				$default_path      = \ABSPATH . 'wp-content';
 				$default_file_name = 'debug.log';
-				$log_in_file       = file_put_contents( "{$default_path}/{$default_file_name}", '[' . gmdate( 'Y-m-d H:i:s' ) . ' UTC]' . $formatted_message . PHP_EOL, FILE_APPEND );
+				$log_in_file       = file_put_contents( "{$default_path}/{$default_file_name}", '[' . gmdate( 'Y-m-d H:i:s' ) . ' UTC]' . $message . PHP_EOL, FILE_APPEND );
 			} else {
 				// Write the log message using error_log()
-				error_log( $formatted_message );
+				error_log( $message );
 			}
 			return;
 		}
 
-		$default_args = [ 'source' => 'debugger' ];
-		$args         = \wp_parse_args($args, $default_args); // phpstan:ignore
-		$log          = new \WC_Logger();
-		$level        = method_exists($log, $level) ? $level : 'info';
-		$log->$level($title . ': ' . $formatted_message, $args);
+		$logger = new \WC_Logger();
+
+		$context = [
+			'source' => $source,
+		];
+
+		if ($args) {
+			$context['args'] = $args;
+		}
+
+		if ($trace_limit) {
+			/** @var array<array{class:string|null, type:string|null, function:string|null, file:string|null, line:string|null}> $backtrace */
+			$backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, $trace_limit);
+
+			$trace_array = [];
+			foreach ($backtrace as $index => $trace) {
+				@[
+				'class'    => $class,
+				'type'     => $type,
+				'function' => $function,
+				'file'     => $file,
+				'line'     => $line,
+				] = $trace;
+
+				$function      = $function ?? 'N/A';
+				$file          = $file ?? 'N/A';
+				$line          = $line ?? 'N/A';
+				$trace_array[] = "#{$index} {$class}{$type}{$function} at {$file} L:{$line}";
+			}
+			if ($trace_array) {
+				$context['trace'] = $trace_array;
+			}
+		}
+
+		$logger->log( $level, $message, $context );
 	}
 }
