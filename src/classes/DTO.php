@@ -21,12 +21,12 @@ abstract class DTO {
 	 * Constructor
 	 *
 	 * @param array<string,mixed> $input The data to set.
-	 * @param bool                $strict Whether to throw an error if the property is not defined.
+	 * @param ?bool               $strict 嚴格模式
 	 *
 	 * @return void
 	 * @throws \Error If the property is not defined and strict is true.
 	 */
-	public function __construct( array $input = [], bool $strict = true ) {
+	public function __construct( array $input = [], ?bool $strict = null ) {
 
 		$this->dto_error = new \WP_Error();
 		$this->dto_data  = $input;
@@ -44,15 +44,22 @@ abstract class DTO {
 		if ($this->dto_error->has_errors()) {
 			// 如果有錯誤，則記錄錯誤
 			$error_messages = $this->dto_error->get_error_messages();
-			WC::log(
-			$error_messages,
-			'',
-			'error',
-			[
-				'source' => 'dto',
-			]
-			);
+			WC::logger(
+				'DTO Error ',
+				'error',
+				[
+					'error_messages' => $error_messages,
+				],
+				'dto'
+				);
 			// 如果嚴格模式，則拋出錯誤
+
+			if (function_exists('wp_get_environment_type')) {
+				$strict = $strict ?? ( 'local' !== wp_get_environment_type() );
+			} else {
+				$strict = $strict ?? false;
+			}
+
 			if ( $strict ) {
 				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
 			}
