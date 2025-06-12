@@ -6,9 +6,7 @@ if ( class_exists( 'DTO' ) ) {
 	return;
 }
 
-/**
- * Class DTO 可能單例也可能多例，需要自行額外實現 instance() 方法
- */
+/** Class DTO 可能單例也可能多例，需要自行額外實現 instance() 方法 */
 abstract class DTO {
 
 	/** @var array<string,mixed> Raw data */
@@ -16,6 +14,9 @@ abstract class DTO {
 
 	/** @var \WP_Error Error */
 	protected \WP_Error $dto_error;
+
+	/** @var static|null DTO instance 可以做單例或工廠，預設為 null，單例需要自己實現 instance() 方法 */
+	protected static $dto_instance;
 
 	/**
 	 * Constructor
@@ -41,10 +42,13 @@ abstract class DTO {
 		$this->validate();
 		$this->after_init();
 
-		if ($this->dto_error->has_errors()) {
-			// 如果有錯誤，則記錄錯誤
-			$error_messages = $this->dto_error->get_error_messages();
-			WC::logger(
+		if (!$this->dto_error->has_errors()) {
+			return;
+		}
+
+		// 如果有錯誤，則記錄錯誤
+		$error_messages = $this->dto_error->get_error_messages();
+		WC::logger(
 				'DTO Error ',
 				'error',
 				[
@@ -52,17 +56,16 @@ abstract class DTO {
 				],
 				'dto'
 				);
-			// 如果嚴格模式，則拋出錯誤
+		// 如果嚴格模式，則拋出錯誤
 
-			if (function_exists('wp_get_environment_type')) {
-				$strict = $strict ?? ( 'local' !== wp_get_environment_type() );
-			} else {
-				$strict = $strict ?? false;
-			}
+		if (function_exists('wp_get_environment_type')) {
+			$strict = $strict ?? ( 'local' !== \wp_get_environment_type() );
+		} else {
+			$strict = $strict ?? false;
+		}
 
-			if ( $strict ) {
+		if ( $strict ) {
 				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
-			}
 		}
 	}
 
@@ -114,6 +117,11 @@ abstract class DTO {
 	 * @throws \Error SimpleDTOs are immutable
 	 */
 	public function __set( string $property, $value ): void {
+		// dto_instance 是可以被賦值得，例如單例模式如果要 invalidate 可以將 dto_instance 設為 null
+		if ('dto_instance' === $property) {
+			static::$dto_instance = $value; // @phpstan-ignore-line
+			return;
+		}
 		$this->dto_error->add( 'immutable', 'SimpleDTOs are immutable. Create a new DTO to set a new value.' );
 	}
 
