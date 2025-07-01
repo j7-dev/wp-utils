@@ -414,4 +414,26 @@ abstract class General {
 		}
 		return true;
 	}
+
+
+	/**
+	 * 解構陣列
+	 *
+	 * @param array<array-key, mixed> $arr 陣列
+	 * @param array<string>|string    $keys 要解構的 key
+	 * @return array<array-key, mixed> 解構後的陣列，可以按照 $keys 順序解構取得，最後一個為 $rest 剩餘的 $array
+	 */
+	public static function destruct( array $arr, array|string $keys ): array {
+		$picked = [];
+		if (is_string($keys)) {
+			$keys = [ $keys ];
+		}
+
+		foreach ($keys as $key) {
+			$picked[] = $arr[ $key ] ?? null;
+		}
+
+		$rest = array_diff_key( $arr, array_flip( $keys ) );
+		return [ ...$picked, $rest ];
+	}
 }
