@@ -436,4 +436,25 @@ abstract class General {
 		$rest = array_diff_key( $arr, array_flip( $keys ) );
 		return [ ...$picked, $rest ];
 	}
+
+	/**
+	 * 將新值轉換為與原值相同的型別
+	 *
+	 * @param mixed $value 原值
+	 * @param mixed $new_value 新值
+	 * @return mixed 轉換後的值
+	 */
+	public static function to_same_type( mixed $value, mixed $new_value ): mixed {
+		$type = gettype($value);
+		return match ($type) {
+			'boolean' => (bool) $new_value,
+			'integer' => (int) $new_value,
+			'double' => (float) $new_value,  // float 在 gettype() 中顯示為 'double'
+			'string' => (string) $new_value,
+			'array' => (array) $new_value,
+			'object' => (object) $new_value,
+			'NULL' => null,
+			default => $new_value, // 其他型別保持原樣
+		};
+	}
 }
