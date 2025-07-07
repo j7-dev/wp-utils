@@ -89,24 +89,6 @@ abstract class DTO {
 		return $result;
 	}
 
-
-	/**
-	 * Get dynamic property from container.
-	 *
-	 * @param string $property The property name.
-	 *
-	 * @return mixed The property value.
-	 * @throws \Error If the property is not defined.
-	 */
-	public function __get(string $property ) { // phpcs:ignore
-		if (!$this->__isset($property)) {
-			$self = static::class;
-			$this->dto_error->add( 'invalid_property', "Try to get undefined property: {$self}::\$$property." );
-		}
-
-		return $this->dto_data[ $property ];
-	}
-
 	/**
 	 * Set dynamic property to container.
 	 *
@@ -122,7 +104,7 @@ abstract class DTO {
 			static::$dto_instance = $value; // @phpstan-ignore-line
 			return;
 		}
-		$this->dto_error->add( 'immutable', 'SimpleDTOs are immutable. Create a new DTO to set a new value.' );
+		$this->dto_error->add( 'immutable', 'DTOs are immutable. Create a new DTO to set a new value.' );
 	}
 
 	/**
