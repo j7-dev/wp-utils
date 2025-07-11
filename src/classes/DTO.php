@@ -18,6 +18,9 @@ abstract class DTO {
 	/** @var static|null DTO instance 可以做單例或工廠，預設為 null，單例需要自己實現 instance() 方法 */
 	protected static $dto_instance;
 
+	/** @var array<string> 必須的屬性，如果沒有設定則會拋出錯誤 */
+	protected array $require_properties = [];
+
 	/**
 	 * Constructor
 	 *
@@ -149,27 +152,20 @@ abstract class DTO {
 			);
 	}
 
-	/**
-	 * Validate the DTO
-	 *
-	 * @return void
-	 */
+	/** @return void 初始化前的處理  */
 	protected function before_init(): void {
 	}
 
-	/**
-	 * Validate the DTO
-	 *
-	 * @return void
-	 */
+	/** @return void 初始化後的處理 */
 	protected function after_init(): void {
 	}
 
-	/**
-	 * Validate the DTO
-	 *
-	 * @return void
-	 */
+	/**  @return void 驗證 DTO */
 	protected function validate(): void {
+		foreach ($this->require_properties as $property) {
+			if (!isset($this->$property)) {
+				$this->dto_error->add( 'validate_failed', "Property {$property} is required." );
+			}
+		}
 	}
 }
