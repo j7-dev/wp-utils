@@ -90,6 +90,7 @@ abstract class ApiBase {
 
 	/**
 	 * 嘗試執行回調函數並返回響應
+	 * 用這個 try 將整個 callback 用 try catch 包起來，如果 callback 拋出異常，則返回500錯誤響應
 	 *
 	 * @param callable         $callback 要執行的回調函數
 	 * @param \WP_REST_Request $request  請求對象
@@ -106,6 +107,20 @@ abstract class ApiBase {
 				'GET' => $request->get_query_params(),
 				default => $request->get_json_params() ?: $request->get_body_params(),
 			};
+
+			// 如果開啟 DEBUG 模式就印出 log
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				WC::logger(
+					"API 錯誤: {$e->getMessage()}",
+					'critical',
+					[
+						'request_endpoint' => $request->get_route(),
+						'request_method'   => $method,
+						'request_params'   => $data,
+					],
+					);
+			}
+
 			return new WP_REST_Response(
 					[
 						'code'    => $e->getCode(),
