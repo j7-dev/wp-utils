@@ -3,6 +3,7 @@
 namespace J7\WpUtils\Classes;
 
 use WP_REST_Response;
+use J7\WpUtils\Classes\WC;
 
 if ( class_exists( 'ApiBase' ) ) {
 	return;
@@ -13,21 +14,37 @@ if ( class_exists( 'ApiBase' ) ) {
  * 用法:
  * 1. 繼承 ApiBase 類別
  * 2. child class 指定 $apis 和 $namespace 就好
+ * 3. 填寫 API schema
+ *
+ * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/
  */
 abstract class ApiBase {
 
 	/** @var string $namespace */
 	protected $namespace;
 
-	/** @var array{endpoint:string,method:string,permission_callback?: callable|null,callback?: callable|null}[] APIs */
-	protected $apis = [
-		// [
-		// 'endpoint'            => 'posts',
-		// 'method'              => 'get',
-		// 'permission_callback' => null,
-		// 'callback' => null,
-		// ],
-	];
+	/**
+	 * @var array<array{
+	 * endpoint:string,
+	 * method:string,
+	 * permission_callback: callable|null,
+	 * callback: callable|null,
+	 * schema: array|null
+	 * }> APIs
+	 *
+	 * @example
+	 * $apis =[
+	 *  [
+	 *   'endpoint' => 'posts',
+	 *   'method' => 'get',
+	 *   'permission_callback' => null,
+	 *   'callback' => null,
+	 *   'schema' => null,
+	 *  ]
+	 * ]
+	 * @phpstan-ignore-next-line
+	 * */
+	protected array $apis = [];
 
 	/** Constructor */
 	public function __construct() {
@@ -35,7 +52,8 @@ abstract class ApiBase {
 	}
 
 	/**
-	 * 預設的 permission_callback 是 manage_woocommerce
+	 * 預設的 permission_callback 是 manage_options | manage_woocommerce
+	 * 也可以按照需求複寫預設的 API 存取權限
 	 *
 	 * @return bool
 	 */
@@ -51,38 +69,47 @@ abstract class ApiBase {
 	 * @throws \Exception 如果 namespace 未設定，則拋出例外
 	 */
 	public function register_apis(): void {
-
 		if ( ! $this->namespace ) {
 			throw new \Exception( 'namespace is required' );
 		}
 
 		foreach ( $this->apis as $api ) {
-			// 用正則表達式替換 -, / 替換為 _
-			$endpoint_fn = str_replace( '(?P<id>\d+)', 'with_id', $api['endpoint'] );
-			$endpoint_fn = preg_replace( '/[-\/]/', '_', $endpoint_fn );
+			@[ // phpcs:ignore
+				'endpoint'            => $endpoint,
+				'method'              => $method,
+				'permission_callback' => $permission_callback,
+				'callback'            => $callback,
+				'schema'              => $schema,
+			] = $api;
 
-			if ( ! isset( $api['permission_callback'] ) ) {
-				$permission_callback = [ $this, 'permission_callback' ];
-			} else {
-				$permission_callback = $api['permission_callback'];
+			// 用正則表達式替換 -, / 替換為 _
+			$formatted_fn_name = str_replace( '(?P<id>\d+)', 'with_id', $endpoint );
+			$formatted_fn_name = preg_replace( '/[-\/]/', '_', $formatted_fn_name );
+
+			/** @var callable $formatted_permission_callback 預設使用 permission_callback 方法 */
+			$formatted_permission_callback = [ $this, 'permission_callback' ];
+			if ( is_callable( $permission_callback ) ) {
+				// 如果個別 API 有設定 permission_callback，則使用個別的
+				$formatted_permission_callback = $permission_callback;
 			}
 
-			/** @var callable $callback */
-			$callback = [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ];
-
-			if ( is_callable( $api['callback'] ?? '' ) ) {
-				$callback = $api['callback'];
+			/** @var callable $callback 預設使用以下規則的 callback 名稱: [method]_[endpoint]_callback */
+			$formatted_callback = [ $this, "{$method}_{$formatted_fn_name}_callback" ];
+			if ( is_callable( $callback ) ) {
+				// 如果個別 API 有設定 callback，則使用個別的
+				$formatted_callback = $callback;
 			}
 
 			\register_rest_route(
 				$this->namespace,
-				$api['endpoint'],
+				$endpoint,
 				[
-					'methods'             => $api['method'],
-					'callback'            => function ( $request ) use ( $callback ) {
-						return $this->try(  $callback, $request );
+					'methods'             => $method,
+					'callback'            => function ( $request ) use ( $formatted_callback ) {
+						return $this->try(  $formatted_callback, $request );
 					},
-					'permission_callback' => $permission_callback,
+					'permission_callback' => $formatted_permission_callback,
+					'schema'              => $schema,
 				]
 			);
 		}
