@@ -23,6 +23,9 @@ abstract class DTO {
 	/** @var array<string> 必須的屬性，如果沒有設定則會拋出錯誤 */
 	protected array $require_properties = [];
 
+	/** @var array<string, \ReflectionProperty[]> 靜態緩存各類別的屬性 */
+	protected static array $reflection_cache = [];
+
 	/**
 	 * Constructor
 	 *
@@ -80,33 +83,53 @@ abstract class DTO {
 	 * @return array<string,mixed>
 	 */
 	public function to_array(): array {
-		$reflection = new \ReflectionClass($this);
-		$props      = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+		$class_name = static::class;
 
+		// 使用靜態緩存避免重複反射操作
+		if (!isset(self::$reflection_cache[ $class_name ])) {
+			$reflection                            = new \ReflectionClass($this);
+			self::$reflection_cache[ $class_name ] = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+		}
+
+		$props  = self::$reflection_cache[ $class_name ];
 		$result = [];
+
 		foreach ($props as $prop) {
 			// 如果沒被初始化就跳過
 			if (!$prop->isInitialized($this)) {
 				continue;
 			}
-			$value = $prop->getValue($this);
+
+			$value     = $prop->getValue($this);
+			$prop_name = $prop->getName();
 
 			// 如果是巢狀的 DTO 則遞歸執行 to_array
 			if ($value instanceof self) {
-				if (method_exists($value, 'to_array')) {
-					$result[ $prop->getName() ] = $value->to_array();
-					continue;
-				}
+				$result[ $prop_name ] = $value->to_array();
+				continue;
 			}
 
 			// 如果是巢狀的 DTO array 則遞歸執行 to_array
 			if (is_array($value)) {
-				if (General::array_every($value, fn( $item ) =>  $item instanceof self)) {
-					$result[ $prop->getName() ] = \array_values(array_map(fn( $item ) => $item->to_array(), $value));
+				// 檢查是否為空數組或第一個元素是否為 DTO
+				if (!empty($value) && reset($value) instanceof self) {
+					// 使用 array_map 直接處理，避免 General::array_every 的額外開銷
+					$dto_array = [];
+					foreach ($value as $item) {
+						if ($item instanceof self) {
+							$dto_array[] = $item->to_array();
+						} else {
+							// 如果陣列中有非 DTO 項目，則使用原始處理方式
+							$result[ $prop_name ] = $value;
+							continue 2;
+						}
+					}
+					$result[ $prop_name ] = $dto_array;
 					continue;
 				}
 			}
-			$result[ $prop->getName() ] = $value;
+
+			$result[ $prop_name ] = $value;
 		}
 
 		return $result;
