@@ -400,14 +400,14 @@ abstract class General {
 	/**
 	 * 檢查陣列中所有元素是否都滿足條件
 	 *
-	 * @param array<array-key, mixed> $array 陣列
+	 * @param array<array-key, mixed> $arr 陣列
 	 * @param callable                $callback 回調函數
 	 * @since 0.3.5
 	 *
 	 * @return bool
 	 */
-	public static function array_every( array $array, callable $callback ): bool {
-		foreach ($array as $value) {
+	public static function array_every( array $arr, callable $callback ): bool {
+		foreach ($arr as $value) {
 			if (!$callback($value)) {
 				return false;
 			}

@@ -2,6 +2,8 @@
 
 namespace J7\WpUtils\Classes;
 
+use J7\WpUtils\Classes\General;
+
 if ( class_exists( 'DTO' ) ) {
 	return;
 }
@@ -87,8 +89,26 @@ abstract class DTO {
 			if (!$prop->isInitialized($this)) {
 				continue;
 			}
-			$result[ $prop->getName() ] = $prop->getValue($this);
+			$value = $prop->getValue($this);
+
+			// 如果是巢狀的 DTO 則遞歸執行 to_array
+			if ($value instanceof self) {
+				if (method_exists($value, 'to_array')) {
+					$result[ $prop->getName() ] = $value->to_array();
+					continue;
+				}
+			}
+
+			// 如果是巢狀的 DTO array 則遞歸執行 to_array
+			if (is_array($value)) {
+				if (General::array_every($value, fn( $item ) =>  $item instanceof self)) {
+					$result[ $prop->getName() ] = \array_values(array_map(fn( $item ) => $item->to_array(), $value));
+					continue;
+				}
+			}
+			$result[ $prop->getName() ] = $value;
 		}
+
 		return $result;
 	}
 
@@ -145,11 +165,11 @@ abstract class DTO {
 	 */
 	public static function parse_array( array $input, ?bool $strict = true ): array {
 		return array_values(
-			array_map(
-				fn ( $item ) => static::parse($item, $strict),
-				$input
-			)
-			);
+		array_map(
+			fn ( $item ) => static::parse($item, $strict),
+			$input
+		)
+		);
 	}
 
 	/** @return void 初始化前的處理  */
