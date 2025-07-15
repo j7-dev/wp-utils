@@ -103,33 +103,17 @@ abstract class DTO {
 			$value     = $prop->getValue($this);
 			$prop_name = $prop->getName();
 
-			// 如果是巢狀的 DTO 則遞歸執行 to_array
-			if ($value instanceof self) {
-				$result[ $prop_name ] = $value->to_array();
+			// 如果是巢狀的 DTO array 則遞歸執行 to_array
+			if (is_array($value)) {
+				$result[ $prop_name ] = array_map(
+					fn ( $item ) => ( $item instanceof self ) ? $item->to_array() : $item,
+					$value
+				);
 				continue;
 			}
 
-			// 如果是巢狀的 DTO array 則遞歸執行 to_array
-			if (is_array($value)) {
-				// 檢查是否為空數組或第一個元素是否為 DTO
-				if (!empty($value) && reset($value) instanceof self) {
-					// 使用 array_map 直接處理，避免 General::array_every 的額外開銷
-					$dto_array = [];
-					foreach ($value as $item) {
-						if ($item instanceof self) {
-							$dto_array[] = $item->to_array();
-						} else {
-							// 如果陣列中有非 DTO 項目，則使用原始處理方式
-							$result[ $prop_name ] = $value;
-							continue 2;
-						}
-					}
-					$result[ $prop_name ] = $dto_array;
-					continue;
-				}
-			}
-
-			$result[ $prop_name ] = $value;
+			// 如果是巢狀的 DTO 則遞歸執行 to_array
+			$result[ $prop_name ] = ( $value instanceof self ) ? $value->to_array() : $value;
 		}
 
 		return $result;
