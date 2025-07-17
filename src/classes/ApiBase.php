@@ -44,7 +44,7 @@ abstract class ApiBase {
 	 * ]
 	 * @phpstan-ignore-next-line
 	 * */
-	protected array $apis = [];
+	protected $apis = [];
 
 	/** Constructor */
 	public function __construct() {
