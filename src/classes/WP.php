@@ -113,39 +113,64 @@ abstract class WP {
 	 * @return string
 	 */
 	public static function array_to_table( array $arr ): string {
-
-		$style = '
-		display: grid;
-		gap: 1rem;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		';
-
-		$html = '<div style="' . $style . '">';
-		foreach ( $arr as $key => $value ) {
-			if ( is_scalar( $value ) ) {
-				if ( is_bool( $value ) ) {
-					$value = $value ? 'true' : 'false';
-				}
-				$html .= "<div>{$key}:</div><div>{$value}</div>";
-			} else {
-				$html .= "<div>{$key}:</div><div>" . \wp_json_encode( $value ) . '</div>';
-			}
-		}
-		$html .= '</div>';
-
-		return $html;
+		return self::array_to_html($arr);
 	}
 
 	/**
-	 * 將關聯陣列顯示為 HTML
+	 * 將陣列轉換為 HTML 表格
 	 *
-	 * @deprecated 1.0.0 使用 array_to_table 取代
-	 *
-	 * @param array<mixed> $arr - array
+	 * @param array<string, mixed> $arr 要轉換的陣列
+	 * @param array{
+	 *  title?: string,
+	 *  br?: bool,
+	 * } $options 選項
 	 * @return string
 	 */
-	public static function array_to_html( array $arr ): string {
-		$html = self::array_to_table( $arr );
+	public static function array_to_html( array $arr, array $options = [] ): string {
+		@[ // @phpstan-ignore-line
+		'title' => $title,
+		'br' => $br, // 是否使用 <br> 不使用 table
+		] = $options;
+
+		$html = '';
+
+		if ( $title ) {
+			$html .= "<h3>{$title}</h3>";
+		}
+
+		$html .= $br ? '' : '<table>';
+		foreach ( $arr as $key => $value ) {
+			try {
+				$value_stringify = match (gettype($value)) {
+					'array' => json_encode($value) ?: '',
+					'object' => $value instanceof \stdClass ? ( json_encode($value) ?: '' ) : $value::class,
+					'boolean' => $value ? 'true' : 'false',
+					'NULL' => 'null',
+					default => (string) $value,
+				};
+			} catch (\Throwable $e) {
+				\J7\WpUtils\Classes\WC::logger(
+					$e->getMessage(),
+					'error',
+					[
+						'arr' => $arr,
+					]
+					);
+				$value_stringify = json_encode($value) ?: '';
+			}
+
+			if ( $br ) {
+				$html .= "{$value_stringify}<br>";
+				continue;
+			}
+			$html .= '<tr>';
+			$html .= "<td>{$key}</td>";
+			$html .= "<td>{$value_stringify}</td>";
+			$html .= '</tr>';
+		}
+
+		$html .= $br ? '' : '</table>';
+
 		return $html;
 	}
 
