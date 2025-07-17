@@ -2,8 +2,6 @@
 
 namespace J7\WpUtils\Classes;
 
-use J7\WpUtils\Classes\General;
-
 if ( class_exists( 'DTO' ) ) {
 	return;
 }
@@ -100,23 +98,42 @@ abstract class DTO {
 				continue;
 			}
 
-			$value     = $prop->getValue($this);
-			$prop_name = $prop->getName();
-
-			// 如果是巢狀的 DTO array 則遞歸執行 to_array
-			if (is_array($value)) {
-				$result[ $prop_name ] = array_map(
-					fn ( $item ) => ( $item instanceof self ) ? $item->to_array() : $item,
-					$value
-				);
-				continue;
-			}
-
-			// 如果是巢狀的 DTO 則遞歸執行 to_array
-			$result[ $prop_name ] = ( $value instanceof self ) ? $value->to_array() : $value;
+			$value                = $prop->getValue($this);
+			$prop_name            = $prop->getName();
+			$result[ $prop_name ] = $this->get_formatted_value($value);
 		}
 
 		return $result;
+	}
+
+	/**
+	 * 格式化 Value
+	 * to_array 時要把值轉為 primitive 值
+	 * 1. array 遞迴
+	 * 2. 巢狀 DTO 要巢狀 to_array
+	 * 3. 枚舉要轉為 value
+	 *
+	 * @param mixed $value The value to format.
+	 *
+	 * @return mixed
+	 */
+	private function get_formatted_value( mixed $value ): mixed {
+		if (is_array($value)) {
+			return array_map(
+				fn ( $item ) => $this->get_formatted_value($item),
+				$value
+			);
+		}
+
+		if ($value instanceof self) {
+			return $value->to_array();
+		}
+
+		if ($value instanceof \BackedEnum) {
+			return $value->value;
+		}
+
+		return $value;
 	}
 
 	/**
