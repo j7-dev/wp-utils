@@ -135,15 +135,18 @@ abstract class WP {
 		$html = '';
 
 		if ( $title ) {
-			$html .= "<h3>{$title}</h3>";
+			$html .= "<p><strong>{$title}</strong></p>";
+		}
+		if (!$arr) {
+			return $html;
 		}
 
-		$html .= $br ? '' : '<table>';
+		$html .= $br ? '' : '<table style="width: 100%;font-size: 12px;border-collapse: collapse;">';
 		foreach ( $arr as $key => $value ) {
 			try {
 				$value_stringify = match (gettype($value)) {
-					'array' => json_encode($value) ?: '',
-					'object' => $value instanceof \stdClass ? ( json_encode($value) ?: '' ) : $value::class,
+					'array' => '<pre style="font-size: 10px;">' . \print_r($value, true) . '</pre>',
+					'object' => $value instanceof \stdClass ? ( '<pre style="font-size: 10px;">' . \print_r($value, true) . '</pre>' ) : $value::class,
 					'boolean' => $value ? 'true' : 'false',
 					'NULL' => 'null',
 					default => (string) $value,
@@ -163,7 +166,7 @@ abstract class WP {
 				$html .= "{$value_stringify}<br>";
 				continue;
 			}
-			$html .= '<tr>';
+			$html .= '<tr style="border-bottom: 1px solid #777;">';
 			$html .= "<td>{$key}</td>";
 			$html .= "<td>{$value_stringify}</td>";
 			$html .= '</tr>';
