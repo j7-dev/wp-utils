@@ -60,6 +60,7 @@ abstract class DTO {
 			WC::logger(
 					'DTO Error ' . $error_messages,
 					'error',
+					[],
 					'dto'
 					);
 		}
