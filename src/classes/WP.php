@@ -163,12 +163,12 @@ abstract class WP {
 			}
 
 			if ( $br ) {
-				$html .= "{$value_stringify}<br>";
+				$html .= "{$key}: {$value_stringify}<br>";
 				continue;
 			}
 			$html .= '<tr style="border-bottom: 1px solid #777;">';
-			$html .= "<td>{$key}</td>";
-			$html .= "<td>{$value_stringify}</td>";
+			$html .= "<th style='vertical-align: top;padding-right: 4px;'>{$key}</th>";
+			$html .= "<td style='word-break: break-all;vertical-align: top;white-space: normal;'>{$value_stringify}</td>";
 			$html .= '</tr>';
 		}
 
