@@ -184,11 +184,14 @@ abstract class DTO {
 	protected function after_init(): void {
 	}
 
-	/**  @return void 驗證 DTO */
+	/**
+	 * @return void 驗證 DTO
+	 * @throws \Exception 如果驗證失敗則拋出錯誤
+	 * */
 	protected function validate(): void {
 		foreach ($this->require_properties as $property) {
 			if (!isset($this->$property)) {
-				$this->dto_error->add( 'validate_failed', "Property {$property} is required." );
+				throw new \Exception("Property {$property} is required.");
 			}
 		}
 	}
