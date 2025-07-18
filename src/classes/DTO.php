@@ -25,16 +25,11 @@ abstract class DTO {
 	protected static array $reflection_cache = [];
 
 	/**
-	 * Constructor
-	 *
 	 * @param array<string,mixed> $input The data to set.
-	 * @param ?bool               $strict 嚴格模式
-	 *
 	 * @return void
-	 * @throws \Error If the property is not defined and strict is true.
+	 * @throws \Exception If the property is not defined.
 	 */
-	public function __construct( array $input = [], ?bool $strict = null ) {
-
+	public function __construct( array $input = [] ) {
 		$this->dto_error = new \WP_Error();
 		$this->dto_data  = $input;
 		$this->before_init();
@@ -64,14 +59,13 @@ abstract class DTO {
 				);
 		// 如果嚴格模式，則拋出錯誤
 
+		$strict = false;
 		if (function_exists('wp_get_environment_type')) {
-			$strict = $strict ?? ( 'local' !== \wp_get_environment_type() );
-		} else {
-			$strict = $strict ?? false;
+			$strict =( 'local' !== \wp_get_environment_type() );
 		}
 
 		if ( $strict ) {
-				throw new \Error(implode("\n", $error_messages)); // phpcs:ignore
+				throw new \Exception(implode("\n", $error_messages)); // phpcs:ignore
 		}
 	}
 
@@ -166,16 +160,9 @@ abstract class DTO {
 	}
 
 
-	/**
-	 * Parse data to DTO
-	 *
-	 * @param mixed $data The data to parse.
-	 * @param bool  $strict Whether to throw an error if the property is not defined.
-	 *
-	 * @return static
-	 */
-	public static function parse( mixed $data, ?bool $strict = true ): static {
-		return new static($data, $strict); // @phpstan-ignore-line
+	/** @param mixed $data Parse data to DTO  @return static */
+	public static function parse( $data ): static {
+		return new static($data); // @phpstan-ignore-line
 	}
 
 	/**
@@ -183,17 +170,14 @@ abstract class DTO {
 	 * 例如 物件組成的 array
 	 *
 	 * @param array<string,mixed> $input The data to parse.
-	 * @param bool                $strict Whether to throw an error if the property is not defined.
-	 *
 	 * @return array<int,static>
 	 */
-	public static function parse_array( array $input, ?bool $strict = true ): array {
-		return array_values(
-		array_map(
-			fn ( $item ) => static::parse($item, $strict),
-			$input
-		)
-		);
+	public static function parse_array( array $input ): array {
+		$arr = [];
+		foreach ($input as $item) {
+			$arr[] = static::parse($item);
+		}
+		return $arr;
 	}
 
 	/** @return void 初始化前的處理  */
