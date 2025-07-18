@@ -31,41 +31,37 @@ abstract class DTO {
 	 */
 	public function __construct( array $input = [] ) {
 		$this->dto_error = new \WP_Error();
-		$this->dto_data  = $input;
-		$this->before_init();
-		foreach ( $input as $key => $value ) {
-			if (!property_exists($this, $key)) {
-				$class_name = static::class;
-				$this->dto_error->add( 'invalid_property', "Try to set undefined property: {$class_name}::\${$key}." );
-			}
-			$this->$key = $value;
-		}
-		$this->validate();
-		$this->after_init();
-
-		if (!$this->dto_error->has_errors()) {
-			return;
-		}
-
-		// 如果有錯誤，則記錄錯誤
-		$error_messages = $this->dto_error->get_error_messages();
-		WC::logger(
-				'DTO Error ',
-				'error',
-				[
-					'error_messages' => $error_messages,
-				],
-				'dto'
-				);
-		// 如果嚴格模式，則拋出錯誤
-
-		$strict = false;
+		$strict          = false;
 		if (function_exists('wp_get_environment_type')) {
 			$strict =( 'local' !== \wp_get_environment_type() );
 		}
-
-		if ( $strict ) {
-				throw new \Exception(implode("\n", $error_messages)); // phpcs:ignore
+		try {
+			$this->dto_data = $input;
+			$this->before_init();
+			foreach ( $input as $key => $value ) {
+				if (!property_exists($this, $key)) {
+					$class_name = static::class;
+					$this->dto_error->add( 'invalid_property', "Try to set undefined property: {$class_name}::\${$key}." );
+				}
+				$this->$key = $value;
+			}
+			$this->validate();
+			$this->after_init();
+			if ( $this->dto_error->has_errors() ) {
+				throw new \Exception(implode("\n", $this->dto_error->get_error_messages())); // phpcs:ignore
+			}
+		} catch (\Throwable $th) {
+			$error_messages = $th->getMessage();
+			// 如果嚴格模式，則拋出錯誤
+			if ( $strict ) {
+				throw new \Exception($error_messages); // phpcs:ignore
+			}
+			// 如果有錯誤，則記錄錯誤
+			WC::logger(
+					'DTO Error ' . $error_messages,
+					'error',
+					'dto'
+					);
 		}
 	}
 
