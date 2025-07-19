@@ -13,8 +13,11 @@
 	"license": "GPL-3.0-or-later",
 	"autoload": {
 		"psr-4": {
-			"J7\\WpUtils\\Classes\\": "src/classes/",
-			"J7\\WpUtils\\Traits\\": "src/traits/"
+			"J7\\WpHelpers\\": "src/helpers/",
+			"J7\\WpUtils\\": "src/utils/",
+			"J7\\WpAbstracts\\": "src/abstracts/",
+			"J7\\WpUtils\\Classes\\": "src/legacy/classes/",
+			"J7\\WpUtils\\Traits\\": "src/legacy/traits/"
 		}
 	},
 	"authors": [
