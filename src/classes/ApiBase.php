@@ -27,10 +27,10 @@ abstract class ApiBase {
 	 * @var array<array{
 	 * endpoint:string,
 	 * method:string,
-	 * permission_callback: callable|null,
-	 * callback: callable|null,
-	 * schema: array|null
-	 * }> APIs
+	 * permission_callback?: callable|null,
+	 * callback?: callable|null,
+	 * schema?: array<string, mixed>|null
+	 * }> $apis APIs
 	 *
 	 * @example
 	 * $apis =[
