@@ -1,6 +1,6 @@
 <?php
 
-namespace J7\WpServices\Log\Model\Enums;
+namespace J7\WpServices\Log\DTOs\Enums;
 
 /**
  * TxnType Enum

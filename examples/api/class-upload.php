@@ -68,7 +68,7 @@ final class Upload {
 		$body_params = $request->get_body_params();
 		$upload_only = $body_params['upload_only'] ?? '0';
 
-		if ( ! ! $file_params['files']['tmp_name'] ) {
+		if ( (bool) $file_params['files']['tmp_name'] ) {
 
 			if ( ! function_exists( 'media_handle_upload' ) ) {
 				require_once 'wp-admin/includes/image.php';

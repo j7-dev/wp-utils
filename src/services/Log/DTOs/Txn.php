@@ -1,6 +1,6 @@
 <?php
 
-namespace J7\WpServices\Log\Model;
+namespace J7\WpServices\Log\DTOs;
 
 use J7\WpAbstracts\DTO;
 

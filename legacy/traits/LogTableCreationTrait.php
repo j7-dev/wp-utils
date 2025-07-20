@@ -19,13 +19,13 @@ if ( trait_exists( 'LogTableCreationTrait' ) ) {
 trait LogTableCreationTrait {
 
 	/**
-														* Create database log table
-														*
-														* @param string $table_name Table name.
-														*
-														* @return void
-														* @throws \Exception Exception.
-														*/
+	 * Create database log table
+	 *
+	 * @param string $table_name Table name.
+	 *
+	 * @return void
+	 * @throws \Exception Exception.
+	 */
 	final protected function create_log_table( string $table_name ): void {
 		try {
 			global $wpdb;
