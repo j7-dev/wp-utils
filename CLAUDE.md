@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 專案概述
+
+這是一個方便 WordPress plugin 開發者使用的 library
+集成了方便的 utils, services, abstracts
+
 ## 開發指令
 
 ### 程式碼品質檢查

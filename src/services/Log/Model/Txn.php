@@ -23,7 +23,7 @@ class Txn extends DTO {
 	/** @var string 交易標題 */
 	public string $title;
 
-	/** @var string 交易類型 */
+	/** @var Enums\TxnType::value 交易類型 */
 	public string $type;
 
 	/** @var int 操作者 ID，0 代表系統 */
@@ -83,102 +83,11 @@ class Txn extends DTO {
 	}
 
 	/**
-	 * 取得錢包的交易記錄
+	 * 驗證交易類型
 	 *
-	 * @param int    $wallet_id 錢包 ID
-	 * @param int    $limit 限制筆數
-	 * @param int    $offset 偏移量
-	 * @param string $order_by 排序欄位
-	 * @param string $order 排序方向
-	 * @return self[]
+	 * @throws \Exception 如果交易類型無效
 	 */
-	public static function get_wallet_transactions(
-		int $wallet_id,
-		int $limit = 20,
-		int $offset = 0,
-		string $order_by = 'created_at',
-		string $order = 'DESC'
-	): array {
-		global $wpdb;
-		$table_name = $wpdb->prefix . 'j7_wallet_logs';
-
-		$records = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table_name}
-				WHERE wallet_id = %d
-				ORDER BY {$order_by} {$order}
-				LIMIT %d OFFSET %d",
-				$wallet_id,
-				$limit,
-				$offset
-			)
-		);
-
-		return array_map( [ self::class, 'create' ], $records );
-	}
-
-	/**
-	 * 取得用戶的所有交易記錄
-	 *
-	 * @param int    $user_id 用戶 ID
-	 * @param int    $limit 限制筆數
-	 * @param int    $offset 偏移量
-	 * @param string $type 交易類型過濾
-	 * @return self[]
-	 */
-	public static function get_user_transactions(
-		int $user_id,
-		int $limit = 20,
-		int $offset = 0,
-		?string $type = null
-	): array {
-		global $wpdb;
-		$logs_table   = $wpdb->prefix . 'j7_wallet_logs';
-		$wallet_table = $wpdb->prefix . 'j7_wallets';
-
-		$type_condition = $type ? $wpdb->prepare( 'AND logs.type = %s', $type ) : '';
-
-		$records = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT logs.* FROM {$logs_table} logs
-				INNER JOIN {$wallet_table} wallet ON logs.wallet_id = wallet.wallet_id
-				WHERE wallet.user_id = %d {$type_condition}
-				ORDER BY logs.created_at DESC
-				LIMIT %d OFFSET %d",
-				$user_id,
-				$limit,
-				$offset
-			)
-		);
-
-		return array_map( [ self::class, 'create' ], $records );
-	}
-
-	/**
-	 * 取得交易類型的有效值
-	 *
-	 * @return array<string>
-	 */
-	public static function get_valid_types(): array {
-		return [
-			'deposit',  // 存入
-			'withdraw', // 提取
-			'expire',   // 過期
-			'bonus',    // 獎勵
-			'refund',   // 退款
-			'modify',   // 修改
-			'cron',     // 定時任務
-			'system',   // 系統操作
-		];
-	}
-
-	/**
-	 * 驗證交易類型是否有效
-	 *
-	 * @param string $type 交易類型
-	 * @return bool
-	 */
-	public static function is_valid_type( string $type ): bool {
-		return in_array( $type, self::get_valid_types(), true );
+	protected function validate(): void {
+		Enums\TxnType::from( $this->type );
 	}
 }
