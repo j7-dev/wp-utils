@@ -20,8 +20,13 @@ class Str {
 	) {
 	}
 
-	/**  @return bool 驗證字串是否為純英文字串 或者是 被 urlencode 過的字串 */
+	/**  @return bool 驗證字串是否為非 urlencode 過的純 ASCII 字串 */
 	public function is_english(): bool {
+		return \preg_match('/^[a-zA-Z0-9 ]+$/', $this->value) === 1;
+	}
+
+	/**  @return bool 驗證字串是否為非 urlencode 過的純 ASCII 字串 */
+	public function is_ascii(): bool {
 		if ( $this->contains_non_ascii() || $this->is_urlencoded() ) {
 			return false; // 包含非ASCII字符或已被 urlencode
 		}
@@ -31,7 +36,7 @@ class Str {
 
 	/**  @return bool 檢查字串是否包含中文字元等非 ASCII 字元 */
 	public function contains_non_ascii(): bool {
-		return preg_match( '/[^\x00-\x7F]/', $this->value ) !== 0;
+		return \preg_match( '/[^\x00-\x7F]/', $this->value ) !== 0;
 	}
 
 	/** @return bool 檢查字串是否已被 urlencode */

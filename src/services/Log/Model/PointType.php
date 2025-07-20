@@ -30,8 +30,12 @@ class PointType extends DTO {
 	/** @var string 點數類型簡短描述 */
 	public string $short_description;
 
+	/** @var int 點數類型排序 */
+	public int $menu_order;
+
 	/** @var string 點數類型的 CPT */
 	protected $post_type;
+
 
 	/**
 	 * 取得實例
@@ -49,6 +53,8 @@ class PointType extends DTO {
 			'icon_url'          => $icon_url,
 			'description'       => \get_post_field( 'post_content', $post->ID ),
 			'short_description' => \get_post_field( 'post_excerpt', $post->ID ),
+			'menu_order'        => $post->menu_order,
+			'post_type'         => $post->post_type,
 		];
 		return new self( $args );
 	}

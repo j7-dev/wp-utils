@@ -43,7 +43,7 @@ abstract class ApiBase {
 	protected $apis = [];
 
 	/** Constructor */
-	public function __construct() {
+	protected function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_apis' ] );
 	}
 
