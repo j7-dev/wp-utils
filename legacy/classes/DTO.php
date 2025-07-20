@@ -6,7 +6,11 @@ if ( class_exists( 'DTO' ) ) {
 	return;
 }
 
-/** Class DTO 可能單例也可能多例，需要自行額外實現 instance() 方法 */
+/**
+ * Class DTO 可能單例也可能多例，需要自行額外實現 instance() 方法
+ *
+ *  @deprecated 改用 J7\WpAbstracts\DTO
+ *  */
 abstract class DTO {
 
 	/** @var array<string,mixed> Raw data */
@@ -157,7 +161,7 @@ abstract class DTO {
 	}
 
 
-	/** @param mixed $data Parse data to DTO  @return static */
+	/** @param mixed $data 從 array 轉換成 DTO  @return static */
 	public static function parse( $data ): static {
 		return new static($data); // @phpstan-ignore-line
 	}

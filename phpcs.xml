@@ -70,7 +70,7 @@
         </properties>
     </rule>
 
-    <config name="testVersion" value="8.0-"/>
+    <config name="testVersion" value="8.1-"/>
     <rule ref="PHPCompatibility"/>
 
     <!-- Enforce PSR1 compatible namespaces. -->

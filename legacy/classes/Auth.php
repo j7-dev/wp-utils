@@ -2,6 +2,8 @@
 /**
  * Auth class
  *
+ * @deprecated 使用 \J7\WpAbstracts\ApiBase
+ *
  * @package J7\WpUtils
  */
 
@@ -21,6 +23,7 @@ abstract class Auth {
 	 * 帳號: WP 帳號的 username
 	 * 密碼: 需要到 wp-admin/user-edit.php?user_id=1 這樣的網址中設定`應用程式密碼`
 	 *
+	 * @deprecated 使用 \J7\WpAbstracts\ApiBase::get_user_by_basic_auth 替代
 	 * @example:
 	 * \register_rest_route(
 	 *       'API_DOMAIN',
@@ -59,6 +62,8 @@ abstract class Auth {
 	 * 帳號: WP 帳號的 username
 	 * 密碼: 需要到 wp-admin/user-edit.php?user_id=1 這樣的網址中設定`應用程式密碼`
 	 *
+	 * @deprecated 使用 \J7\WpAbstracts\ApiBase::get_user_by_basic_auth 替代
+	 *
 	 * @return \WP_Error|\WP_User
 	 */
 	public static function get_user_by_basic_auth(): \WP_Error|\WP_User {
@@ -78,33 +83,10 @@ abstract class Auth {
 	 * Check IP Permission
 	 * 限制 API 只能由指定的 IP 範圍內訪問
 	 *
-	 * @example:
-	 * \register_rest_route(
-	 *       'v1/api',
-	 *       'posts',
-	 *       array(
-	 *           'methods'             => 'GET',
-	 *           'callback'            => array( $this, 'get_posts_callback' ),
-	 *           'permission_callback' => array( $this, 'check_ip_permission' ),
-	 *       )
-	 * );
-	 *
+	 * @deprecated 使用 \J7\WpUtils\IP::in_range 替代
 	 * @return bool
 	 */
 	public function check_ip_permission() {
-		// 允許的 IP 範圍起始和結束 IP
-		$start_ip = '61.220.100.0';
-		$end_ip   = '61.220.100.10';
-
-		// 將起始和結束 IP 轉換為長整型
-		$start_ip_long = sprintf( '%u', ip2long( $start_ip ) );
-		$end_ip_long   = sprintf( '%u', ip2long( $end_ip ) );
-
-    // phpcs:disable
-    $request_ip_long = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
-    // phpcs:enable
-
-		// 檢查發起請求的 IP 是否在允許的範圍內
-		return ( $request_ip_long >= $start_ip_long && $request_ip_long <= $end_ip_long );
+		return \J7\WpUtils\IP::in_range( '61.220.100.0', '61.220.100.10' );
 	}
 }

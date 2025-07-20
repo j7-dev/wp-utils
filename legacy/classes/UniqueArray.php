@@ -15,6 +15,8 @@ if ( class_exists( 'UniqueArray' ) ) {
 /**
  * UniqueArray class
  *
+ * @deprecated \J7\WpHelpers\Arr::remove_duplicates()
+ *
  * @package J7\WpUtils
  */
 final class UniqueArray {

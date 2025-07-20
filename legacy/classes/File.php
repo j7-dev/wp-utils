@@ -13,58 +13,29 @@ if ( class_exists( 'File' ) ) {
 
 /**
  * File class
+ *
+ * @deprecated 改用 J7\WpAbstracts\ParseCSV
  */
 abstract class File {
 
 	/**
 	 * 解析上傳的 CSV 檔
 	 *
+	 * @deprecated 改用 J7\WpAbstracts\ParseCSV
+	 *
 	 * @param array $file 上傳的 CSV 檔
 	 * @return array 解析後的 CSV 數據
 	 * @throws \Exception 如果文件上傳失敗或不存在, 或無法打開文件.
 	 */
 	public static function parse_csv( $file ): array {
-		// 檢查文件是否存在
-		if (!isset($file['tmp_name'])) {
-			throw new \Exception('文件上傳失敗或不存在');
-		}
-
-		// 打開文件
-		$handle = fopen($file['tmp_name'], 'r');
-		if ($handle === false) {
-			throw new \Exception('無法打開文件');
-		}
-
-		$data = [];
-		$row  = 0;
-
-		// 逐行讀取 CSV
-		while (( $fileop = fgetcsv($handle, 0, ',') ) !== false) {
-			$num = count($fileop);
-			++$row;
-
-			// 跳過第一行如果它是標題
-			if ($row == 1) {
-				continue;
-			}
-
-			// 處理每一列數據
-			$item = [];
-			for ($c=0; $c < $num; $c++) {
-				$item[] = $fileop[ $c ];
-			}
-			$data[] = $item;
-		}
-
-		// 關閉文件
-		fclose($handle);
-
-		return $data;
+		return ( new \J7\WpAbstracts\ParseCSV($file) )->parse();
 	}
 
 
 	/**
 	 * 以 streaming 方式解析 CSV 檔案
+	 *
+	 * @deprecated 改用 J7\WpAbstracts\ParseCSV
 	 *
 	 * @param array $file 上傳的 CSV 檔案
 	 * @param int   $batch 批次，從 0 開始

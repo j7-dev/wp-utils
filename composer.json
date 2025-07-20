@@ -16,6 +16,7 @@
 			"J7\\WpHelpers\\": "src/helpers/",
 			"J7\\WpUtils\\": "src/utils/",
 			"J7\\WpAbstracts\\": "src/abstracts/",
+			"J7\\WpServices\\": "src/services/",
 			"J7\\WpUtils\\Classes\\": "legacy/classes/",
 			"J7\\WpUtils\\Traits\\": "legacy/traits/"
 		}

@@ -20,6 +20,8 @@ abstract class WP {
 	 * Admin do_shortcode function.
 	 * 讓你可以在 wp-admin 後台也使用 do_shortcode
 	 *
+	 * @deprecated 使用 \J7\WpUtils\Shortcode::admin_do_shortcode 替代
+	 *
 	 * @example: WP::admin_do_shortcode( '[your-shortcode]' );
 	 *
 	 * @param string $content The shortcode
@@ -27,34 +29,7 @@ abstract class WP {
 	 * @return string The processed content.
 	 */
 	public static function admin_do_shortcode( string $content, ?bool $ignore_html = false ) {
-		global $shortcode_tags;
-
-		if ( false === strpos( $content, '[' ) ) {
-			return $content;
-		}
-
-		if ( empty( $shortcode_tags ) || ! is_array( $shortcode_tags ) ) {
-			return $content;
-		}
-
-		// Find all registered tag names in $content.
-		preg_match_all( '@\[([^<>&/\[\]\x00-\x20=]++)@', $content, $matches );
-		$tagnames = array_intersect( array_keys( $shortcode_tags ), $matches[1] );
-
-		if ( empty( $tagnames ) ) {
-			return $content;
-		}
-
-		/** @var bool $ignore_html */
-		$content = \do_shortcodes_in_html_tags( $content, $ignore_html, $tagnames );
-
-		$pattern = \get_shortcode_regex( $tagnames );
-		$content = preg_replace_callback( "/$pattern/", 'do_shortcode_tag', $content ); // @phpstan-ignore-line
-
-		// Always restore square braces so we don't break things like <!--[if IE ]>.
-		$content = \unescape_invalid_shortcodes( (string) $content );
-
-		return $content;
+		return \J7\WpUtils\Shortcode::admin_do_shortcode( $content, $ignore_html );
 	}
 
 
@@ -62,35 +37,21 @@ abstract class WP {
 	 * Sanitize Array
 	 * Sanitize 一個深層的關聯陣列
 	 *
+	 * @deprecated 使用 \J7\WpHelpers\Arr::sanitize 替代
+	 *
 	 * @param mixed         $value Value to sanitize
 	 * @param bool          $allow_br 是否允許換行 \n \r，預設為 true，如果為 false，則會用 sanitize_text_field
 	 * @param array<string> $skip_keys - 要跳過的 key，如果符合就不做任何 sanitize
 	 * @return array<string, mixed>|string
 	 */
 	public static function sanitize_text_field_deep( $value, $allow_br = true, $skip_keys = [] ) {
-		if ( is_array( $value ) ) {
-			// if array, sanitize each element
-			foreach ( $value as $key => $item ) {
-				if ( in_array( $key, $skip_keys, true ) ) {
-					continue;
-				}
-				$value[ $key ] = self::sanitize_text_field_deep( $item );
-			}
-			return $value;
-		}
-
-		// if not array, sanitize the value
-		if ( $allow_br ) {
-			/** @var string $value */
-			return \sanitize_textarea_field( $value );
-		} else {
-			/** @var string $value */
-			return \sanitize_text_field( $value );
-		}
+		return \J7\WpHelpers\Arr::sanitize_text_field_deep( $value, $allow_br, $skip_keys );
 	}
 
 	/**
 	 * 檢查關聯陣列是否包含了必要參數
+	 *
+	 * @deprecated 可以用 DTO 檢查
 	 *
 	 * @param array<string, mixed> $params - 要檢查的參數 assoc array
 	 * @param array<string>        $required_params - string[] 必要參數
@@ -109,6 +70,8 @@ abstract class WP {
 	/**
 	 * 將關聯陣列顯示為 HTML
 	 *
+	 * @deprecated 使用 \J7\WpHelpers\Arr::to_html 替代
+	 *
 	 * @param array<mixed> $arr - array
 	 * @return string
 	 */
@@ -119,6 +82,7 @@ abstract class WP {
 	/**
 	 * 將陣列轉換為 HTML 表格
 	 *
+	 * @deprecated 使用 \J7\WpHelpers\Arr::to_html 替代
 	 * @param array<string, mixed> $arr 要轉換的陣列
 	 * @param array{
 	 *  title?: string,
@@ -127,54 +91,8 @@ abstract class WP {
 	 * @return string
 	 */
 	public static function array_to_html( array $arr, array $options = [] ): string {
-		@[ // @phpstan-ignore-line
-		'title' => $title,
-		'br' => $br, // 是否使用 <br> 不使用 table
-		] = $options;
-
-		$html = '';
-
-		if ( $title ) {
-			$html .= "<p><strong>{$title}</strong></p>";
-		}
-		if (!$arr) {
-			return $html;
-		}
-
-		$html .= $br ? '' : '<table style="width: 100%;font-size: 12px;border-collapse: collapse;">';
-		foreach ( $arr as $key => $value ) {
-			try {
-				$value_stringify = match (gettype($value)) {
-					'array' => '<pre style="font-size: 10px;">' . \print_r($value, true) . '</pre>',
-					'object' => $value instanceof \stdClass ? ( '<pre style="font-size: 10px;">' . \print_r($value, true) . '</pre>' ) : $value::class,
-					'boolean' => $value ? 'true' : 'false',
-					'NULL' => 'null',
-					default => (string) $value,
-				};
-			} catch (\Throwable $e) {
-				\J7\WpUtils\Classes\WC::logger(
-				$e->getMessage(),
-				'error',
-				[
-					'arr' => $arr,
-				]
-				);
-				$value_stringify = json_encode($value) ?: '';
-			}
-
-			if ( $br ) {
-				$html .= "{$key}: {$value_stringify}<br>";
-				continue;
-			}
-			$html .= '<tr style="border-bottom: 1px solid #777;">';
-			$html .= "<th style='vertical-align: top;padding-right: 4px;'>{$key}</th>";
-			$html .= "<td style='word-break: break-all;vertical-align: top;white-space: normal;'>{$value_stringify}</td>";
-			$html .= '</tr>';
-		}
-
-		$html .= $br ? '' : '</table>';
-
-		return $html;
+		$arr_instance = \J7\WpHelpers\Arr::create( $arr );
+		return $arr_instance->to_html( $options );
 	}
 
 

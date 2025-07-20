@@ -2,6 +2,7 @@
 /**
  * DB class
  *
+ * @deprecated 這個蠻容易的應該不需要
  * @package J7\WpUtils
  */
 

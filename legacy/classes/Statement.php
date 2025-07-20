@@ -12,6 +12,8 @@ if ( class_exists( 'Statement' ) ) {
 }
 /**
  * Statement class
+ *
+ * @deprecated \J7\WpHelpers\Arr::to_string()
  */
 class Statement {
 

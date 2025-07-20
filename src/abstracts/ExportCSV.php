@@ -1,0 +1,87 @@
+<?php
+
+declare (strict_types = 1);
+
+namespace J7\WpAbstracts;
+
+/**
+ * ExportCSV 匯出 CSV
+ * 使用方式
+ * 1. 繼承此類
+ * 2. 定義 $rows 資料源
+ * 3. 定義 $filename, $columns
+ * 4. 呼叫 export()
+ * */
+abstract class ExportCSV {
+
+	/** @var string 檔案名稱 */
+	protected string $filename;
+
+	/** @var array<object> 資料 */
+	protected array $rows;
+
+	/** @var array<string, string> 欄位名稱，預設會從 $row 身上拿屬性 */
+	protected array $columns = [];
+
+	/**
+	 * 匯出 CSV
+	 *
+	 *  @return void
+	 *  @throws \Exception 如果無法開啟輸出檔案或無法寫入 CSV 標頭
+	 * */
+	public function export(): void {
+		try {
+			$filename = $this->filename . '_' . \wp_date('Y-m-d') . '.csv';
+			header('Content-Type: text/csv; charset=utf-8');
+			header('Content-Disposition: attachment; filename=' . $filename);
+
+			$output = fopen('php://output', 'w');
+			if ($output === false) {
+				throw new \Exception('無法開啟輸出檔案');
+			}
+
+			fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+			// CSV 標頭
+			$fputcsv = fputcsv($output, array_values($this->columns));
+			if ($fputcsv === false) {
+				throw new \Exception('無法寫入 CSV 標頭');
+			}
+
+			\J7\WpHelpers\Arr::create($this->rows)->batch_process(
+				function ( $row ) use ( &$output ) {
+					fputcsv(
+						$output,
+						self::get_field_value($row)
+					);
+				}
+			);
+
+			fclose($output);
+			exit;
+		} catch (\Throwable $th) {
+			throw new \Exception($th->getMessage());
+		}
+	}
+
+	/**
+	 * 取得欄位值
+	 * 否則使用 row 的值
+	 *
+	 * @param object $row 文章
+	 * @return array 欄位值
+	 */
+	protected function get_field_value( $row ) {
+		$values = [];
+		foreach ($this->columns as $property => $column_label) {
+			if (property_exists($row, $property)) {
+				$values[] = $row->$property;
+				continue;
+			}
+
+			$values[] = '';
+
+		}
+		return $values;
+	}
+}

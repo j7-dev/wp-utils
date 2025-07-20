@@ -18,6 +18,8 @@ abstract class General {
 	/**
 	 * JSON Parse
 	 *
+	 * @deprecated 不需要這個
+	 *
 	 * @param string $json_string The string to parse.
 	 * @param mixed  $default_value The default value.
 	 * @param bool   $assoc 是否轉為關聯數組，預設 true
@@ -36,6 +38,8 @@ abstract class General {
 
 	/**
 	 * Spread Array
+	 *
+	 * @deprecated 用 array_reduce 就好不需要這個
 	 *
 	 * @example array to html attribute string array_spread($args, '=', ' ')
 	 * @example array to css styles string array_spread($args, ':', ';')
@@ -58,7 +62,8 @@ abstract class General {
 
 	/**
 	 * Array to html grid
-	 * TODO
+	 *
+	 * @deprecated \J7\WpHelpers\Arr::create($arr)->to_html()
 	 *
 	 * @param array $arr - array
 	 * @return string
@@ -99,6 +104,8 @@ abstract class General {
 	 * For PHP 7, random_int is a PHP core function
 	 * For PHP 5.x, depends on https://github.com/paragonie/random_compat
 	 *
+	 * @deprecated \J7\WpAbstracts\Str::random()
+	 *
 	 * @param int    $length      How many characters do we want?.
 	 * @param string $keyspace base character set. [0-9a-zA-Z]
 	 * @param string $extend A string of all possible characters to select from.
@@ -107,43 +114,31 @@ abstract class General {
 	 * @throws \RangeException RangeException.
 	 */
 	public static function random_str( int $length = 64, ?string $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ?string $extend = '' ): string {
-		if ( $length < 1 ) {
-			throw new \RangeException( 'Length must be a positive integer' );
-		}
-		$keyspace .= $extend; // '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-
-		$pieces = [];
-		$max    = mb_strlen( $keyspace, '8bit' ) - 1;
-		for ( $i = 0; $i < $length; ++$i ) {
-			$pieces [] = $keyspace[ random_int( 0, $max ) ];
-		}
-		return implode( '', $pieces );
+		return \J7\WpHelpers\Str::random( $length, $keyspace, $extend );
 	}
 
 	/**
 	 * 驗證字串是否為純英文字串 或者是 被 urlencode 過的字串
 	 *
+	 * @deprecated \J7\WpHelpers\Str::is_english()
 	 * @param string $str - 字串
 	 *
 	 * @return bool
 	 */
 	public static function is_english( string $str ): bool {
-		if ( self::contains_non_ascii( $str ) || self::is_urlencoded( $str ) ) {
-			return false; // 包含非ASCII字符或已被 urlencode
-		}
-
-		return true; // 純英文字串
+		return ( new \J7\WpHelpers\Str( $str ) )->is_english();
 	}
 
 	/**
 	 * 檢查字串是否包含中文字元等非 ASCII 字元
 	 *
+	 * @deprecated \J7\WpHelpers\Str::contains_non_ascii()
 	 * @param string $str - 字串
 	 *
 	 * @return bool
 	 */
 	public static function contains_non_ascii( string $str ): bool {
-		return preg_match( '/[^\x00-\x7F]/', $str ) !== 0;
+		return ( new \J7\WpHelpers\Str( $str ) )->contains_non_ascii();
 	}
 
 	/**
@@ -154,13 +149,13 @@ abstract class General {
 	 * @return bool
 	 */
 	public static function is_urlencoded( string $str ): bool {
-		$decoded = urldecode( $str );
-
-		return $decoded !== $str;
+		return ( new \J7\WpHelpers\Str( $str ) )->is_urlencoded();
 	}
 
 	/**
 	 * 比較兩個函數的效能
+	 *
+	 * @deprecated \J7\WpUtils\Performance::compare_performance()
 	 *
 	 * @param array    $from_fn_array 原函數
 	 * - callback callable function
@@ -187,41 +182,13 @@ abstract class General {
 		?int $sleep = 3,
 		?int $precision = 5
 	): array {
-		$from_result = self::performance( $from_fn_array, $precision, false );
-		sleep( $sleep );
-		$to_result = self::performance( $to_fn_array, $precision, false );
-
-		$execution_time_diff = $to_result['execution_time'] - $from_result['execution_time'];
-		$percent             = abs( round( $execution_time_diff / $from_result['execution_time'], 2 ) ) * 100;
-
-		\J7\WpUtils\Classes\ErrorLog::info(
-			sprintf(
-				'
-		 效能比較
-		 %1$s 花費時間: %2$s 豪秒
-		 %3$s 花費時間: %4$s 豪秒
-		 差異: %5$s 秒
-		 %6$s %7$s%%',
-				$from_result['function_name'],
-				$from_result['execution_time'],
-				$to_result['function_name'],
-				$to_result['execution_time'],
-				$execution_time_diff > 0 ? "+{$execution_time_diff}" : "{$execution_time_diff}",
-				$execution_time_diff > 0 ? '❌ 變慢了' : '✅ 提升了',
-				$percent
-			)
-		);
-
-		return [
-			'from'                => $from_result,
-			'to'                  => $to_result,
-			'execution_time_diff' => $execution_time_diff,
-		];
+		return \J7\WpUtils\Performance::compare_performance( $from_fn_array, $to_fn_array, $sleep, $precision );
 	}
 
 	/**
 	 * 測試函數執行時間
 	 *
+	 * @deprecated \J7\WpUtils\Performance::performance()
 	 * @param array     $fn_array 函數
 	 * - callback callable function
 	 * - args array 參數
@@ -234,83 +201,31 @@ abstract class General {
 	 * @throws \Exception 不是可呼叫的函數
 	 */
 	public static function performance( array $fn_array, ?int $precision = 5, ?bool $print_log = true ): array {
-		$callback      = $fn_array['callback'] ?? '';
-		$args          = $fn_array['args'] ?? [];
-		$function_name = is_array( $callback ) ? "[{$callback[0]}, {$callback[1]}]" : $callback;
-
-		if ( ! is_callable( $callback ) ) {
-			throw new \Exception( "{$function_name} 不是可呼叫的函數" );
-		}
-
-		$start = microtime( true );
-
-		$fn_return = call_user_func( $callback, ...$args );
-
-		$end            = microtime( true );
-		$execution_time = round( ( $end - $start ), $precision );
-
-		if ( $print_log ) {
-			\J7\WpUtils\Classes\ErrorLog::info(
-			sprintf(
-				'
-		執行: %1$s
-		花費時間: %2$s 秒',
-				$function_name,
-				$execution_time
-			)
-			);
-		}
-
-		return [
-			'return'         => $fn_return,
-			'execution_time' => $execution_time,
-			'function_name'  => $function_name,
-		];
+		return \J7\WpUtils\Performance::performance( $fn_array, $precision, $print_log );
 	}
 
 	/**
 	 * 檢查單前網址是否在特定關鍵字內
 	 *
+	 * @deprecated \J7\WpHelpers\Arr::in_url()
+	 *
 	 * @param array $keywords 關鍵字
 	 * @return bool
 	 */
 	public static function in_url( array $keywords ): bool {
-	$request_uri = $_SERVER['REQUEST_URI'] ?? ''; // phpcs:ignore
-		if (!$request_uri) {
-			return false;
-		}
-		$in_url = false;
-
-		foreach ($keywords as $keyword) {
-			if (strpos($request_uri, $keyword) !== false) {
-				$in_url = true;
-				break;
-			}
-		}
-		return $in_url;
+		return ( new \J7\WpHelpers\Arr( $keywords ) )->in_url();
 	}
 
 	/**
 	 * 將 '[]' 轉為空數組，'true' 轉為 true，'false' 轉為 false。
 	 *
+	 * @deprecated \J7\WpHelpers\Arr::parse()
 	 * @param array<array-key, mixed> $arr 原始數組。
 	 * @return array<array-key, mixed> 轉換後的數組。
 	 * @since 0.3.11
 	 */
 	public static function parse( array $arr ): array {
-		$formatted_array = [];
-		foreach ($arr as $key => $value) {
-			$new_value = match ($value) {
-				'[]' => [],
-				'true' => true,
-				'false' => false,
-				default => $value,
-			};
-
-			$formatted_array[ $key ] = $new_value;
-		}
-
-		return $formatted_array;
+		return ( new \J7\WpHelpers\Arr( $arr ) )->parse()->to_array();
 	}
 
 	/**
@@ -332,37 +247,17 @@ abstract class General {
 	 * 針對台灣地區網路環境優化的 IP 獲取函數
 	 * 適用於: 中華電信/遠傳/台灣大哥大等 ISP 的光纖/4G/5G 網路
 	 *
+	 * @deprecated \J7\WpUtils\IP::get_client_ip()
 	 * @return string|null
 	 */
 	public static function get_client_ip(): string|null {
-		$ip_headers = [
-			'HTTP_CLIENT_IP',
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_X_FORWARDED',
-			'HTTP_X_CLUSTER_CLIENT_IP',
-			'HTTP_FORWARDED_FOR',
-			'HTTP_FORWARDED',
-			'REMOTE_ADDR',
-		];
-
-		foreach ($ip_headers as $header) {
-			if (!empty($_SERVER[ $header ])) {
-				$ip = $_SERVER[ $header ]; // phpcs:ignore
-				if (strpos($ip, ',') !== false) {
-					$ips = explode(',', $ip);
-					$ip  = trim($ips[0]);
-				}
-				if (filter_var($ip, FILTER_VALIDATE_IP)) {
-					return $ip;
-				}
-			}
-		}
-
-		return null;
+		return \J7\WpUtils\IP::get_client_ip();
 	}
 
 	/**
 	 * Array Find
+	 *
+	 * @deprecated \J7\WpHelpers\Arr::find()
 	 *
 	 * @param array<array-key, mixed> $array 陣列
 	 * @param callable                $callback 回調函數
@@ -371,17 +266,13 @@ abstract class General {
 	 * @return mixed|null
 	 */
 	public static function array_find( array $array, callable $callback ) {
-		foreach ( $array as $key => $item ) {
-			if ( $callback( $item, $key ) ) {
-				return $item;
-			}
-		}
-		return null;
+		return ( new \J7\WpHelpers\Arr( $array ) )->find( $callback );
 	}
 
 	/**
 	 * 檢查陣列中是否至少有一個元素滿足條件
 	 *
+	 * @deprecated \J7\WpHelpers\Arr::some()
 	 * @param array<array-key, mixed> $array 陣列
 	 * @param callable                $callback 回調函數
 	 * @since 0.3.5
@@ -389,17 +280,13 @@ abstract class General {
 	 * @return bool
 	 */
 	public static function array_some( array $array, callable $callback ): bool {
-		foreach ($array as $value) {
-			if ($callback($value)) {
-				return true;
-			}
-		}
-		return false;
+		return ( new \J7\WpHelpers\Arr( $array ) )->some( $callback );
 	}
 
 	/**
 	 * 檢查陣列中所有元素是否都滿足條件
 	 *
+	 * @deprecated \J7\WpHelpers\Arr::every()
 	 * @param array<array-key, mixed> $arr 陣列
 	 * @param callable                $callback 回調函數
 	 * @since 0.3.5
@@ -407,38 +294,30 @@ abstract class General {
 	 * @return bool
 	 */
 	public static function array_every( array $arr, callable $callback ): bool {
-		foreach ($arr as $value) {
-			if (!$callback($value)) {
-				return false;
-			}
-		}
-		return true;
+		return ( new \J7\WpHelpers\Arr( $arr ) )->every( $callback );
 	}
 
 
 	/**
 	 * 解構陣列
 	 *
+	 * @deprecated \J7\WpHelpers\Arr::pick()
 	 * @param array<array-key, mixed> $arr 陣列
 	 * @param array<string>|string    $keys 要解構的 key
 	 * @return array<array-key, mixed> 解構後的陣列，可以按照 $keys 順序解構取得，最後一個為 $rest 剩餘的 $array
 	 */
 	public static function destruct( array $arr, array|string $keys ): array {
-		$picked = [];
 		if (is_string($keys)) {
 			$keys = [ $keys ];
 		}
 
-		foreach ($keys as $key) {
-			$picked[] = $arr[ $key ] ?? null;
-		}
-
-		$rest = array_diff_key( $arr, array_flip( $keys ) );
-		return [ ...$picked, $rest ];
+		return ( new \J7\WpHelpers\Arr( $arr ) )->pick( $keys );
 	}
 
 	/**
 	 * 將新值轉換為與原值相同的型別
+	 *
+	 * @deprecated \J7\WpAbstracts\DTO::fit_type()
 	 *
 	 * @param mixed $value 原值
 	 * @param mixed $new_value 新值
