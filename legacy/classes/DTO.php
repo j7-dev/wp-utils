@@ -58,11 +58,11 @@ abstract class DTO {
 			}
 			// 如果有錯誤，則記錄錯誤
 			WC::logger(
-					'DTO Error ' . $error_messages,
-					'error',
-					[],
-					'dto'
-					);
+				'DTO Error ' . $error_messages,
+				'error',
+				[],
+				'dto'
+				);
 		}
 	}
 
@@ -111,8 +111,8 @@ abstract class DTO {
 	private function get_formatted_value( mixed $value ): mixed {
 		if (is_array($value)) {
 			return array_map(
-				fn ( $item ) => $this->get_formatted_value($item),
-				$value
+			fn ( $item ) => $this->get_formatted_value($item),
+			$value
 			);
 		}
 

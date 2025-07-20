@@ -107,13 +107,13 @@ abstract class WC {
 		$statuses = $args['status'] ?? 'any';
 		if ( is_array( $statuses ) ) {
 			$statuses_string  = implode(
-				',',
-				array_map(
-					function ( $status ) {
-						return '"' . $status . '"';
-					},
-					$statuses
-				)
+			',',
+			array_map(
+				function ( $status ) {
+					return '"' . $status . '"';
+				},
+				$statuses
+			)
 			);
 			$status_condition = sprintf(
 				'AND posts.post_status IN ( %1$s )',
@@ -121,15 +121,15 @@ abstract class WC {
 			);
 		} else {
 			$status_condition = ( $statuses === 'any' ) ? '' : sprintf(
-				'AND posts.post_status = %1$s',
-				$statuses
+			'AND posts.post_status = %1$s',
+			$statuses
 			);
 
 		}
 
 		try {
 			$prepare = $wpdb->prepare(
-				"
+			"
         SELECT order_items.order_id
         FROM {$wpdb->prefix}woocommerce_order_items as order_items
         LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta ON order_items.order_item_id = order_item_meta.order_item_id
@@ -142,10 +142,10 @@ abstract class WC {
           AND order_item_meta.meta_value = %3\$s
         ORDER BY order_items.order_id DESC
         LIMIT %4\$s",
-				$user_id,
-				$status_condition,
-				$product_id,
-				$limit
+			$user_id,
+			$status_condition,
+			$product_id,
+			$limit
 			);
 
 			return $wpdb->get_col( str_replace( '\"', '"', $prepare ) ); // phpcs:ignore
@@ -282,14 +282,14 @@ abstract class WC {
 
 		if ( '' === $sale_price) {
 			return sprintf(
-				/*html*/                '
+			/*html*/                '
 		<span class="regular-price">
 				<span class="woocommerce-Price-amount amount">
 					%1$s
 				</span>
 		</span>
 		',
-				\wc_price( (float) $regular_price),
+			\wc_price( (float) $regular_price),
 			);
 		}
 

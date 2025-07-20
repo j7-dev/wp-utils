@@ -16,8 +16,8 @@
 			"J7\\WpHelpers\\": "src/helpers/",
 			"J7\\WpUtils\\": "src/utils/",
 			"J7\\WpAbstracts\\": "src/abstracts/",
-			"J7\\WpUtils\\Classes\\": "src/legacy/classes/",
-			"J7\\WpUtils\\Traits\\": "src/legacy/traits/"
+			"J7\\WpUtils\\Classes\\": "legacy/classes/",
+			"J7\\WpUtils\\Traits\\": "legacy/traits/"
 		}
 	},
 	"authors": [
@@ -51,6 +51,7 @@
 		"phpstan/extension-installer": "^1.4"
 	},
 	"scripts": {
-		"lint": "phpcs"
+		"lint": "phpcbf && phpcs src --report=full -v",
+		"phpstan": "phpstan analyse src"
 	}
 }

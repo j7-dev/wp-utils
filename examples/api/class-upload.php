@@ -144,11 +144,11 @@ final class Upload {
 
 			// 返回上傳成功的訊息
 			return \rest_ensure_response(
-				[
-					'code'    => 'upload_success',
-					'message' => '檔案上傳成功',
-					'data'    => $upload_results,
-				]
+			[
+				'code'    => 'upload_success',
+				'message' => '檔案上傳成功',
+				'data'    => $upload_results,
+			]
 			);
 
 		}

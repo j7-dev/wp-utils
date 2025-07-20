@@ -75,11 +75,11 @@ abstract class ApiBase {
 
 		foreach ( $this->apis as $api ) {
 			@[ // phpcs:ignore
-				'endpoint'            => $endpoint,
-				'method'              => $method,
-				'permission_callback' => $permission_callback,
-				'callback'            => $callback,
-				'schema'              => $schema,
+			'endpoint'            => $endpoint,
+			'method'              => $method,
+			'permission_callback' => $permission_callback,
+			'callback'            => $callback,
+			'schema'              => $schema,
 			] = $api;
 
 			// 用正則表達式替換 -, / 替換為 _
@@ -101,16 +101,16 @@ abstract class ApiBase {
 			}
 
 			\register_rest_route(
-				$this->namespace,
-				$endpoint,
-				[
-					'methods'             => $method,
-					'callback'            => function ( $request ) use ( $formatted_callback ) {
-						return $this->try(  $formatted_callback, $request );
-					},
-					'permission_callback' => $formatted_permission_callback,
-					'schema'              => $schema,
-				]
+			$this->namespace,
+			$endpoint,
+			[
+				'methods'             => $method,
+				'callback'            => function ( $request ) use ( $formatted_callback ) {
+					return $this->try(  $formatted_callback, $request );
+				},
+				'permission_callback' => $formatted_permission_callback,
+				'schema'              => $schema,
+			]
 			);
 		}
 	}
@@ -138,24 +138,24 @@ abstract class ApiBase {
 			// 如果開啟 DEBUG 模式就印出 log
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				WC::logger(
-					"API 錯誤: {$e->getMessage()}",
-					'critical',
-					[
-						'request_endpoint' => $request->get_route(),
-						'request_method'   => $method,
-						'request_params'   => $data,
-					],
+				"API 錯誤: {$e->getMessage()}",
+				'critical',
+				[
+					'request_endpoint' => $request->get_route(),
+					'request_method'   => $method,
+					'request_params'   => $data,
+				],
 					);
 			}
 
 			return new WP_REST_Response(
-					[
-						'code'    => $e->getCode(),
-						'message' => $e->getMessage(),
-						'data'    => $data,
-					],
-					500
-				);
+				[
+					'code'    => $e->getCode(),
+					'message' => $e->getMessage(),
+					'data'    => $data,
+				],
+				500
+			);
 		}
 	}
 }

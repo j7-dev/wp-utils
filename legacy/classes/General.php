@@ -251,13 +251,13 @@ abstract class General {
 
 		if ( $print_log ) {
 			\J7\WpUtils\Classes\ErrorLog::info(
-				sprintf(
-					'
+			sprintf(
+				'
 		執行: %1$s
 		花費時間: %2$s 秒',
-					$function_name,
-					$execution_time
-				)
+				$function_name,
+				$execution_time
+			)
 			);
 		}
 

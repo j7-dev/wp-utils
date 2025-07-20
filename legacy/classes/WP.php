@@ -153,12 +153,12 @@ abstract class WP {
 				};
 			} catch (\Throwable $e) {
 				\J7\WpUtils\Classes\WC::logger(
-					$e->getMessage(),
-					'error',
-					[
-						'arr' => $arr,
-					]
-					);
+				$e->getMessage(),
+				'error',
+				[
+					'arr' => $arr,
+				]
+				);
 				$value_stringify = json_encode($value) ?: '';
 			}
 
@@ -610,8 +610,8 @@ abstract class WP {
 		} else {
 			// 將檔案上傳到媒體庫
 			$attachment_id = \media_handle_upload(
-				file_id: 'file',
-				post_id: 0
+			file_id: 'file',
+			post_id: 0
 			);
 
 			if ( \is_wp_error( $attachment_id ) ) {
@@ -701,12 +701,14 @@ abstract class WP {
 	/**
 	 * 判斷內容是否包含短碼
 	 *
+	 * @deprecated 使用 \J7\WpUtils\Shortcode::has_shortcode 替代
+	 *
 	 * @param string $content 內容
 	 *
 	 * @return bool
 	 */
 	public static function has_shortcode( string $content ): bool {
-		return ( \str_contains( $content, '[' ) && \str_contains( $content, ']' ) );
+		return \J7\WpUtils\Shortcode::has_shortcode( $content );
 	}
 
 
@@ -760,37 +762,26 @@ abstract class WP {
 	/**
 	 * 將 local 時間字串轉換成 timestamp
 	 *
+	 * @deprecated 使用 \J7\WpUtils\Time::wp_strtotime 替代
+	 *
 	 * @param string $date_string 時間字串
 	 * @return int|null
 	 */
 	public static function wp_strtotime( string $date_string ): int|null {
-		$date_time = date_create($date_string, \wp_timezone());
-		if (!$date_time) {
-			return null;
-		}
-		return $date_time->getTimestamp();
+		return \J7\WpUtils\Time::wp_strtotime( $date_string );
 	}
 
 
 	/**
 	 * 判斷資料庫 table 是否存在
 	 *
+	 * @deprecated 使用 \J7\WpHelpers\Table 替代
+	 *
 	 * @param string $table_name 表格名稱 (含 wp_ 前綴)
 	 * @return bool
 	 */
 	public static function is_table_exists( string $table_name ): bool {
-		global $wpdb;
-		$exists = $wpdb->get_var(
-		$wpdb->prepare(
-		'SELECT EXISTS (
-            SELECT 1 FROM information_schema.tables
-            WHERE table_schema = %s
-            AND table_name = %s
-        )',
-		DB_NAME,
-		$table_name
-		)
-		);
-		return (bool) $exists;
+		$table = new \J7\WpHelpers\Table( $table_name );
+		return $table->is_exists();
 	}
 }

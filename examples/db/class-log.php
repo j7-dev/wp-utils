@@ -144,17 +144,17 @@ abstract class Log {
 		try {
 			$new_balance = (float) ( $args['new_balance'] ?? \get_user_meta( $user_id, $points_slug, true ) );
 			$result      = $wpdb->insert(
-				$table_name,
-				[
-					'title'         => \sanitize_text_field( $args['title'] ?? 'No Title' ),
-					'type'          => \sanitize_text_field( $args['type'] ?? '' ),
-					'user_id'       => $user_id,
-					'modified_by'   => $args['modified_by'] ?? '',
-					'point_slug'    => empty( $points_slug ) ? Point::POINT_SLUG : $points_slug,
-					'point_changed' => number_format( $args['point_changed'] ?? '', 2 ),
-					'new_balance'   => number_format( $new_balance, 2 ),
-					'date'          => \current_time( 'mysql' ),
-				]
+			$table_name,
+			[
+				'title'         => \sanitize_text_field( $args['title'] ?? 'No Title' ),
+				'type'          => \sanitize_text_field( $args['type'] ?? '' ),
+				'user_id'       => $user_id,
+				'modified_by'   => $args['modified_by'] ?? '',
+				'point_slug'    => empty( $points_slug ) ? Point::POINT_SLUG : $points_slug,
+				'point_changed' => number_format( $args['point_changed'] ?? '', 2 ),
+				'new_balance'   => number_format( $new_balance, 2 ),
+				'date'          => \current_time( 'mysql' ),
+			]
 			);
 
 			if ( ! $result ) {

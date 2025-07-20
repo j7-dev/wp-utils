@@ -21,18 +21,18 @@ if ( trait_exists( 'ApiRegisterTrait' ) ) {
 trait ApiRegisterTrait {
 
 	/**
-	 * Register APIs
-	 * 預設的 permission_callback 是 '__return_true'，即不做任何權限檢查
-	 *
-	 * @param array     $apis api has following keys:
-	 * - endpoint: string
-	 * - method: 'get' | 'post' | 'patch' | 'delete'
-	 * - permission_callback : callable
-	 *
-	 * @param ?string   $namespace Namespace.
-	 * @param ?callable $default_permission_callback Default permission callback.
-	 * @return void
-	 */
+														* Register APIs
+														* 預設的 permission_callback 是 '__return_true'，即不做任何權限檢查
+														*
+														* @param array     $apis api has following keys:
+														* - endpoint: string
+														* - method: 'get' | 'post' | 'patch' | 'delete'
+														* - permission_callback : callable
+														*
+														* @param ?string   $namespace Namespace.
+														* @param ?callable $default_permission_callback Default permission callback.
+														* @return void
+														*/
 	final protected function register_apis( array $apis, ?string $namespace = 'wp-utils/v1', ?callable $default_permission_callback = null ): void {
 
 		foreach ( $apis as $api ) {
@@ -51,13 +51,13 @@ trait ApiRegisterTrait {
 			}
 
 			\register_rest_route(
-				$namespace,
-				$api['endpoint'],
-				[
-					'methods'             => $api['method'],
-					'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
-					'permission_callback' => $permission_callback,
-				]
+			$namespace,
+			$api['endpoint'],
+			[
+				'methods'             => $api['method'],
+				'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
+				'permission_callback' => $permission_callback,
+			]
 			);
 		}
 	}

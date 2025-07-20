@@ -36,21 +36,21 @@ final class Product {
 				'endpoint'            => 'products',
 				'method'              => 'get',
 				'permission_callback' => function () {
-					return \current_user_can( 'manage_options' );
+						return \current_user_can( 'manage_options' );
 				},
 			],
 			[
 				'endpoint'            => 'terms',
 				'method'              => 'get',
 				'permission_callback' => function () {
-					return \current_user_can( 'manage_options' );
+						return \current_user_can( 'manage_options' );
 				},
 			],
 			[
 				'endpoint'            => 'options',
 				'method'              => 'get',
 				'permission_callback' => function () {
-					return \current_user_can( 'manage_options' );
+						return \current_user_can( 'manage_options' );
 				},
 			],
 		];
@@ -60,13 +60,13 @@ final class Product {
 			$endpoint_fn = str_replace( '(?P<id>\d+)', 'with_id', $api['endpoint'] );
 			$endpoint_fn = preg_replace( '/[-\/]/', '_', $endpoint_fn );
 			\register_rest_route(
-				'wp-utils/v1',
-				$api['endpoint'],
-				[
-					'methods'             => $api['method'],
-					'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
-					'permission_callback' => $api['permission_callback'],
-				]
+			'wp-utils/v1',
+			$api['endpoint'],
+			[
+				'methods'             => $api['method'],
+				'callback'            => [ $this, $api['method'] . '_' . $endpoint_fn . '_callback' ],
+				'permission_callback' => $api['permission_callback'],
+			]
 			);
 		}
 	}
@@ -94,8 +94,8 @@ final class Product {
 		];
 
 		$args = \wp_parse_args(
-			$params,
-			$default_args,
+		$params,
+		$default_args,
 		);
 
 		$results     = \wc_get_products( $args );
@@ -203,7 +203,7 @@ final class Product {
 			'default_attributes' => $product->get_default_attributes(), // TODO
 			'attribute'          => $product->get_attribute( 'attributeid' ), // TODO get specific attribute value
 
-			// Get Product Taxonomies
+		// Get Product Taxonomies
 			'category_ids'       => array_map( 'strval', $product->get_category_ids() ),
 			'tag_ids'            => array_map( 'strval', $product->get_tag_ids() ),
 
@@ -211,13 +211,13 @@ final class Product {
 			'image_url'          => $image_url,
 			'gallery_image_urls' => $gallery_image_urls,
 
-			// variations
-			// 'children'           => $children,
+		// variations
+		// 'children'           => $children,
 		] + $children;
 
 		return array_merge(
-			$description_array,
-			$base_array
+		$description_array,
+		$base_array
 		);
 	}
 
@@ -245,8 +245,8 @@ final class Product {
 		];
 
 		$args = \wp_parse_args(
-			$params,
-			$default_args,
+		$params,
+		$default_args,
 		);
 
 		$terms = \get_terms( $args );

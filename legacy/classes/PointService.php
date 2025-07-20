@@ -265,11 +265,11 @@ final class PointService {
 		} else {
 			// create default member_lv
 			$post_id             = \wp_insert_post(
-				[
-					'post_title'  => '購物金',
-					'post_type'   => $post_type,
-					'post_status' => 'publish',
-				]
+			[
+				'post_title'  => '購物金',
+				'post_type'   => $post_type,
+				'post_status' => 'publish',
+			]
 			);
 			$post                = get_post($post_id);
 			$this->default_point = $post;
