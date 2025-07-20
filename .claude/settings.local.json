@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require:*)",
+      "Bash(composer config:*)",
+      "Bash(composer install:*)",
+      "Bash(./vendor/bin/pest:*)",
+      "Bash(ls:*)",
+      "Bash(composer test)"
+    ],
+    "deny": []
+  }
+}

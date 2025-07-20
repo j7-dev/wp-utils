@@ -33,7 +33,8 @@
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"phpstan/extension-installer": false
+			"phpstan/extension-installer": false,
+			"pestphp/pest-plugin": true
 		}
 	},
 	"require": {
@@ -49,10 +50,13 @@
 		"phpstan/phpstan": "^1.11",
 		"php-stubs/woocommerce-stubs": "^9.0",
 		"php-stubs/wordpress-stubs": "^6.5",
-		"phpstan/extension-installer": "^1.4"
+		"phpstan/extension-installer": "^1.4",
+		"pestphp/pest": "*"
 	},
 	"scripts": {
 		"lint": "phpcbf && phpcs src --report=full -v",
-		"phpstan": "phpstan analyse src"
+		"phpstan": "phpstan analyse src",
+		"test": "pest --no-coverage",
+		"test:coverage": "pest"
 	}
 }
