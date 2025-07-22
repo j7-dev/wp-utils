@@ -15,7 +15,7 @@ abstract class DTO {
 	/** @var \WP_Error Error */
 	protected \WP_Error $dto_error;
 
-	/** @var static|null DTO instance 可以做單例或工廠，預設為 null，單例需要自己實現 instance() 方法 */
+	/** @var static|null @deprecated 單例模式已經棄用 */
 	protected static $dto_instance;
 
 	/** @var array<string> 必須的屬性，如果沒有設定則會拋出錯誤 */
@@ -137,11 +137,6 @@ abstract class DTO {
 	 * @throws \Error SimpleDTOs are immutable
 	 */
 	public function __set( string $property, $value ): void {
-		// dto_instance 是可以被賦值得，例如單例模式如果要 invalidate 可以將 dto_instance 設為 null
-		if ('dto_instance' === $property) {
-			static::$dto_instance = $value; // @phpstan-ignore-line
-			return;
-		}
 		$this->dto_error->add( 'immutable', 'DTOs are immutable. Create a new DTO to set a new value.' );
 	}
 

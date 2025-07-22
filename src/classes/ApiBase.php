@@ -130,22 +130,18 @@ abstract class ApiBase {
 			return call_user_func( $callback, $request );
 		} catch (\Exception $e) {
 			$method = $request->get_method();
-			$data   = match ( $method ) {
-				'GET' => $request->get_query_params(),
-				default => $request->get_json_params() ?: $request->get_body_params(),
-			};
+			$data   = $request->get_params();
 
 			// 如果開啟 DEBUG 模式就印出 log
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				WC::logger(
-					"API 錯誤: {$e->getMessage()}",
+					"[{$method}] {$request->get_route()} API 錯誤: {$e->getMessage()}",
 					'critical',
 					[
-						'request_endpoint' => $request->get_route(),
-						'request_method'   => $method,
-						'request_params'   => $data,
+						'error_message'  => $e->getMessage(),
+						'request_params' => $data,
 					],
-					);
+				);
 			}
 
 			return new WP_REST_Response(
