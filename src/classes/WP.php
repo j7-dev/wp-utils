@@ -127,7 +127,14 @@ abstract class WP {
 	 * @return string
 	 */
 	public static function array_to_html( array $arr, array $options = [] ): string {
-		@[ // @phpstan-ignore-line
+
+		$default_options = [
+			'title' => '',
+			'br'    => false,
+		];
+		$options         = \wp_parse_args( $options, $default_options );
+
+		[
 		'title' => $title,
 		'br' => $br, // 是否使用 <br> 不使用 table
 		] = $options;
@@ -145,8 +152,13 @@ abstract class WP {
 		foreach ( $arr as $key => $value ) {
 			try {
 				$value_stringify = match (gettype($value)) {
-					'array' => '<pre style="font-size: 10px;">' . \print_r($value, true) . '</pre>',
-					'object' => $value instanceof \stdClass ? ( '<pre style="font-size: 10px;">' . \print_r($value, true) . '</pre>' ) : $value::class,
+					'array' => self::array_depth($value) > 1 ? 'Array' : self::array_to_html(
+						$value,
+						[
+							'br' => true,
+						]
+						),
+					'object' => $value::class,
 					'boolean' => $value ? 'true' : 'false',
 					'NULL' => 'null',
 					default => (string) $value,
@@ -175,6 +187,29 @@ abstract class WP {
 		$html .= $br ? '' : '</table>';
 
 		return $html;
+	}
+
+
+	/**
+	 * 取得陣列的深度
+	 *
+	 * @param array<mixed> $array - 要取得深度的陣列
+	 * @return int
+	 */
+	public static function array_depth( array $array ) {
+		$max_depth = 1;
+
+		foreach ($array as $value) {
+			if (is_array($value)) {
+				$depth = self::array_depth($value) + 1;
+
+				if ($depth > $max_depth) {
+					$max_depth = $depth;
+				}
+			}
+		}
+
+		return $max_depth;
 	}
 
 
