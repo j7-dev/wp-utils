@@ -136,7 +136,7 @@ abstract class WP {
 
 		[
 		'title' => $title,
-		'br' => $br, // 是否使用 <br> 不使用 table
+		'br' => $br, // 是否使用 <br> 不使用 grid
 		] = $options;
 
 		$html = '';
@@ -148,7 +148,7 @@ abstract class WP {
 			return $html;
 		}
 
-		$html .= $br ? '' : '<table style="width: 100%;font-size: 12px;border-collapse: collapse;">';
+		$html .= $br ? '' : '<div style="display: grid;grid-template-columns: 72px 1fr;gap: 0px;width: 100%;align-items: start;font-size: 12px;justify-content: start;">';
 		foreach ( $arr as $key => $value ) {
 			try {
 				$value_stringify = match (gettype($value)) {
@@ -178,13 +178,12 @@ abstract class WP {
 				$html .= "{$key}: {$value_stringify}<br>";
 				continue;
 			}
-			$html .= '<tr style="border-bottom: 1px solid #777;">';
-			$html .= "<th style='vertical-align: top;padding-right: 4px;'>{$key}</th>";
-			$html .= "<td style='word-break: break-all;vertical-align: top;white-space: normal;'>{$value_stringify}</td>";
-			$html .= '</tr>';
+
+			$html .= "<div style='padding-right: 4px;font-weight: bold;border-bottom: 1px solid #aaa;'>{$key}</div>";
+			$html .= "<div style='word-break: break-all;white-space: normal;border-bottom: 1px solid #aaa;'>{$value_stringify}</div>";
 		}
 
-		$html .= $br ? '' : '</table>';
+		$html .= $br ? '' : '</div>';
 
 		return $html;
 	}
