@@ -109,6 +109,8 @@ abstract class WP {
 	/**
 	 * 將關聯陣列顯示為 HTML
 	 *
+	 * @deprecated 使用 array_to_html 代替
+	 *
 	 * @param array<mixed> $arr - array
 	 * @return string
 	 */
