@@ -39,11 +39,9 @@ abstract class DTO {
 			$this->dto_data = $input;
 			$this->before_init();
 			foreach ( $input as $key => $value ) {
-				if (!property_exists($this, $key)) {
-					$class_name = static::class;
-					$this->dto_error->add( 'invalid_property', "Try to set undefined property: {$class_name}::\${$key}." );
+				if (property_exists($this, $key)) {
+					$this->$key = $value;
 				}
-				$this->$key = $value;
 			}
 			$this->validate();
 			$this->after_init();
