@@ -33,7 +33,7 @@ abstract class DTO {
 		$this->dto_error = new \WP_Error();
 		$strict          = false;
 		if (function_exists('wp_get_environment_type')) {
-			$strict =( 'local' !== \wp_get_environment_type() );
+			$strict =( 'local' === \wp_get_environment_type() );
 		}
 		try {
 			$this->dto_data = $input;
