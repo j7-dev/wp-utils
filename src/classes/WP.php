@@ -150,7 +150,7 @@ abstract class WP {
 			return $html;
 		}
 
-		$html .= $br ? '' : '<div style="display: grid;grid-template-columns: 72px 1fr;gap: 0px;width: 100%;align-items: start;font-size: 12px;justify-content: start;word-break: break-all;white-space: normal;">';
+		$html .= $br ? '' : '<div style="display: grid;grid-template-columns: 72px 1fr;gap: 0;width: 100%;align-items: start;font-size: 12px;justify-content: start;word-break: break-all;white-space: normal;">';
 		foreach ( $arr as $key => $value ) {
 			try {
 				$value_stringify = match (gettype($value)) {
@@ -173,7 +173,7 @@ abstract class WP {
 						'arr' => $arr,
 					]
 					);
-				$value_stringify = json_encode($value) ?: '';
+				$value_stringify = \wp_json_encode($value) ?: '';
 			}
 
 			if ( $br ) {
@@ -182,7 +182,7 @@ abstract class WP {
 			}
 
 			$html .= "<div style='padding-right: 4px;font-weight: bold;border-bottom: 1px solid #aaa;height:100%;'>{$key}</div>";
-			$html .= "<div style='border-bottom: 1px solid #aaa;height:100%;'>{$value_stringify}</div>";
+			$html .= "<div style='border-bottom: 1px solid #aaa;height:100%;overflow-wrap: anywhere;'>{$value_stringify}</div>";
 		}
 
 		$html .= $br ? '' : '</div>';
