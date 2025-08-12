@@ -58,33 +58,14 @@ abstract class General {
 
 	/**
 	 * Array to html grid
-	 * TODO
 	 *
-	 * @param array $arr - array
+	 * @deprecated 改用 WP::array_to_html
+	 *
+	 * @param array<string, mixed> $arr - array
 	 * @return string
 	 */
 	public static function array_to_grid( array $arr ): string {
-
-		$style = '
-		display: grid;
-		gap: 1rem;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		';
-
-		$html = '<div style="' . $style . '">';
-		foreach ( $arr as $key => $value ) {
-			if ( is_scalar( $value ) ) {
-				if ( is_bool( $value ) ) {
-					$value = $value ? 'true' : 'false';
-				}
-				$html .= "<div>{$key}:</div><div>{$value}</div>";
-			} else {
-				$html .= "<div>{$key}:</div><div>" . \wp_json_encode( $value ) . '</div>';
-			}
-		}
-		$html .= '</div>';
-
-		return $html;
+		return WP::array_to_html( $arr );
 	}
 
 	/**
