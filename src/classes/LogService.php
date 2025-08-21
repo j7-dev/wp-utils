@@ -186,7 +186,7 @@ final class LogService {
 
 		$expire_date = \sanitize_text_field($args['expire_date'] ?? '');
 
-		$expire_date = !!$expire_date ? \gmdate('Y-m-d H:i:s', strtotime($args['expire_date'])) : null;
+		$expire_date = (bool) $expire_date ? \gmdate('Y-m-d H:i:s', strtotime($args['expire_date'])) : null;
 
 		try {
 			$new_balance = (float) ( $args['new_balance'] ?? \get_user_meta($user_id, $points_slug, true) );

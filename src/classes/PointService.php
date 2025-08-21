@@ -258,7 +258,7 @@ final class PointService {
 			]
 		);
 
-		if (!!$posts && is_array($posts)) {
+		if ( (bool) $posts && is_array($posts)) {
 			$post                = $posts[0];
 			$point               = new Point($post);
 			$this->default_point = $point;
