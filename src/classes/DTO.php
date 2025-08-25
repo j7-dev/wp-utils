@@ -9,9 +9,6 @@ if( class_exists( 'DTO' ) ) {
 /** Class DTO 可能單例也可能多例，需要自行額外實現 instance() 方法 */
 abstract class DTO {
     
-    /** @var array<string,mixed> Raw data */
-    protected array $dto_data = [];
-    
     /** @var \WP_Error Error */
     protected \WP_Error $dto_error;
     
@@ -25,21 +22,20 @@ abstract class DTO {
     protected static array $reflection_cache = [];
     
     /**
-     * @param array<string,mixed> $input The data to set.
+     * @param array<string,mixed> $dto_data The data to set.
      *
      * @return void
      * @throws \Exception If the property is not defined.
      */
-    public function __construct( array $input = [] ) {
+    public function __construct( protected array $dto_data = [] ) {
         $this->dto_error = new \WP_Error();
         $strict = false;
         if( function_exists( 'wp_get_environment_type' ) ) {
             $strict = ( 'local' === \wp_get_environment_type() );
         }
         try {
-            $this->dto_data = $input;
             $this->before_init();
-            foreach ( $input as $key => $value ) {
+            foreach ( $this->dto_data as $key => $value ) {
                 if( property_exists( $this, $key ) ) {
                     $this->$key = $value;
                 }
