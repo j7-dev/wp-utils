@@ -194,7 +194,7 @@ abstract class DTO {
         return $arr;
     }
     
-    /** @return void 初始化前的處理 */
+    /** @return void 初始化前的處理。例如：初始化前 Merge 參數，提供預設參數 */
     protected function before_init(): void {}
     
     /** @return void 初始化後的處理 */
@@ -221,5 +221,21 @@ abstract class DTO {
                 throw new \Exception( "Property {$property} is required." );
             }
         }
+    }
+    
+    /**
+     * 生成唯一的 key
+     * @param bool $md5
+     *
+     * @return string
+     */
+    public function to_unique_key( bool $md5 = true ):string {
+        $array = $this->to_array();
+        ksort( $array );
+        $json_string = \wp_json_encode( $array ) ?: '';
+        if($md5){
+            return md5(  $json_string );
+        }
+        return  $json_string;
     }
 }
