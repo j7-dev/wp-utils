@@ -93,12 +93,16 @@ abstract class DTO {
     /**
      * 轉換為另一個 DTO
      * @param string $dto_class
+     * @param callable|null $data_filter 在轉換前過濾資料的 callback function
      *
      * @return $this|self
      */
-    public function to_dto( string $dto_class  ): self {
+    public function to_dto( string $dto_class, callable $data_filter = null  ): self {
         try {
             $data = $this->to_array();
+            if($data_filter){
+                $data = $data_filter( $data );
+            }
             return call_user_func( [ $dto_class, 'parse' ], $data ); // @phpstan-ignore-line
         }catch ( \Throwable $th ) {
             // 如果有錯誤，則記錄錯誤
