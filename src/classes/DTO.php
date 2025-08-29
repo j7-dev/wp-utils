@@ -21,8 +21,8 @@ abstract class DTO {
     /** @var array<string, \ReflectionProperty[]> 靜態緩存各類別的屬性 */
     protected static array $reflection_cache = [];
     
-    /** @var ?string 唯一 key，通常是 to_unique_key() 的結果，可以用來快取 */
-    protected  ?string $unique_key = null;
+    /** @var string 唯一 key，通常是 to_unique_key() 的結果，可以用來快取 */
+    protected string $unique_key = '';
     
     /**
      * @param array<string,mixed> $dto_data The data to set.
@@ -233,7 +233,7 @@ abstract class DTO {
      * @return string
      */
     public function to_unique_key( bool $md5 = true ):string {
-        if(null !== $this->unique_key) {
+        if('' !== $this->unique_key) {
             return $this->unique_key;
         }
         $array = $this->to_array();
