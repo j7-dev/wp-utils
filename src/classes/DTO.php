@@ -228,17 +228,19 @@ abstract class DTO {
     
     /**
      * 生成唯一的 key
+     * 通常用於快取
+     * @param string $identifier 例如 __METHOD__ 之類的識別字串
      * @param bool $md5
      *
      * @return string
      */
-    public function to_unique_key( bool $md5 = true ):string {
+    public function to_unique_key( string $identifier = '', bool $md5 = true ):string {
         if('' !== $this->unique_key) {
             return $this->unique_key;
         }
         $array = $this->to_array();
         ksort( $array );
-        $json_string = \wp_json_encode( $array ) ?: '';
+        $json_string = $identifier .  \wp_json_encode( $array );
         if($md5){
             $json_string = md5(  $json_string );
         }
