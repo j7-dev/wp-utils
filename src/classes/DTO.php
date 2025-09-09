@@ -15,8 +15,8 @@ abstract class DTO {
     /** @var static|null @deprecated 單例模式已經棄用 */
     protected static $dto_instance;
     
-    /** @var array<string>|'ALL' 必須的屬性，如果沒有設定則會拋出錯誤, 如果是 ALL 代表所有屬性都必要 */
-    protected $require_properties = [];
+    /** @var array<string> 必須的屬性，如果沒有設定則會拋出錯誤, 如果是 ['ALL'] 代表所有屬性都必要 */
+    protected array $require_properties = [];
     
     /** @var array<string, \ReflectionProperty[]> 靜態緩存各類別的屬性 */
     protected static array $reflection_cache = [];
@@ -208,22 +208,23 @@ abstract class DTO {
      * @throws \Exception 如果驗證失敗則拋出錯誤
      * */
     protected function validate(): void {
-        
-        if( is_array( $this->require_properties ) ) {
             foreach ( $this->require_properties as $property ) {
+                if("ALL" === $property){
+                    $all_props = \get_object_vars( $this );
+                    
+                    foreach ( $all_props as $prop => $value ) {
+                        if( !isset( $this->$prop ) ) {
+                            throw new \Exception( "Property {$prop} is required." );
+                        }
+                    }
+                    break;
+                }
+                
+                
                 if( !isset( $this->$property ) ) {
                     throw new \Exception( "Property {$property} is required." );
                 }
             }
-            return;
-        }
-        
-        $all_properties = get_object_vars( $this );
-        foreach ( $all_properties as $property => $value ) {
-            if( !isset( $this->$property ) ) {
-                throw new \Exception( "Property {$property} is required." );
-            }
-        }
     }
     
     /**
