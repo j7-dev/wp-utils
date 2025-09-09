@@ -16,7 +16,7 @@ abstract class DTO {
     protected static $dto_instance;
     
     /** @var array<string>|'ALL' 必須的屬性，如果沒有設定則會拋出錯誤, 如果是 ALL 代表所有屬性都必要 */
-    protected array|string $require_properties = [];
+    protected $require_properties = [];
     
     /** @var array<string, \ReflectionProperty[]> 靜態緩存各類別的屬性 */
     protected static array $reflection_cache = [];
