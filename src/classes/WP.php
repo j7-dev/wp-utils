@@ -150,7 +150,7 @@ abstract class WP {
 			return $html;
 		}
 
-		$html .= $br ? '' : '<div style="display: grid;grid-template-columns: 72px 1fr;gap: 0;width: 100%;align-items: start;font-size: 12px;justify-content: start;word-break: break-all;white-space: normal;">';
+		$html .= $br ? '' : '<div class="array_to_html" style="display: grid;grid-template-columns: 72px 1fr;gap: 0;width: 100%;align-items: start;font-size: 12px;justify-content: start;word-break: break-all;white-space: normal;">';
 		foreach ( $arr as $key => $value ) {
 			try {
 				$value_stringify = match (gettype($value)) {
