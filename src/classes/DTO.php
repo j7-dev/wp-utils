@@ -25,12 +25,13 @@ abstract class DTO {
     protected string $unique_key = '';
     
     /**
-     * @param array<string,mixed> $dto_data The data to set.
+     * @param array<string,mixed>|null $dto_data The data to set.
      *
      * @return void
      * @throws \Exception If the property is not defined.
      */
-    public function __construct( protected array $dto_data = [] ) {
+    public function __construct( protected array|null $dto_data = [] ) {
+        $this->dto_data = \is_array( $dto_data ) ? $dto_data : [];
         $this->dto_error = new \WP_Error();
         $strict = false;
         if( function_exists( 'wp_get_environment_type' ) ) {
@@ -38,7 +39,7 @@ abstract class DTO {
         }
         try {
             $this->before_init();
-            foreach ( $this->dto_data as $key => $value ) {
+            foreach ( $this->dto_data as $key => $value ) { // @phpstan-ignore-line
                 if( property_exists( $this, $key ) ) {
                     $this->$key = $value;
                 }
