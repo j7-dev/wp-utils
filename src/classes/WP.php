@@ -126,10 +126,10 @@ abstract class WP {
 	 *  title?: string,
 	 *  br?: bool,
 	 * } $options 選項
+     * @parma array<string, string> $string_mapper 轉換後的字串對應表
 	 * @return string
 	 */
-	public static function array_to_html( array $arr, array $options = [] ): string {
-
+	public static function array_to_html( array $arr, array $options = [], array $string_mapper = [] ): string {
 		$default_options = [
 			'title' => '',
 			'br'    => false,
@@ -175,13 +175,15 @@ abstract class WP {
 					);
 				$value_stringify = \wp_json_encode($value) ?: '';
 			}
+            
+            $key_label = $string_mapper[$key] ?? $key;
 
 			if ( $br ) {
-				$html .= "{$key}: {$value_stringify}<br>";
+				$html .= "{$key_label}: {$value_stringify}<br>";
 				continue;
 			}
 
-			$html .= "<div style='padding-right: 4px;font-weight: bold;border-bottom: 1px solid #aaa;height:100%;'>{$key}</div>";
+			$html .= "<div style='padding-right: 4px;font-weight: bold;border-bottom: 1px solid #aaa;height:100%;'>{$key_label}</div>";
 			$html .= "<div style='border-bottom: 1px solid #aaa;height:100%;overflow-wrap: anywhere;'>{$value_stringify}</div>";
 		}
 
