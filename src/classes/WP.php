@@ -126,7 +126,7 @@ abstract class WP {
 	 *  title?: string,
 	 *  br?: bool,
 	 * } $options 選項
-     * @parma array<string, string> $string_mapper 轉換後的字串對應表
+	 * @parma array<string, string> $string_mapper 轉換後的字串對應表
 	 * @return string
 	 */
 	public static function array_to_html( array $arr, array $options = [], array $string_mapper = [] ): string {
@@ -150,15 +150,48 @@ abstract class WP {
 			return $html;
 		}
 
-		$html .= $br ? '' : '<div class="array_to_html" style="display: grid;grid-template-columns: 72px 1fr;gap: 0;width: 100%;align-items: start;font-size: 12px;justify-content: start;word-break: break-all;white-space: normal;">';
+		?>
+		
+		<style>
+            .order_notes{
+                .array_to_html{
+                    grid-template-columns: 72px 1fr;
+                }
+            }
+			.array_to_html{
+				display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 0;width: 100%;
+                align-items: start;
+                font-size: 12px;
+                justify-content: start;
+                word-break: break-all;
+                white-space: normal;
+
+                & > div:nth-child(odd) {
+                    padding-right: 4px;
+                    font-weight: bold;
+                    border-bottom: 1px solid #aaa;
+                    height:100%;
+                }
+                
+                & > div:nth-child(even) {
+                    border-bottom: 1px solid #aaa;
+                    height:100%;
+                    overflow-wrap: anywhere;
+                }
+			}
+		</style>
+		<?php
+
+		$html .= $br ? '' : '<div class="array_to_html">';
 		foreach ( $arr as $key => $value ) {
 			try {
 				$value_stringify = match (gettype($value)) {
 					'array' => self::array_depth($value) > 1 ? 'Array' : self::array_to_html(
 						$value,
-						[
-							'br' => true,
-						]
+						[ 'br' => true ],
+						$string_mapper
 						),
 					'object' => $value::class,
 					'boolean' => $value ? 'true' : 'false',
@@ -175,16 +208,17 @@ abstract class WP {
 					);
 				$value_stringify = \wp_json_encode($value) ?: '';
 			}
-            
-            $key_label = $string_mapper[$key] ?? $key;
+
+			$mapped_key   = $string_mapper[ $key ] ?? $key;
+			$mapped_value = $string_mapper[ $value_stringify ] ?? $value_stringify;
 
 			if ( $br ) {
-				$html .= "{$key_label}: {$value_stringify}<br>";
+				$html .= "{$mapped_key}: {$mapped_value}<br>";
 				continue;
 			}
 
-			$html .= "<div style='padding-right: 4px;font-weight: bold;border-bottom: 1px solid #aaa;height:100%;'>{$key_label}</div>";
-			$html .= "<div style='border-bottom: 1px solid #aaa;height:100%;overflow-wrap: anywhere;'>{$value_stringify}</div>";
+			$html .= "<div>{$mapped_key}</div>";
+			$html .= "<div>{$mapped_value}</div>";
 		}
 
 		$html .= $br ? '' : '</div>';
