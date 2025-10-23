@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eacbfc490c897670bed47df64a91ed59",
+    "content-hash": "95b83fd27cd62e7345a35ba9e288354f",
     "packages": [
         {
             "name": "j7-dev/tgm-plugin-activation-forked",
@@ -58,16 +58,16 @@
         },
         {
             "name": "j7-dev/wp-plugin-trait",
-            "version": "0.2.13",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/j7-dev/wp-plugin-trait.git",
-                "reference": "b328bd3f738f3374496597b4ede452ef0213d6f4"
+                "reference": "ef366a305898c7f7224c192d140e4ed15f863ee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/b328bd3f738f3374496597b4ede452ef0213d6f4",
-                "reference": "b328bd3f738f3374496597b4ede452ef0213d6f4",
+                "url": "https://api.github.com/repos/j7-dev/wp-plugin-trait/zipball/ef366a305898c7f7224c192d140e4ed15f863ee5",
+                "reference": "ef366a305898c7f7224c192d140e4ed15f863ee5",
                 "shasum": ""
             },
             "require": {
@@ -84,10 +84,10 @@
                 "squizlabs/php_codesniffer": "@stable",
                 "wp-coding-standards/wpcs": "@stable"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "J7\\TGM\\": "src/tgm/",
                     "J7\\WpUtils\\Traits\\": "src/traits/"
                 }
             },
@@ -112,9 +112,9 @@
             ],
             "support": {
                 "issues": "https://github.com/j7-dev/wp-plugin-trait/issues",
-                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/0.2.13"
+                "source": "https://github.com/j7-dev/wp-plugin-trait/tree/master"
             },
-            "time": "2025-10-17T11:00:49+00:00"
+            "time": "2025-10-23T10:28:34+00:00"
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
@@ -266,16 +266,16 @@
         },
         {
             "name": "php-stubs/woocommerce-stubs",
-            "version": "v10.2.0",
+            "version": "v10.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/woocommerce-stubs.git",
-                "reference": "113bf98892b5fc2b709a36970ce618fd375edb9a"
+                "reference": "8d037215365f64df63ca90e5cdf026b982558405"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/113bf98892b5fc2b709a36970ce618fd375edb9a",
-                "reference": "113bf98892b5fc2b709a36970ce618fd375edb9a",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/8d037215365f64df63ca90e5cdf026b982558405",
+                "reference": "8d037215365f64df63ca90e5cdf026b982558405",
                 "shasum": ""
             },
             "require": {
@@ -304,9 +304,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/woocommerce-stubs/issues",
-                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v10.2.0"
+                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v10.3.0"
             },
-            "time": "2025-09-17T14:44:22+00:00"
+            "time": "2025-10-22T17:11:01+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",
@@ -854,6 +854,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "dealerdirect/phpcodesniffer-composer-installer": 0,
+        "j7-dev/wp-plugin-trait": 20,
         "php-stubs/woocommerce-stubs": 0,
         "php-stubs/wordpress-stubs": 0,
         "phpcompatibility/php-compatibility": 0,
