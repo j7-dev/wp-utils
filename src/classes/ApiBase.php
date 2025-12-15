@@ -74,13 +74,11 @@ abstract class ApiBase {
 		}
 
 		foreach ( $this->apis as $api ) {
-			@[ // phpcs:ignore
-				'endpoint'            => $endpoint,
-				'method'              => $method,
-				'permission_callback' => $permission_callback,
-				'callback'            => $callback,
-				'schema'              => $schema,
-			] = $api;
+			$endpoint            = $api['endpoint'] ?? '';
+			$method              = $api['method'] ?? 'GET';
+			$permission_callback = $api['permission_callback'] ?? null;
+			$callback            = $api['callback'] ?? null;
+			$schema              = $api['schema'] ?? null;
 
 			// 用正則表達式替換 -, / 替換為 _
 			$formatted_fn_name = str_replace( '(?P<id>\d+)', 'with_id', $endpoint );
